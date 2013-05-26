@@ -1,4 +1,4 @@
-target: hello4
+target: hello5
 
 ncurses-lib-built: ncurses.rs
 	rustc --lib $<

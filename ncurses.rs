@@ -35,8 +35,8 @@ pub extern {
     unsafe fn addch (_:chtype) -> c_int;
     unsafe fn addchnstr (_:*chtype, _:c_int) -> c_int;
     unsafe fn addchstr (_:*chtype) -> c_int;
-    unsafe fn addnstr (_:*char, _:c_int) -> c_int;
-    unsafe fn addstr (_:*char) -> c_int;
+    unsafe fn addnstr (_:*c_char, _:c_int) -> c_int;
+    unsafe fn addstr (_:*c_char) -> c_int;
     unsafe fn attroff (_:NCURSES_ATTR_T) -> c_int;
     unsafe fn attron (_:NCURSES_ATTR_T) -> c_int;
     unsafe fn attrset (_:NCURSES_ATTR_T) -> c_int;
@@ -408,12 +408,12 @@ pub fn A_VERTICAL() -> c_int	{ NCURSES_BITS(1u,22)  as c_int }
  * These pseudo functions are always implemented as macros:
  */
 
-unsafe fn getyx(win:WINDOW_p,y: &mut c_int,x: &mut c_int) { *y = getcury(win); *x = getcurx(win); }
-unsafe fn getbegyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getbegy(win); *x = getbegx(win) }
-unsafe fn getmaxyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getmaxy(win); *x = getmaxx(win) }
-unsafe fn getparyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getpary(win); *x = getparx(win) }
+pub unsafe fn getyx(win:WINDOW_p,y: &mut c_int,x: &mut c_int) { *y = getcury(win); *x = getcurx(win); }
+pub unsafe fn getbegyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getbegy(win); *x = getbegx(win) }
+pub unsafe fn getmaxyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getmaxy(win); *x = getmaxx(win) }
+pub unsafe fn getparyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getpary(win); *x = getparx(win) }
 
-unsafe fn getsyx(y:&mut c_int, x:&mut c_int) {
+pub unsafe fn getsyx(y:&mut c_int, x:&mut c_int) {
     if newscr != (0 as WINDOW_p) {
         if is_leaveok(newscr) {
             *x = -1 as c_int;
@@ -425,7 +425,7 @@ unsafe fn getsyx(y:&mut c_int, x:&mut c_int) {
 }
 
 
-unsafe fn setsyx(y:&mut c_int,x:&mut c_int) {
+pub unsafe fn setsyx(y:&mut c_int,x:&mut c_int) {
     if newscr != (0 as WINDOW_p) {
         if *y == -1 && *x == -1 {
             leaveok(newscr, true);
