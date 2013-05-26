@@ -138,7 +138,7 @@ pub extern {
     unsafe fn mvinsnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
     unsafe fn mvinsstr (_:c_int, _:c_int, _:char_p) -> c_int;
     unsafe fn mvinstr (_:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvprintw (_:c_int, _:c_int, _:char_p) -> c_int;
+    //unsafe fn mvprintw (_:c_int, _:c_int, _:char_p) -> c_int;
     // unsafe fn mvscanw (_:c_int,_:c_int, _:char_p) -> c_int;
     unsafe fn mvvline (_:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
     unsafe fn mvwaddch (_:WINDOW_p, _:c_int, _:c_int, _:chtype) -> c_int;
@@ -161,7 +161,7 @@ pub extern {
     unsafe fn mvwinsnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
     unsafe fn mvwinsstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
     unsafe fn mvwinstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvwprintw (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
+    //unsafe fn mvwprintw (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
 
     // unsafe fn mvwscanw (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
     unsafe fn mvwvline (_:WINDOW_p, _:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
@@ -185,7 +185,7 @@ pub extern {
     unsafe fn pnoutrefresh (_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
     unsafe fn prefresh (_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
 
-    unsafe fn printw (_:char_p) -> c_int;
+    //unsafe fn printw (_:char_p) -> c_int;
     unsafe fn putwin (_:WINDOW_p, _:FILE_p) -> c_int;
     unsafe fn qiflush ();
     unsafe fn raw () -> c_int;
@@ -242,8 +242,8 @@ pub extern {
     // unsafe fn vidputs (_:chtype, extern unsafe fn f(c_int) -> c_int) -> c_int;
     unsafe fn vidputs (_:chtype, f:*u8) -> c_int;
     unsafe fn vline (_:chtype, _:c_int) -> c_int;
-    unsafe fn vwprintw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
-    unsafe fn vw_printw (_:WINDOW_p, _:char_p,_:va_list) -> c_int;
+    //unsafe fn vwprintw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
+    //unsafe fn vw_printw (_:WINDOW_p, _:char_p,_:va_list) -> c_int;
     // unsafe fn vwscanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
     // unsafe fn vw_scanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
     unsafe fn waddch (_:WINDOW_p, _:chtype) -> c_int;
@@ -287,7 +287,7 @@ pub extern {
     unsafe fn winstr (_:WINDOW_p, _:char_p) -> c_int;
     unsafe fn wmove (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
     unsafe fn wnoutrefresh (_:WINDOW_p) -> c_int;
-    unsafe fn wprintw (_:WINDOW_p, _:char_p) -> c_int;
+    //unsafe fn wprintw (_:WINDOW_p, _:char_p) -> c_int;
     unsafe fn wredrawln (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
     unsafe fn wrefresh (_:WINDOW_p) -> c_int;
     // unsafe fn wscanw (_:WINDOW_p, _:NCURSES_CONST char_p) -> c_int;
