@@ -20,309 +20,309 @@ struct WINDOW;
 struct SCREEN;
 
 #[link_args = "-lncurses"]
-pub extern {
-    static curscr: WINDOW_p;
-    static newscr: WINDOW_p;
-    static stdscr: WINDOW_p;
-    static ttytype: *c_char;
-    static COLORS : c_int;
-    static COLOR_PAIRS : int;
-    static COLS : int;
-    static ESCDELAY : int;
-    static LINES : int;
-    static TABSIZE : int;
+extern {
+    pub static curscr: WINDOW_p;
+    pub static newscr: WINDOW_p;
+    pub static stdscr: WINDOW_p;
+    pub static ttytype: *c_char;
+    pub static COLORS : c_int;
+    pub static COLOR_PAIRS : c_int;
+    pub static COLS : c_int;
+    pub static ESCDELAY : c_int;
+    pub static LINES : c_int;
+    pub static TABSIZE : c_int;
 
-    unsafe fn addch (_:chtype) -> c_int;
-    unsafe fn addchnstr (_:*chtype, _:c_int) -> c_int;
-    unsafe fn addchstr (_:*chtype) -> c_int;
-    unsafe fn addnstr (_:*char, _:c_int) -> c_int;
-    unsafe fn addstr (_:*char) -> c_int;
-    unsafe fn attroff (_:NCURSES_ATTR_T) -> c_int;
-    unsafe fn attron (_:NCURSES_ATTR_T) -> c_int;
-    unsafe fn attrset (_:NCURSES_ATTR_T) -> c_int;
-    unsafe fn attr_get (_:attr_t_p, _:short_p, _:void_p) -> c_int;
-    unsafe fn attr_off (_:attr_t, _:void_p) -> c_int;
-    unsafe fn attr_on (_:attr_t, _:void_p) -> c_int;
-    unsafe fn attr_set (_:attr_t, _:c_short, _:void_p) -> c_int;
-    unsafe fn baudrate () -> c_int;
-    unsafe fn beep  () -> c_int;
-    unsafe fn bkgd (_:chtype) -> c_int;
-    unsafe fn bkgdset (_:chtype);
-    unsafe fn border (_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
-    unsafe fn box (_:WINDOW_p, _:chtype, _:chtype) -> c_int;
-    unsafe fn can_change_color () -> bool;
-    unsafe fn cbreak () -> c_int;
-    unsafe fn chgat (_:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
-    unsafe fn clear () -> c_int;
-    unsafe fn clearok (_:WINDOW_p,_:bool) -> c_int;
-    unsafe fn clrtobot () -> c_int;
-    unsafe fn clrtoeol () -> c_int;
-    unsafe fn color_content (_:c_short,_:short_p,_:short_p,_:short_p) -> c_int;
-    unsafe fn color_set (_:c_short,_:void_p) -> c_int;
-    unsafe fn COLOR_PAIR (_:c_int) -> c_int;
-    unsafe fn copywin (_:WINDOW_p,_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
-    unsafe fn curs_set (_:c_int) -> c_int;
-    unsafe fn def_prog_mode () -> c_int;
-    unsafe fn def_shell_mode () -> c_int;
-    unsafe fn delay_output (_:c_int) -> c_int;
-    unsafe fn delch () -> c_int;
-    unsafe fn delscreen (_:SCREEN_p);
-    unsafe fn delwin (_:WINDOW_p) -> c_int;
-    unsafe fn deleteln () -> c_int;
-    unsafe fn derwin (_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int) -> *WINDOW;
-    unsafe fn doupdate () -> c_int;
-    unsafe fn dupwin (_:WINDOW_p) -> *WINDOW;
-    unsafe fn echo () -> c_int;
-    unsafe fn echochar (_:chtype) -> c_int;
-    unsafe fn erase () -> c_int;
-    unsafe fn endwin () -> c_int;
-    unsafe fn erasechar () -> c_char;
-    unsafe fn filter ();
-    unsafe fn flash () -> c_int;
-    unsafe fn flushinp () -> c_int;
-    unsafe fn getbkgd (_:WINDOW_p) -> chtype;
-    unsafe fn getch () -> c_int;
-    unsafe fn getnstr (_:char_p, _:c_int) -> c_int;
-    unsafe fn getstr (_:char_p) -> c_int;
-    unsafe fn getwin (_:FILE_p) -> *WINDOW;
-    unsafe fn halfdelay (_:c_int) -> c_int;
-    unsafe fn has_colors () -> bool;
-    unsafe fn has_ic () -> bool;
-    unsafe fn has_il () -> bool;
-    unsafe fn hline (_:chtype, _:c_int) -> c_int;
-    unsafe fn idcok (_:WINDOW_p, _:bool);
-    unsafe fn idlok (_:WINDOW_p, _:bool) -> c_int;
-    unsafe fn immedok (_:WINDOW_p, _:bool);
-    unsafe fn inch () -> chtype;
-    unsafe fn inchnstr (_:chtype_p, _:c_int) -> c_int;
-    unsafe fn inchstr (_:chtype_p) -> c_int;
-    unsafe fn initscr () -> *WINDOW;
-    unsafe fn init_color (_:c_short,_:c_short,_:c_short,_:c_short) -> c_int;
-    unsafe fn init_pair (_:c_short,_:c_short,_:c_short) -> c_int;
-    unsafe fn innstr (_:char_p, _:c_int) -> c_int;
-    unsafe fn insch (_:chtype) -> c_int;
-    unsafe fn insdelln (_:c_int) -> c_int;
-    unsafe fn insertln () -> c_int;
-    unsafe fn insnstr (_:char_p, _:c_int) -> c_int;
-    unsafe fn insstr (_:char_p) -> c_int;
-    unsafe fn instr (_:char_p) -> c_int;
-    unsafe fn intrflush (_:WINDOW_p,_:bool) -> c_int;
-    unsafe fn isendwin () -> bool;
-    unsafe fn is_linetouched (_:WINDOW_p,_:c_int) -> bool;
-    unsafe fn is_wintouched (_:WINDOW_p) -> bool;
-    unsafe fn keyname (_:c_int) -> *c_char;
-    unsafe fn keypad (_:WINDOW_p, _:bool) -> c_int;
-    unsafe fn killchar () -> char;
-    unsafe fn leaveok (_:WINDOW_p,_:bool) -> c_int;
-    unsafe fn longname () -> *c_char;
-    unsafe fn meta (_:WINDOW_p,_:bool) -> c_int;
-    unsafe fn move (_:c_int, _:c_int) -> c_int;
-    unsafe fn mvaddch (_:c_int, _:c_int, _:chtype) -> c_int;
-    unsafe fn mvaddchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
-    unsafe fn mvaddchstr (_:c_int, _:c_int, _:chtype_p) -> c_int;
-    unsafe fn mvaddnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    unsafe fn mvaddstr (_:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvchgat (_:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
-    unsafe fn mvcur (_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
-    unsafe fn mvdelch (_:c_int, _:c_int) -> c_int;
-    unsafe fn mvderwin (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
-    unsafe fn mvgetch (_:c_int, _:c_int) -> c_int;
-    unsafe fn mvgetnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    unsafe fn mvgetstr (_:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvhline (_:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
-    unsafe fn mvinch (_:c_int, _:c_int) -> chtype;
-    unsafe fn mvinchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
-    unsafe fn mvinchstr (_:c_int, _:c_int, _:chtype_p) -> c_int;
-    unsafe fn mvinnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    unsafe fn mvinsch (_:c_int, _:c_int, _:chtype) -> c_int;
-    unsafe fn mvinsnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    unsafe fn mvinsstr (_:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvinstr (_:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvprintw (_:c_int, _:c_int, _:char_p) -> c_int;
-    // unsafe fn mvscanw (_:c_int,_:c_int, _:char_p) -> c_int;
-    unsafe fn mvvline (_:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
-    unsafe fn mvwaddch (_:WINDOW_p, _:c_int, _:c_int, _:chtype) -> c_int;
-    unsafe fn mvwaddchnstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
-    unsafe fn mvwaddchstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p) -> c_int;
-    unsafe fn mvwaddnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    unsafe fn mvwaddstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvwchgat (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
-    unsafe fn mvwdelch (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
-    unsafe fn mvwgetch (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
-    unsafe fn mvwgetnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    unsafe fn mvwgetstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvwhline (_:WINDOW_p, _:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
-    unsafe fn mvwin (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
-    unsafe fn mvwinch (_:WINDOW_p, _:c_int, _:c_int) -> chtype;
-    unsafe fn mvwinchnstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
-    unsafe fn mvwinchstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p) -> c_int;
-    unsafe fn mvwinnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    unsafe fn mvwinsch (_:WINDOW_p, _:c_int, _:c_int, _:chtype) -> c_int;
-    unsafe fn mvwinsnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    unsafe fn mvwinsstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvwinstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvwprintw (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
+     fn addch (_:chtype) -> c_int;
+     fn addchnstr (_:*chtype, _:c_int) -> c_int;
+     fn addchstr (_:*chtype) -> c_int;
+     fn addnstr (_:*char, _:c_int) -> c_int;
+     fn addstr (_:*char) -> c_int;
+     fn attroff (_:NCURSES_ATTR_T) -> c_int;
+     fn attron (_:NCURSES_ATTR_T) -> c_int;
+     fn attrset (_:NCURSES_ATTR_T) -> c_int;
+     fn attr_get (_:attr_t_p, _:short_p, _:void_p) -> c_int;
+     fn attr_off (_:attr_t, _:void_p) -> c_int;
+     fn attr_on (_:attr_t, _:void_p) -> c_int;
+     fn attr_set (_:attr_t, _:c_short, _:void_p) -> c_int;
+     fn baudrate () -> c_int;
+     fn beep  () -> c_int;
+     fn bkgd (_:chtype) -> c_int;
+     fn bkgdset (_:chtype);
+     fn border (_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
+     fn box (_:WINDOW_p, _:chtype, _:chtype) -> c_int;
+     fn can_change_color () -> bool;
+     fn cbreak () -> c_int;
+     fn chgat (_:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
+     fn clear () -> c_int;
+     fn clearok (_:WINDOW_p,_:bool) -> c_int;
+     fn clrtobot () -> c_int;
+     fn clrtoeol () -> c_int;
+     fn color_content (_:c_short,_:short_p,_:short_p,_:short_p) -> c_int;
+     fn color_set (_:c_short,_:void_p) -> c_int;
+     fn COLOR_PAIR (_:c_int) -> c_int;
+     fn copywin (_:WINDOW_p,_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
+     fn curs_set (_:c_int) -> c_int;
+     fn def_prog_mode () -> c_int;
+     fn def_shell_mode () -> c_int;
+     fn delay_output (_:c_int) -> c_int;
+     fn delch () -> c_int;
+     fn delscreen (_:SCREEN_p);
+     fn delwin (_:WINDOW_p) -> c_int;
+     fn deleteln () -> c_int;
+     fn derwin (_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int) -> *WINDOW;
+     fn doupdate () -> c_int;
+     fn dupwin (_:WINDOW_p) -> *WINDOW;
+     fn echo () -> c_int;
+     fn echochar (_:chtype) -> c_int;
+     fn erase () -> c_int;
+     fn endwin () -> c_int;
+     fn erasechar () -> c_char;
+     fn filter ();
+     fn flash () -> c_int;
+     fn flushinp () -> c_int;
+     fn getbkgd (_:WINDOW_p) -> chtype;
+     fn getch () -> c_int;
+     fn getnstr (_:char_p, _:c_int) -> c_int;
+     fn getstr (_:char_p) -> c_int;
+     fn getwin (_:FILE_p) -> *WINDOW;
+     fn halfdelay (_:c_int) -> c_int;
+     fn has_colors () -> bool;
+     fn has_ic () -> bool;
+     fn has_il () -> bool;
+     fn hline (_:chtype, _:c_int) -> c_int;
+     fn idcok (_:WINDOW_p, _:bool);
+     fn idlok (_:WINDOW_p, _:bool) -> c_int;
+     fn immedok (_:WINDOW_p, _:bool);
+     fn inch () -> chtype;
+     fn inchnstr (_:chtype_p, _:c_int) -> c_int;
+     fn inchstr (_:chtype_p) -> c_int;
+     fn initscr () -> *WINDOW;
+     fn init_color (_:c_short,_:c_short,_:c_short,_:c_short) -> c_int;
+     fn init_pair (_:c_short,_:c_short,_:c_short) -> c_int;
+     fn innstr (_:char_p, _:c_int) -> c_int;
+     fn insch (_:chtype) -> c_int;
+     fn insdelln (_:c_int) -> c_int;
+     fn insertln () -> c_int;
+     fn insnstr (_:char_p, _:c_int) -> c_int;
+     fn insstr (_:char_p) -> c_int;
+     fn instr (_:char_p) -> c_int;
+     fn intrflush (_:WINDOW_p,_:bool) -> c_int;
+     fn isendwin () -> bool;
+     fn is_linetouched (_:WINDOW_p,_:c_int) -> bool;
+     fn is_wintouched (_:WINDOW_p) -> bool;
+     fn keyname (_:c_int) -> *c_char;
+     fn keypad (_:WINDOW_p, _:bool) -> c_int;
+     fn killchar () -> char;
+     fn leaveok (_:WINDOW_p,_:bool) -> c_int;
+     fn longname () -> *c_char;
+     fn meta (_:WINDOW_p,_:bool) -> c_int;
+     fn move (_:c_int, _:c_int) -> c_int;
+     fn mvaddch (_:c_int, _:c_int, _:chtype) -> c_int;
+     fn mvaddchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
+     fn mvaddchstr (_:c_int, _:c_int, _:chtype_p) -> c_int;
+     fn mvaddnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+     fn mvaddstr (_:c_int, _:c_int, _:char_p) -> c_int;
+     fn mvchgat (_:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
+     fn mvcur (_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
+     fn mvdelch (_:c_int, _:c_int) -> c_int;
+     fn mvderwin (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
+     fn mvgetch (_:c_int, _:c_int) -> c_int;
+     fn mvgetnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+     fn mvgetstr (_:c_int, _:c_int, _:char_p) -> c_int;
+     fn mvhline (_:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
+     fn mvinch (_:c_int, _:c_int) -> chtype;
+     fn mvinchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
+     fn mvinchstr (_:c_int, _:c_int, _:chtype_p) -> c_int;
+     fn mvinnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+     fn mvinsch (_:c_int, _:c_int, _:chtype) -> c_int;
+     fn mvinsnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+     fn mvinsstr (_:c_int, _:c_int, _:char_p) -> c_int;
+     fn mvinstr (_:c_int, _:c_int, _:char_p) -> c_int;
+     fn mvprintw (_:c_int, _:c_int, _:char_p) -> c_int;
+    //  fn mvscanw (_:c_int,_:c_int, _:char_p) -> c_int;
+     fn mvvline (_:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
+     fn mvwaddch (_:WINDOW_p, _:c_int, _:c_int, _:chtype) -> c_int;
+     fn mvwaddchnstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
+     fn mvwaddchstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p) -> c_int;
+     fn mvwaddnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+     fn mvwaddstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
+     fn mvwchgat (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
+     fn mvwdelch (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
+     fn mvwgetch (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
+     fn mvwgetnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+     fn mvwgetstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
+     fn mvwhline (_:WINDOW_p, _:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
+     fn mvwin (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
+     fn mvwinch (_:WINDOW_p, _:c_int, _:c_int) -> chtype;
+     fn mvwinchnstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
+     fn mvwinchstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p) -> c_int;
+     fn mvwinnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+     fn mvwinsch (_:WINDOW_p, _:c_int, _:c_int, _:chtype) -> c_int;
+     fn mvwinsnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+     fn mvwinsstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
+     fn mvwinstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
+     fn mvwprintw (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
 
-    // unsafe fn mvwscanw (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
-    unsafe fn mvwvline (_:WINDOW_p, _:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
-    unsafe fn napms (_:c_int) -> c_int;
-    unsafe fn newpad (_:c_int,_:c_int) -> *WINDOW;
-    unsafe fn newterm (_:char_p,_:FILE_p,_:FILE_p) -> *SCREEN;
-    unsafe fn newwin (_:c_int,_:c_int,_:c_int,_:c_int) -> *WINDOW;
-    unsafe fn nl () -> c_int;
-    unsafe fn nocbreak () -> c_int;
-    unsafe fn nodelay (_:WINDOW_p,_:bool) -> c_int;
-    unsafe fn noecho () -> c_int;
-    unsafe fn nonl () -> c_int;
-    unsafe fn noqiflush ();
-    unsafe fn noraw () -> c_int;
-    unsafe fn notimeout (_:WINDOW_p,_:bool) -> c_int;
-    unsafe fn overlay (_:WINDOW_p,_:WINDOW_p) -> c_int;
-    unsafe fn overwrite (_:WINDOW_p,_:WINDOW_p) -> c_int;
-    unsafe fn pair_content (_:c_short,_:short_p,_:short_p) -> c_int;
-    unsafe fn PAIR_NUMBER (_:c_int) -> c_int;
-    unsafe fn pechochar (_:WINDOW_p, _:chtype) -> c_int;
-    unsafe fn pnoutrefresh (_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
-    unsafe fn prefresh (_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
+    //  fn mvwscanw (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
+     fn mvwvline (_:WINDOW_p, _:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
+     fn napms (_:c_int) -> c_int;
+     fn newpad (_:c_int,_:c_int) -> *WINDOW;
+     fn newterm (_:char_p,_:FILE_p,_:FILE_p) -> *SCREEN;
+     fn newwin (_:c_int,_:c_int,_:c_int,_:c_int) -> *WINDOW;
+     fn nl () -> c_int;
+     fn nocbreak () -> c_int;
+     fn nodelay (_:WINDOW_p,_:bool) -> c_int;
+     fn noecho () -> c_int;
+     fn nonl () -> c_int;
+     fn noqiflush ();
+     fn noraw () -> c_int;
+     fn notimeout (_:WINDOW_p,_:bool) -> c_int;
+     fn overlay (_:WINDOW_p,_:WINDOW_p) -> c_int;
+     fn overwrite (_:WINDOW_p,_:WINDOW_p) -> c_int;
+     fn pair_content (_:c_short,_:short_p,_:short_p) -> c_int;
+     fn PAIR_NUMBER (_:c_int) -> c_int;
+     fn pechochar (_:WINDOW_p, _:chtype) -> c_int;
+     fn pnoutrefresh (_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
+     fn prefresh (_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
 
-    unsafe fn printw (_:char_p) -> c_int;
-    unsafe fn putwin (_:WINDOW_p, _:FILE_p) -> c_int;
-    unsafe fn qiflush ();
-    unsafe fn raw () -> c_int;
-    unsafe fn redrawwin (_:WINDOW_p) -> c_int;
-    unsafe fn refresh () -> c_int;
-    unsafe fn resetty () -> c_int;
-    unsafe fn reset_prog_mode () -> c_int;
-    unsafe fn reset_shell_mode () -> c_int;
-    //unsafe fn ripoffline (_:c_int, extern unsafe fn f(WINDOW_p, c_int) -> c_int) -> c_int;
-    unsafe fn ripoffline (_:c_int, f:*u8) -> c_int;
-    unsafe fn savetty () -> c_int;
-    // unsafe fn scanw (_:NCURSES_CONST char_p,...) -> c_int;
-    unsafe fn scr_dump (_:char_p) -> c_int;
-    unsafe fn scr_init (_:char_p) -> c_int;
-    unsafe fn scrl (_:c_int) -> c_int;
-    unsafe fn scroll (_:WINDOW_p) -> c_int;
-    unsafe fn scrollok (_:WINDOW_p,_:bool) -> c_int;
-    unsafe fn scr_restore (_:char_p) -> c_int;
-    unsafe fn scr_set (_:char_p) -> c_int;
-    unsafe fn setscrreg (_:c_int,_:c_int) -> c_int;
-    unsafe fn set_term (_:SCREEN_p) -> SCREEN_p;
-    unsafe fn slk_attroff (_:chtype) -> c_int;
-    unsafe fn slk_attr_off (_:attr_t, _:void_p) -> c_int;
-    unsafe fn slk_attron (_:chtype) -> c_int;
-    unsafe fn slk_attr_on (_:attr_t,_:void_p) -> c_int;
-    unsafe fn slk_attrset (_:chtype) -> c_int;
-    unsafe fn slk_attr () -> attr_t;
-    unsafe fn slk_attr_set (_:attr_t,_:c_short,_:void_p) -> c_int;
-    unsafe fn slk_clear () -> c_int;
-    unsafe fn slk_color (_:c_short) -> c_int;
-    unsafe fn slk_init (_:c_int) -> c_int;
-    unsafe fn slk_label (_:c_int) -> char_p; 
-    unsafe fn slk_noutrefresh () -> c_int;
-    unsafe fn slk_refresh () -> c_int;
-    unsafe fn slk_restore () -> c_int;
-    unsafe fn slk_set (_:c_int,_:char_p,_:c_int) -> c_int;
-    unsafe fn slk_touch () -> c_int;
-    unsafe fn standout () -> c_int;
-    unsafe fn standend () -> c_int;
-    unsafe fn start_color () -> c_int;
-    unsafe fn subpad (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:c_int) -> WINDOW_p;
-    unsafe fn subwin (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:c_int) -> WINDOW_p;
-    unsafe fn syncok (_:WINDOW_p, _:bool) -> c_int;
-    unsafe fn termattrs () -> chtype;
-    unsafe fn termname () -> char_p;
-    unsafe fn timeout (_:c_int);
-    unsafe fn touchline (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
-    unsafe fn touchwin (_:WINDOW_p) -> c_int;
-    unsafe fn typeahead (_:c_int) -> c_int;
-    unsafe fn ungetch (_:c_int) -> c_int;
-    unsafe fn untouchwin (_:WINDOW_p) -> c_int;
-    unsafe fn use_env (_:bool);
-    unsafe fn vidattr (_:chtype) -> c_int;
-    // unsafe fn vidputs (_:chtype, extern unsafe fn f(c_int) -> c_int) -> c_int;
-    unsafe fn vidputs (_:chtype, f:*u8) -> c_int;
-    unsafe fn vline (_:chtype, _:c_int) -> c_int;
-    unsafe fn vwprintw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
-    unsafe fn vw_printw (_:WINDOW_p, _:char_p,_:va_list) -> c_int;
-    // unsafe fn vwscanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
-    // unsafe fn vw_scanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
-    unsafe fn waddch (_:WINDOW_p, _:chtype) -> c_int;
-    unsafe fn waddchnstr (_:WINDOW_p,_:chtype_p,_:c_int) -> c_int;
-    unsafe fn waddchstr (_:WINDOW_p,_:chtype_p) -> c_int;
-    unsafe fn waddnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
-    unsafe fn waddstr (_:WINDOW_p,_:char_p) -> c_int;
-    unsafe fn wattron (_:WINDOW_p, _:c_int) -> c_int;
-    unsafe fn wattroff (_:WINDOW_p, _:c_int) -> c_int;
-    unsafe fn wattrset (_:WINDOW_p, _:c_int) -> c_int;
-    unsafe fn wattr_get (_:WINDOW_p, _:attr_t_p, _:short_p, _:void_p) -> c_int;
-    unsafe fn wattr_on (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
-    unsafe fn wattr_off (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
-    unsafe fn wattr_set (_:WINDOW_p, _:attr_t, _:c_short, _:void_p) -> c_int;
-    unsafe fn wbkgd (_:WINDOW_p, _:chtype) -> c_int;
-    unsafe fn wbkgdset (_:WINDOW_p,_:chtype);
-    unsafe fn wborder (_:WINDOW_p,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
-    unsafe fn wchgat (_:WINDOW_p, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
-    unsafe fn wclear (_:WINDOW_p) -> c_int;
-    unsafe fn wclrtobot (_:WINDOW_p) -> c_int;
-    unsafe fn wclrtoeol (_:WINDOW_p) -> c_int;
-    unsafe fn wcolor_set (_:WINDOW_p,_:c_short,_:void_p) -> c_int;
-    unsafe fn wcursyncup (_:WINDOW_p);
-    unsafe fn wdelch (_:WINDOW_p) -> c_int;
-    unsafe fn wdeleteln (_:WINDOW_p) -> c_int;
-    unsafe fn wechochar (_:WINDOW_p, _:chtype) -> c_int;
-    unsafe fn werase (_:WINDOW_p) -> c_int;
-    unsafe fn wgetch (_:WINDOW_p) -> c_int;
-    unsafe fn wgetnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
-    unsafe fn wgetstr (_:WINDOW_p, _:char_p) -> c_int;
-    unsafe fn whline (_:WINDOW_p, _:chtype, _:c_int) -> c_int;
-    unsafe fn winch (_:WINDOW_p) -> chtype;
-    unsafe fn winchnstr (_:WINDOW_p, _:chtype_p, _:c_int) -> c_int;
-    unsafe fn winchstr (_:WINDOW_p, _:chtype_p) -> c_int;
-    unsafe fn winnstr (_:WINDOW_p, _:char_p, _:c_int) -> c_int;
-    unsafe fn winsch (_:WINDOW_p, _:chtype) -> c_int;
-    unsafe fn winsdelln (_:WINDOW_p,_:c_int) -> c_int;
-    unsafe fn winsertln (_:WINDOW_p) -> c_int;
-    unsafe fn winsnstr (_:WINDOW_p, _:char_p,_:c_int) -> c_int;
-    unsafe fn winsstr (_:WINDOW_p, _:char_p) -> c_int;
-    unsafe fn winstr (_:WINDOW_p, _:char_p) -> c_int;
-    unsafe fn wmove (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
-    unsafe fn wnoutrefresh (_:WINDOW_p) -> c_int;
-    unsafe fn wprintw (_:WINDOW_p, _:char_p) -> c_int;
-    unsafe fn wredrawln (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
-    unsafe fn wrefresh (_:WINDOW_p) -> c_int;
-    // unsafe fn wscanw (_:WINDOW_p, _:NCURSES_CONST char_p) -> c_int;
-    unsafe fn wscrl (_:WINDOW_p,_:c_int) -> c_int;
-    unsafe fn wsetscrreg (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
-    unsafe fn wstandout (_:WINDOW_p) -> c_int;
-    unsafe fn wstandend (_:WINDOW_p) -> c_int;
-    unsafe fn wsyncdown (_:WINDOW_p);
-    unsafe fn wsyncup (_:WINDOW_p);
-    unsafe fn wtimeout (_:WINDOW_p,_:c_int);
-    unsafe fn wtouchln (_:WINDOW_p,_:c_int,_:c_int,_:c_int) -> c_int;
-    unsafe fn wvline (_:WINDOW_p,_:chtype,_:c_int) -> c_int;
+     fn printw (_:char_p) -> c_int;
+     fn putwin (_:WINDOW_p, _:FILE_p) -> c_int;
+     fn qiflush ();
+     fn raw () -> c_int;
+     fn redrawwin (_:WINDOW_p) -> c_int;
+     fn refresh () -> c_int;
+     fn resetty () -> c_int;
+     fn reset_prog_mode () -> c_int;
+     fn reset_shell_mode () -> c_int;
+    // fn ripoffline (_:c_int, extern  fn f(WINDOW_p, c_int) -> c_int) -> c_int;
+     fn ripoffline (_:c_int, f:*u8) -> c_int;
+     fn savetty () -> c_int;
+    //  fn scanw (_:NCURSES_CONST char_p,...) -> c_int;
+     fn scr_dump (_:char_p) -> c_int;
+     fn scr_init (_:char_p) -> c_int;
+     fn scrl (_:c_int) -> c_int;
+     fn scroll (_:WINDOW_p) -> c_int;
+     fn scrollok (_:WINDOW_p,_:bool) -> c_int;
+     fn scr_restore (_:char_p) -> c_int;
+     fn scr_set (_:char_p) -> c_int;
+     fn setscrreg (_:c_int,_:c_int) -> c_int;
+     fn set_term (_:SCREEN_p) -> SCREEN_p;
+     fn slk_attroff (_:chtype) -> c_int;
+     fn slk_attr_off (_:attr_t, _:void_p) -> c_int;
+     fn slk_attron (_:chtype) -> c_int;
+     fn slk_attr_on (_:attr_t,_:void_p) -> c_int;
+     fn slk_attrset (_:chtype) -> c_int;
+     fn slk_attr () -> attr_t;
+     fn slk_attr_set (_:attr_t,_:c_short,_:void_p) -> c_int;
+     fn slk_clear () -> c_int;
+     fn slk_color (_:c_short) -> c_int;
+     fn slk_init (_:c_int) -> c_int;
+     fn slk_label (_:c_int) -> char_p; 
+     fn slk_noutrefresh () -> c_int;
+     fn slk_refresh () -> c_int;
+     fn slk_restore () -> c_int;
+     fn slk_set (_:c_int,_:char_p,_:c_int) -> c_int;
+     fn slk_touch () -> c_int;
+     fn standout () -> c_int;
+     fn standend () -> c_int;
+     fn start_color () -> c_int;
+     fn subpad (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:c_int) -> WINDOW_p;
+     fn subwin (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:c_int) -> WINDOW_p;
+     fn syncok (_:WINDOW_p, _:bool) -> c_int;
+     fn termattrs () -> chtype;
+     fn termname () -> char_p;
+     fn timeout (_:c_int);
+     fn touchline (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
+     fn touchwin (_:WINDOW_p) -> c_int;
+     fn typeahead (_:c_int) -> c_int;
+     fn ungetch (_:c_int) -> c_int;
+     fn untouchwin (_:WINDOW_p) -> c_int;
+     fn use_env (_:bool);
+     fn vidattr (_:chtype) -> c_int;
+    //  fn vidputs (_:chtype, extern  fn f(c_int) -> c_int) -> c_int;
+     fn vidputs (_:chtype, f:*u8) -> c_int;
+     fn vline (_:chtype, _:c_int) -> c_int;
+     fn vwprintw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
+     fn vw_printw (_:WINDOW_p, _:char_p,_:va_list) -> c_int;
+    //  fn vwscanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
+    //  fn vw_scanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
+     fn waddch (_:WINDOW_p, _:chtype) -> c_int;
+     fn waddchnstr (_:WINDOW_p,_:chtype_p,_:c_int) -> c_int;
+     fn waddchstr (_:WINDOW_p,_:chtype_p) -> c_int;
+     fn waddnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
+     fn waddstr (_:WINDOW_p,_:char_p) -> c_int;
+     fn wattron (_:WINDOW_p, _:c_int) -> c_int;
+     fn wattroff (_:WINDOW_p, _:c_int) -> c_int;
+     fn wattrset (_:WINDOW_p, _:c_int) -> c_int;
+     fn wattr_get (_:WINDOW_p, _:attr_t_p, _:short_p, _:void_p) -> c_int;
+     fn wattr_on (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
+     fn wattr_off (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
+     fn wattr_set (_:WINDOW_p, _:attr_t, _:c_short, _:void_p) -> c_int;
+     fn wbkgd (_:WINDOW_p, _:chtype) -> c_int;
+     fn wbkgdset (_:WINDOW_p,_:chtype);
+     fn wborder (_:WINDOW_p,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
+     fn wchgat (_:WINDOW_p, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
+     fn wclear (_:WINDOW_p) -> c_int;
+     fn wclrtobot (_:WINDOW_p) -> c_int;
+     fn wclrtoeol (_:WINDOW_p) -> c_int;
+     fn wcolor_set (_:WINDOW_p,_:c_short,_:void_p) -> c_int;
+     fn wcursyncup (_:WINDOW_p);
+     fn wdelch (_:WINDOW_p) -> c_int;
+     fn wdeleteln (_:WINDOW_p) -> c_int;
+     fn wechochar (_:WINDOW_p, _:chtype) -> c_int;
+     fn werase (_:WINDOW_p) -> c_int;
+     fn wgetch (_:WINDOW_p) -> c_int;
+     fn wgetnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
+     fn wgetstr (_:WINDOW_p, _:char_p) -> c_int;
+     fn whline (_:WINDOW_p, _:chtype, _:c_int) -> c_int;
+     fn winch (_:WINDOW_p) -> chtype;
+     fn winchnstr (_:WINDOW_p, _:chtype_p, _:c_int) -> c_int;
+     fn winchstr (_:WINDOW_p, _:chtype_p) -> c_int;
+     fn winnstr (_:WINDOW_p, _:char_p, _:c_int) -> c_int;
+     fn winsch (_:WINDOW_p, _:chtype) -> c_int;
+     fn winsdelln (_:WINDOW_p,_:c_int) -> c_int;
+     fn winsertln (_:WINDOW_p) -> c_int;
+     fn winsnstr (_:WINDOW_p, _:char_p,_:c_int) -> c_int;
+     fn winsstr (_:WINDOW_p, _:char_p) -> c_int;
+     fn winstr (_:WINDOW_p, _:char_p) -> c_int;
+     fn wmove (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
+     fn wnoutrefresh (_:WINDOW_p) -> c_int;
+     fn wprintw (_:WINDOW_p, _:char_p) -> c_int;
+     fn wredrawln (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
+     fn wrefresh (_:WINDOW_p) -> c_int;
+    //  fn wscanw (_:WINDOW_p, _:NCURSES_CONST char_p) -> c_int;
+     fn wscrl (_:WINDOW_p,_:c_int) -> c_int;
+     fn wsetscrreg (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
+     fn wstandout (_:WINDOW_p) -> c_int;
+     fn wstandend (_:WINDOW_p) -> c_int;
+     fn wsyncdown (_:WINDOW_p);
+     fn wsyncup (_:WINDOW_p);
+     fn wtimeout (_:WINDOW_p,_:c_int);
+     fn wtouchln (_:WINDOW_p,_:c_int,_:c_int,_:c_int) -> c_int;
+     fn wvline (_:WINDOW_p,_:chtype,_:c_int) -> c_int;
 
     /*
      * These are also declared in <term.h>:
      */
-    unsafe fn tigetflag (_:char_p) -> c_int;
-    unsafe fn tigetnum (_:char_p) -> c_int;
-    unsafe fn tigetstr (_:char_p) -> *c_char;
-    unsafe fn putp (_:char_p) -> c_int;
+     fn tigetflag (_:char_p) -> c_int;
+     fn tigetnum (_:char_p) -> c_int;
+     fn tigetstr (_:char_p) -> *c_char;
+     fn putp (_:char_p) -> c_int;
 
-    unsafe fn tparm (_:char_p) -> *c_char;
+     fn tparm (_:char_p) -> *c_char;
 
 /*
  * These functions are not in X/Open, but we use them in macro definitions:
  */
-    unsafe fn getattrs (_:WINDOW_p) -> c_int;
-    unsafe fn getcurx (_:WINDOW_p) -> c_int;
-    unsafe fn getcury (_:WINDOW_p) -> c_int;
-    unsafe fn getbegx (_:WINDOW_p) -> c_int;
-    unsafe fn getbegy (_:WINDOW_p) -> c_int;
-    unsafe fn getmaxx (_:WINDOW_p) -> c_int;
-    unsafe fn getmaxy (_:WINDOW_p) -> c_int;
-    unsafe fn getparx (_:WINDOW_p) -> c_int;
-    unsafe fn getpary (_:WINDOW_p) -> c_int;
+     fn getattrs (_:WINDOW_p) -> c_int;
+     fn getcurx (_:WINDOW_p) -> c_int;
+     fn getcury (_:WINDOW_p) -> c_int;
+     fn getbegx (_:WINDOW_p) -> c_int;
+     fn getbegy (_:WINDOW_p) -> c_int;
+     fn getmaxx (_:WINDOW_p) -> c_int;
+     fn getmaxy (_:WINDOW_p) -> c_int;
+     fn getparx (_:WINDOW_p) -> c_int;
+     fn getpary (_:WINDOW_p) -> c_int;
 }
 
 /*
@@ -358,24 +358,24 @@ extern NCURSES_EXPORT(void) nofilter(void);
  * when NCURSES_OPAQUE is set:
  */
 extern {
-unsafe fn wgetparent (_:WINDOW_p) -> WINDOW_p;
-unsafe fn is_cleared (_:WINDOW_p) -> bool;
-unsafe fn is_idcok (_:WINDOW_p) -> bool;
-unsafe fn is_idlok (_:WINDOW_p) -> bool;
-unsafe fn is_immedok (_:WINDOW_p) -> bool;
-unsafe fn is_keypad (_:WINDOW_p) -> bool;
-unsafe fn is_leaveok (_:WINDOW_p) -> bool;
-unsafe fn is_nodelay (_:WINDOW_p) -> bool;
-unsafe fn is_notimeout (_:WINDOW_p) -> bool;
-unsafe fn is_scrollok (_:WINDOW_p) -> bool;
-unsafe fn is_syncok (_:WINDOW_p) -> bool;
-unsafe fn wgetscrreg (_:WINDOW_p, _:*c_int, _:*c_int) -> c_int;
+ fn wgetparent (_:WINDOW_p) -> WINDOW_p;
+ fn is_cleared (_:WINDOW_p) -> bool;
+ fn is_idcok (_:WINDOW_p) -> bool;
+ fn is_idlok (_:WINDOW_p) -> bool;
+ fn is_immedok (_:WINDOW_p) -> bool;
+ fn is_keypad (_:WINDOW_p) -> bool;
+ fn is_leaveok (_:WINDOW_p) -> bool;
+ fn is_nodelay (_:WINDOW_p) -> bool;
+ fn is_notimeout (_:WINDOW_p) -> bool;
+ fn is_scrollok (_:WINDOW_p) -> bool;
+ fn is_syncok (_:WINDOW_p) -> bool;
+ fn wgetscrreg (_:WINDOW_p, _:*c_int, _:*c_int) -> c_int;
 
 }
 
 /* attributes */
 
-static NCURSES_ATTR_SHIFT  : uint =       8;
+pub static NCURSES_ATTR_SHIFT  : uint =       8;
 fn NCURSES_BITS(mask:uint,shift:uint) -> uint { ((mask) << ((shift) + NCURSES_ATTR_SHIFT) as i32) }
 
 pub fn A_NORMAL() -> c_int		{ (1u - 1u) as c_int }
@@ -408,11 +408,16 @@ pub fn A_VERTICAL() -> c_int	{ NCURSES_BITS(1u,22)  as c_int }
  * These pseudo functions are always implemented as macros:
  */
 
+#[fixed_stack_segment]
 unsafe fn getyx(win:WINDOW_p,y: &mut c_int,x: &mut c_int) { *y = getcury(win); *x = getcurx(win); }
+#[fixed_stack_segment]
 unsafe fn getbegyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getbegy(win); *x = getbegx(win) }
+#[fixed_stack_segment]
 unsafe fn getmaxyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getmaxy(win); *x = getmaxx(win) }
+#[fixed_stack_segment]
 unsafe fn getparyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getpary(win); *x = getparx(win) }
 
+#[fixed_stack_segment]
 unsafe fn getsyx(y:&mut c_int, x:&mut c_int) {
     if newscr != (0 as WINDOW_p) {
         if is_leaveok(newscr) {
@@ -425,6 +430,7 @@ unsafe fn getsyx(y:&mut c_int, x:&mut c_int) {
 }
 
 
+#[fixed_stack_segment]
 unsafe fn setsyx(y:&mut c_int,x:&mut c_int) {
     if newscr != (0 as WINDOW_p) {
         if *y == -1 && *x == -1 {
@@ -446,19 +452,19 @@ unsafe fn setsyx(y:&mut c_int,x:&mut c_int) {
 //#define gettmode()
 
 /* colors */
-static COLOR_BLACK : c_int =	0;
-static COLOR_RED : c_int =	1;
-static COLOR_GREEN : c_int =    2;
-static COLOR_YELLOW : c_int =    3;
-static COLOR_BLUE : c_int =      4;
-static COLOR_MAGENTA : c_int =   5;
-static COLOR_CYAN : c_int =      6;
-static COLOR_WHITE : c_int =      7;
+pub static COLOR_BLACK : c_int =	0;
+pub static COLOR_RED : c_int =	1;
+pub static COLOR_GREEN : c_int =    2;
+pub static COLOR_YELLOW : c_int =    3;
+pub static COLOR_BLUE : c_int =      4;
+pub static COLOR_MAGENTA : c_int =   5;
+pub static COLOR_CYAN : c_int =      6;
+pub static COLOR_WHITE : c_int =      7;
 
 /* line graphics */
 
 extern {
-    static acs_map : chtype_p;
+    pub static acs_map : chtype_p;
 }
 
 unsafe fn NCURSES_ACS(c:char) -> c_uchar {
@@ -524,30 +530,30 @@ unsafe fn ACS_SBSB() -> c_uchar { ACS_VLINE() }
 unsafe fn ACS_SSSS() -> c_uchar { ACS_PLUS() }
 
 
-static ERR:c_int =     (-1);
+pub static ERR:c_int =     (-1);
 
-static OK:c_int =      (0);
+pub static OK:c_int =      (0);
 
 /* values for the _flags member */
-static _SUBWIN:c_int =         0x01;	/* is this a sub-window? */
-static _ENDLINE:c_int =       0x02;	/* is the window flush right? */
-static _FULLWIN:c_int  =      0x04;	/* is the window full-screen? */
-static _SCROLLWIN:c_int =     0x08;	/* bottom edge is at screen bottom? */
-static _ISPAD:c_int	  =      0x10;	/* is this window a pad? */
-static _HASMOVED:c_int    =   0x20;	/* has cursor moved since last refresh? */
-static _WRAPPED:c_int      =  0x40;	/* cursor was just wrappped */
+pub static _SUBWIN:c_int =         0x01;	/* is this a sub-window? */
+pub static _ENDLINE:c_int =       0x02;	/* is the window flush right? */
+pub static _FULLWIN:c_int  =      0x04;	/* is the window full-screen? */
+pub static _SCROLLWIN:c_int =     0x08;	/* bottom edge is at screen bottom? */
+pub static _ISPAD:c_int	  =      0x10;	/* is this window a pad? */
+pub static _HASMOVED:c_int    =   0x20;	/* has cursor moved since last refresh? */
+pub static _WRAPPED:c_int      =  0x40;	/* cursor was just wrappped */
 
 /*
  * this value is used in the firstchar and lastchar fields to mark
  * unchanged lines
  */
-static _NOCHANGE:c_int =       -1;
+pub static _NOCHANGE:c_int =       -1;
 
 /*
  * this value is used in the oldindex field to mark lines created by insertions
  * and scrolls.
  */
-static _NEWINDEX:c_int =	-1;
+pub static _NEWINDEX:c_int =	-1;
 
 /*
  * Pseudo-character tokens outside ASCII range.  The curses wgetch() function
@@ -561,122 +567,122 @@ static _NEWINDEX:c_int =	-1;
  *
  * A few key codes do not depend upon the terminfo entry.
  */
-static KEY_CODE_YES:c_int =	0x100;		/* A wchar_t contains a key code */
-static KEY_MIN:c_int =		0x101;		/* Minimum curses key */
-static KEY_BREAK:c_int =	0x101;		/* Break key (unreliable) */
-static KEY_SRESET:c_int =	0x158;		/* Soft (partial) reset (unreliable) */
-static KEY_RESET:c_int =	0x159;		/* Reset or hard reset (unreliable) */
+pub static KEY_CODE_YES:c_int =	0x100;		/* A wchar_t contains a key code */
+pub static KEY_MIN:c_int =		0x101;		/* Minimum curses key */
+pub static KEY_BREAK:c_int =	0x101;		/* Break key (unreliable) */
+pub static KEY_SRESET:c_int =	0x158;		/* Soft (partial) reset (unreliable) */
+pub static KEY_RESET:c_int =	0x159;		/* Reset or hard reset (unreliable) */
 /*
  * These definitions were generated by /tmp/ncurses-27.roots/ncurses-27/ncurses/include/MKkey_defs.sh /tmp/ncurses-27.roots/ncurses-27/ncurses/include/Caps
  */
-static KEY_DOWN:c_int =	0x102;		/* down-arrow key */
-static KEY_UP:c_int=		0x103;		/* up-arrow key */
-static KEY_LEFT:c_int=	0x104;		/* left-arrow key */
-static KEY_RIGHT:c_int=	0x105;		/* right-arrow key */
-static KEY_HOME:c_int=	0x106;		/* home key */
-static KEY_BACKSPACE:c_int=	0x107;		/* backspace key */
-static KEY_F0:c_int=		0x108;		/* Function keys.  Space for 64 */
-static KEY_F1:c_int=		0x109;
-static KEY_F2:c_int=		0x10a;
-static KEY_F3:c_int=		0x10b;
-static KEY_F4:c_int=		0x10c;
-static KEY_F5:c_int=		0x10d;
-static KEY_F6:c_int=		0x10e;
-static KEY_F7:c_int=		0x10f;
-static KEY_F8:c_int=		0x110;
-static KEY_F9:c_int=		0x111;
-static KEY_F10:c_int=		0x112;
-static KEY_F11:c_int=		0x113;
-static KEY_F12:c_int=		0x114;
-static KEY_F13:c_int=		0x115;
-static KEY_F14:c_int=		0x116;
-static KEY_F15:c_int=		0x117;
-//static KEY_F(n)	(KEY_F0+(n))	/* Value of function key n */
+pub static KEY_DOWN:c_int =	0x102;		/* down-arrow key */
+pub static KEY_UP:c_int=		0x103;		/* up-arrow key */
+pub static KEY_LEFT:c_int=	0x104;		/* left-arrow key */
+pub static KEY_RIGHT:c_int=	0x105;		/* right-arrow key */
+pub static KEY_HOME:c_int=	0x106;		/* home key */
+pub static KEY_BACKSPACE:c_int=	0x107;		/* backspace key */
+pub static KEY_F0:c_int=		0x108;		/* Function keys.  Space for 64 */
+pub static KEY_F1:c_int=		0x109;
+pub static KEY_F2:c_int=		0x10a;
+pub static KEY_F3:c_int=		0x10b;
+pub static KEY_F4:c_int=		0x10c;
+pub static KEY_F5:c_int=		0x10d;
+pub static KEY_F6:c_int=		0x10e;
+pub static KEY_F7:c_int=		0x10f;
+pub static KEY_F8:c_int=		0x110;
+pub static KEY_F9:c_int=		0x111;
+pub static KEY_F10:c_int=		0x112;
+pub static KEY_F11:c_int=		0x113;
+pub static KEY_F12:c_int=		0x114;
+pub static KEY_F13:c_int=		0x115;
+pub static KEY_F14:c_int=		0x116;
+pub static KEY_F15:c_int=		0x117;
+//pub static KEY_F(n)	(KEY_F0+(n))	/* Value of function key n */
 
-static KEY_DL:c_int=		0x148;		/* delete-line key */
-static KEY_IL:c_int=		0x149;		/* insert-line key */
-static KEY_DC:c_int=		0x150;		/* delete-character key */
-static KEY_IC:c_int=		0x151;		/* insert-character key */
-static KEY_EIC:c_int=		0x152;		/* sent by rmir or smir in insert mode */
-static KEY_CLEAR:c_int=	0x14d;		/* clear-screen or erase key */
-static KEY_EOS:c_int=		0x14e;		/* clear-to-end-of-screen key */
-static KEY_EOL:c_int=		0x14f;		/* clear-to-end-of-line key */
-static KEY_SF:c_int=		0x150;		/* scroll-forward key */
-static KEY_SR:c_int=		0x151;		/* scroll-backward key */
-static KEY_NPAGE:c_int=	0x152;		/* next-page key */
-static KEY_PPAGE:c_int=	0x153;		/* previous-page key */
-static KEY_STAB:c_int=	0x154;		/* set-tab key */
-static KEY_CTAB:c_int=	0x155;		/* clear-tab key */
-static KEY_CATAB:c_int=	0x156;		/* clear-all-tabs key */
-static KEY_ENTER:c_int=	0x157;		/* enter/send key */
-static KEY_PRINT:c_int=	0x15a;		/* print key */
-static KEY_LL:c_int=		0x15b;		/* lower-left key (home down) */
-static KEY_A1:c_int=		0x15c;		/* upper left of keypad */
-static KEY_A3:c_int=		0x15d;		/* upper right of keypad */
-static KEY_B2:c_int=		0x15e;		/* center of keypad */
-static KEY_C1:c_int=		0x15f;		/* lower left of keypad */
-static KEY_C3:c_int=		0x160;		/* lower right of keypad */
-static KEY_BTAB:c_int=	0x161;		/* back-tab key */
-static KEY_BEG:c_int=		0x162;		/* begin key */
-static KEY_CANCEL:c_int=	0x163;		/* cancel key */
-static KEY_CLOSE:c_int=	0x164;		/* close key */
-static KEY_COMMAND:c_int=	0x165;		/* command key */
-static KEY_COPY:c_int=	0x166;		/* copy key */
-static KEY_CREATE:c_int=	0x167;		/* create key */
-static KEY_END:c_int=		0x168;		/* end key */
-static KEY_EXIT:c_int=	0x169;		/* exit key */
-static KEY_FIND:c_int=	0x16a;		/* find key */
-static KEY_HELP:c_int=	0x16b;		/* help key */
-static KEY_MARK:c_int=	0x16c;		/* mark key */
-static KEY_MESSAGE:c_int=	0x16d;		/* message key */
-static KEY_MOVE:c_int=	0x16e;		/* move key */
-static KEY_NEXT:c_int=	0x16f;		/* next key */
-static KEY_OPEN:c_int=	0x170;		/* open key */
-static KEY_OPTIONS:c_int=	0x171;		/* options key */
-static KEY_PREVIOUS:c_int=	0x172;		/* previous key */
-static KEY_REDO:c_int=	0x173;		/* redo key */
-static KEY_REFERENCE:c_int=	0x174;		/* reference key */
-static KEY_REFRESH:c_int=	0x175;		/* refresh key */
-static KEY_REPLACE:c_int=	0x176;		/* replace key */
-static KEY_RESTART:c_int=	0x177;		/* restart key */
-static KEY_RESUME:c_int=	0x178;		/* resume key */
-static KEY_SAVE:c_int=	0x179;		/* save key */
-static KEY_SBEG:c_int=	0x17a;		/* shifted begin key */
-static KEY_SCANCEL:c_int=	0x17b;		/* shifted cancel key */
-static KEY_SCOMMAND:c_int=	0x17c;		/* shifted command key */
-static KEY_SCOPY:c_int=	0x17d;		/* shifted copy key */
-static KEY_SCREATE:c_int=	0x17e;		/* shifted create key */
-static KEY_SDC	:c_int=	0x17f;		/* shifted delete-character key */
-static KEY_SDL	:c_int=	0x180;		/* shifted delete-line key */
-static KEY_SELECT:c_int=	0x181;		/* select key */
-static KEY_SEND:c_int=	0x182;		/* shifted end key */
-static KEY_SEOL:c_int=	0x183;		/* shifted clear-to-end-of-line key */
-static KEY_SEXIT:c_int=	0x184;		/* shifted exit key */
-static KEY_SFIND:c_int=	0x185;		/* shifted find key */
-static KEY_SHELP:c_int=	0x186;		/* shifted help key */
-static KEY_SHOME:c_int=	0x187;		/* shifted home key */
-static KEY_SIC	:c_int=	0x188;		/* shifted insert-character key */
-static KEY_SLEFT:c_int=	0x189;		/* shifted left-arrow key */
-static KEY_SMESSAGE:c_int=	0x18a;		/* shifted message key */
-static KEY_SMOVE:c_int=	0x18b;		/* shifted move key */
-static KEY_SNEXT:c_int=	0x18c;		/* shifted next key */
-static KEY_SOPTIONS:c_int=	0x18d;		/* shifted options key */
-static KEY_SPREVIOUS:c_int=	0x18e;		/* shifted previous key */
-static KEY_SPRINT:c_int=	0x18f;		/* shifted print key */
-static KEY_SREDO:c_int=	0x190;		/* shifted redo key */
-static KEY_SREPLACE:c_int=	0x191;		/* shifted replace key */
-static KEY_SRIGHT:c_int=	0x192;		/* shifted right-arrow key */
-static KEY_SRSUME:c_int=	0x193;		/* shifted resume key */
-static KEY_SSAVE:c_int=	0x194;		/* shifted save key */
-static KEY_SSUSPEND:c_int=	0x195;		/* shifted suspend key */
-static KEY_SUNDO:c_int=	0x196;		/* shifted undo key */
-static KEY_SUSPEND:c_int=	0x197;		/* suspend key */
-static KEY_UNDO:c_int=	0x198;		/* undo key */
-static KEY_MOUSE:c_int=	0x199;		/* Mouse event has occurred */
-static KEY_RESIZE:c_int=	0x19a;		/* Terminal resize event */
-static KEY_EVENT:c_int=	0x19b;		/* We were interrupted by an event */
+pub static KEY_DL:c_int=		0x148;		/* delete-line key */
+pub static KEY_IL:c_int=		0x149;		/* insert-line key */
+pub static KEY_DC:c_int=		0x150;		/* delete-character key */
+pub static KEY_IC:c_int=		0x151;		/* insert-character key */
+pub static KEY_EIC:c_int=		0x152;		/* sent by rmir or smir in insert mode */
+pub static KEY_CLEAR:c_int=	0x14d;		/* clear-screen or erase key */
+pub static KEY_EOS:c_int=		0x14e;		/* clear-to-end-of-screen key */
+pub static KEY_EOL:c_int=		0x14f;		/* clear-to-end-of-line key */
+pub static KEY_SF:c_int=		0x150;		/* scroll-forward key */
+pub static KEY_SR:c_int=		0x151;		/* scroll-backward key */
+pub static KEY_NPAGE:c_int=	0x152;		/* next-page key */
+pub static KEY_PPAGE:c_int=	0x153;		/* previous-page key */
+pub static KEY_STAB:c_int=	0x154;		/* set-tab key */
+pub static KEY_CTAB:c_int=	0x155;		/* clear-tab key */
+pub static KEY_CATAB:c_int=	0x156;		/* clear-all-tabs key */
+pub static KEY_ENTER:c_int=	0x157;		/* enter/send key */
+pub static KEY_PRINT:c_int=	0x15a;		/* print key */
+pub static KEY_LL:c_int=		0x15b;		/* lower-left key (home down) */
+pub static KEY_A1:c_int=		0x15c;		/* upper left of keypad */
+pub static KEY_A3:c_int=		0x15d;		/* upper right of keypad */
+pub static KEY_B2:c_int=		0x15e;		/* center of keypad */
+pub static KEY_C1:c_int=		0x15f;		/* lower left of keypad */
+pub static KEY_C3:c_int=		0x160;		/* lower right of keypad */
+pub static KEY_BTAB:c_int=	0x161;		/* back-tab key */
+pub static KEY_BEG:c_int=		0x162;		/* begin key */
+pub static KEY_CANCEL:c_int=	0x163;		/* cancel key */
+pub static KEY_CLOSE:c_int=	0x164;		/* close key */
+pub static KEY_COMMAND:c_int=	0x165;		/* command key */
+pub static KEY_COPY:c_int=	0x166;		/* copy key */
+pub static KEY_CREATE:c_int=	0x167;		/* create key */
+pub static KEY_END:c_int=		0x168;		/* end key */
+pub static KEY_EXIT:c_int=	0x169;		/* exit key */
+pub static KEY_FIND:c_int=	0x16a;		/* find key */
+pub static KEY_HELP:c_int=	0x16b;		/* help key */
+pub static KEY_MARK:c_int=	0x16c;		/* mark key */
+pub static KEY_MESSAGE:c_int=	0x16d;		/* message key */
+pub static KEY_MOVE:c_int=	0x16e;		/* move key */
+pub static KEY_NEXT:c_int=	0x16f;		/* next key */
+pub static KEY_OPEN:c_int=	0x170;		/* open key */
+pub static KEY_OPTIONS:c_int=	0x171;		/* options key */
+pub static KEY_PREVIOUS:c_int=	0x172;		/* previous key */
+pub static KEY_REDO:c_int=	0x173;		/* redo key */
+pub static KEY_REFERENCE:c_int=	0x174;		/* reference key */
+pub static KEY_REFRESH:c_int=	0x175;		/* refresh key */
+pub static KEY_REPLACE:c_int=	0x176;		/* replace key */
+pub static KEY_RESTART:c_int=	0x177;		/* restart key */
+pub static KEY_RESUME:c_int=	0x178;		/* resume key */
+pub static KEY_SAVE:c_int=	0x179;		/* save key */
+pub static KEY_SBEG:c_int=	0x17a;		/* shifted begin key */
+pub static KEY_SCANCEL:c_int=	0x17b;		/* shifted cancel key */
+pub static KEY_SCOMMAND:c_int=	0x17c;		/* shifted command key */
+pub static KEY_SCOPY:c_int=	0x17d;		/* shifted copy key */
+pub static KEY_SCREATE:c_int=	0x17e;		/* shifted create key */
+pub static KEY_SDC	:c_int=	0x17f;		/* shifted delete-character key */
+pub static KEY_SDL	:c_int=	0x180;		/* shifted delete-line key */
+pub static KEY_SELECT:c_int=	0x181;		/* select key */
+pub static KEY_SEND:c_int=	0x182;		/* shifted end key */
+pub static KEY_SEOL:c_int=	0x183;		/* shifted clear-to-end-of-line key */
+pub static KEY_SEXIT:c_int=	0x184;		/* shifted exit key */
+pub static KEY_SFIND:c_int=	0x185;		/* shifted find key */
+pub static KEY_SHELP:c_int=	0x186;		/* shifted help key */
+pub static KEY_SHOME:c_int=	0x187;		/* shifted home key */
+pub static KEY_SIC	:c_int=	0x188;		/* shifted insert-character key */
+pub static KEY_SLEFT:c_int=	0x189;		/* shifted left-arrow key */
+pub static KEY_SMESSAGE:c_int=	0x18a;		/* shifted message key */
+pub static KEY_SMOVE:c_int=	0x18b;		/* shifted move key */
+pub static KEY_SNEXT:c_int=	0x18c;		/* shifted next key */
+pub static KEY_SOPTIONS:c_int=	0x18d;		/* shifted options key */
+pub static KEY_SPREVIOUS:c_int=	0x18e;		/* shifted previous key */
+pub static KEY_SPRINT:c_int=	0x18f;		/* shifted print key */
+pub static KEY_SREDO:c_int=	0x190;		/* shifted redo key */
+pub static KEY_SREPLACE:c_int=	0x191;		/* shifted replace key */
+pub static KEY_SRIGHT:c_int=	0x192;		/* shifted right-arrow key */
+pub static KEY_SRSUME:c_int=	0x193;		/* shifted resume key */
+pub static KEY_SSAVE:c_int=	0x194;		/* shifted save key */
+pub static KEY_SSUSPEND:c_int=	0x195;		/* shifted suspend key */
+pub static KEY_SUNDO:c_int=	0x196;		/* shifted undo key */
+pub static KEY_SUSPEND:c_int=	0x197;		/* suspend key */
+pub static KEY_UNDO:c_int=	0x198;		/* undo key */
+pub static KEY_MOUSE:c_int=	0x199;		/* Mouse event has occurred */
+pub static KEY_RESIZE:c_int=	0x19a;		/* Terminal resize event */
+pub static KEY_EVENT:c_int=	0x19b;		/* We were interrupted by an event */
 
-static KEY_MAX	:c_int=	0x1ff;		/* Maximum key value is 0633 */
+pub static KEY_MAX	:c_int=	0x1ff;		/* Maximum key value is 0633 */
 
 // FSK skipping functions involving cchar_t which has "interesting"
 // structure and which are all guarded by #ifdef
