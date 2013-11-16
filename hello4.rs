@@ -1,7 +1,8 @@
 extern mod ncurses;
 
+#[fixed_stack_segment]
 fn main() {
-    use ncurses::*;
+    use ncurses::{initscr, raw, keypad, noecho, printw, getch, attroff, A_BOLD, stdscr, refresh, endwin, attron, KEY_F1};
 
     unsafe {
         // raw(), cbreak(): turn off terminal buffering.  raw() passes
@@ -12,32 +13,32 @@ fn main() {
         // halfdelay(): This is some mode where input functions will only
         // wait for a timeout and then return ERR
 
-        let ch:libc::c_int;
         initscr();                    /* Start curses mode      */
         raw();
         keypad(stdscr, true);
         noecho();
 
-        do str::as_c_str("Type any character to see it in bold\n") |m| {
+        do "Type any character to see it in bold\n".to_c_str().with_ref |m| {
             printw(m);
         }
 
-        ch = getch(); // Without raw the input would be buffered to line break
+        let ch = getch(); // Without raw the input would be buffered to line break
 
         if ch == KEY_F1 { // Without keypad we'd miss F1
-            do str::as_c_str("F1 Key pressed") |m| { printw(m); }
+            do "F1 Key pressed".to_c_str().with_ref |m| { printw(m); }
         } else {
-            do str::as_c_str("The pressed key is") |m| { printw(m); }
+            do "The pressed key is ".to_c_str().with_ref |m| { printw(m); }
             attron(A_BOLD());
             // FSK: actual invocation was printw("%c", ch);
             // FSK: I am now curious as to whether curses needs to
             // FSK: muck with the internals within format strings,
             // FSK: and thus my simplification of passing one (fmt!'ed) string
             // FSK: will be broken.
-            do str::as_c_str(fmt!("%c", ch as char)) |m| { printw(m); }
+            let mychar = std::char::from_u32(ch as u32).unwrap().to_str().to_c_str();
+            do mychar.with_ref |m| { printw(m); }
             attroff(A_BOLD());
         }
-        refresh(); // 
+        refresh();                    // 
         getch();
         endwin();                     /* Terminate and cleanup  */
     }
