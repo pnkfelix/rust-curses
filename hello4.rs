@@ -1,8 +1,8 @@
-extern mod ncurses;
+extern mod ncurses_core;
 
 #[fixed_stack_segment]
 fn main() {
-    use ncurses::{initscr, raw, keypad, noecho, printw, getch, attroff, A_BOLD, stdscr, refresh, endwin, attron, KEY_F1};
+    use ncurses_core::{initscr, raw, keypad, noecho, printw, getch, attroff, A_BOLD, stdscr, refresh, endwin, attron, KEY_F1};
 
     unsafe {
         // raw(), cbreak(): turn off terminal buffering.  raw() passes

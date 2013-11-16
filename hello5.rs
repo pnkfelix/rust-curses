@@ -1,10 +1,10 @@
 #[feature(globs)];
 
-extern mod ncurses;
+extern mod ncurses_core;
 
 #[fixed_stack_segment]
 fn body() {
-    use ncurses::*;
+    use ncurses_core::*;
     use std::libc::{c_int,c_char};
 
     unsafe {
@@ -18,7 +18,7 @@ fn body() {
         do mesg.with_c_str |m| { mvaddstr(row-2, 0, m); }
         let mesg = "Try resizing your window (if possible) \
                     and then run this program again";
-        do mesg.with_c_str |m:*c_char| { ncurses::addstr(m); }
+        do mesg.with_c_str |m:*c_char| { addstr(m); }
         refresh();
         getch();
         endwin();
