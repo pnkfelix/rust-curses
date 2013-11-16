@@ -15,7 +15,7 @@ fn main() {
 
         initscr();                    /* Start curses mode      */
         raw();
-        keypad(stdscr, true);
+        keypad(stdscr, true as ncurses_core::NCURSES_BOOL);
         noecho();
 
         do "Type any character to see it in bold\n".to_c_str().with_ref |m| {

@@ -4,7 +4,9 @@ use std::libc::{c_char, c_int, c_short, c_uchar, c_uint, c_void,FILE};
 pub type chtype = c_uint;
 pub type attr_t = c_int;
 pub type NCURSES_ATTR_T = attr_t;
+pub type NCURSES_BOOL = c_char;
 
+type bool_t = NCURSES_BOOL;
 type attr_t_p = *attr_t;
 type short_p = *c_short;
 type void_p = *c_void;
@@ -50,11 +52,11 @@ extern {
     fn bkgdset (_:chtype);
     fn border (_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
     fn box (_:WINDOW_p, _:chtype, _:chtype) -> c_int;
-    fn can_change_color () -> bool;
+    fn can_change_color () -> bool_t;
     fn cbreak () -> c_int;
     fn chgat (_:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
     fn clear () -> c_int;
-    fn clearok (_:WINDOW_p,_:bool) -> c_int;
+    fn clearok (_:WINDOW_p,_:bool_t) -> c_int;
     fn clrtobot () -> c_int;
     fn clrtoeol () -> c_int;
     fn color_content (_:c_short,_:short_p,_:short_p,_:short_p) -> c_int;
@@ -86,13 +88,13 @@ extern {
     fn getstr (_:char_p) -> c_int;
     fn getwin (_:FILE_p) -> *WINDOW;
     fn halfdelay (_:c_int) -> c_int;
-    fn has_colors () -> bool;
-    fn has_ic () -> bool;
-    fn has_il () -> bool;
+    fn has_colors () -> bool_t;
+    fn has_ic () -> bool_t;
+    fn has_il () -> bool_t;
     fn hline (_:chtype, _:c_int) -> c_int;
-    fn idcok (_:WINDOW_p, _:bool);
-    fn idlok (_:WINDOW_p, _:bool) -> c_int;
-    fn immedok (_:WINDOW_p, _:bool);
+    fn idcok (_:WINDOW_p, _:bool_t);
+    fn idlok (_:WINDOW_p, _:bool_t) -> c_int;
+    fn immedok (_:WINDOW_p, _:bool_t);
     fn inch () -> chtype;
     fn inchnstr (_:chtype_p, _:c_int) -> c_int;
     fn inchstr (_:chtype_p) -> c_int;
@@ -106,16 +108,16 @@ extern {
     fn insnstr (_:char_p, _:c_int) -> c_int;
     fn insstr (_:char_p) -> c_int;
     fn instr (_:char_p) -> c_int;
-    fn intrflush (_:WINDOW_p,_:bool) -> c_int;
-    fn isendwin () -> bool;
-    fn is_linetouched (_:WINDOW_p,_:c_int) -> bool;
-    fn is_wintouched (_:WINDOW_p) -> bool;
+    fn intrflush (_:WINDOW_p,_:bool_t) -> c_int;
+    fn isendwin () -> bool_t;
+    fn is_linetouched (_:WINDOW_p,_:c_int) -> bool_t;
+    fn is_wintouched (_:WINDOW_p) -> bool_t;
     fn keyname (_:c_int) -> *c_char;
-    fn keypad (_:WINDOW_p, _:bool) -> c_int;
+    fn keypad (_:WINDOW_p, _:bool_t) -> c_int;
     fn killchar () -> c_char;
-    fn leaveok (_:WINDOW_p,_:bool) -> c_int;
+    fn leaveok (_:WINDOW_p,_:bool_t) -> c_int;
     fn longname () -> *c_char;
-    fn meta (_:WINDOW_p,_:bool) -> c_int;
+    fn meta (_:WINDOW_p,_:bool_t) -> c_int;
     fn move (_:c_int, _:c_int) -> c_int;
     fn mvaddch (_:c_int, _:c_int, _:chtype) -> c_int;
     fn mvaddchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
@@ -171,12 +173,12 @@ extern {
     fn newwin (_:c_int,_:c_int,_:c_int,_:c_int) -> *WINDOW;
     fn nl () -> c_int;
     fn nocbreak () -> c_int;
-    fn nodelay (_:WINDOW_p,_:bool) -> c_int;
+    fn nodelay (_:WINDOW_p,_:bool_t) -> c_int;
     fn noecho () -> c_int;
     fn nonl () -> c_int;
     fn noqiflush ();
     fn noraw () -> c_int;
-    fn notimeout (_:WINDOW_p,_:bool) -> c_int;
+    fn notimeout (_:WINDOW_p,_:bool_t) -> c_int;
     fn overlay (_:WINDOW_p,_:WINDOW_p) -> c_int;
     fn overwrite (_:WINDOW_p,_:WINDOW_p) -> c_int;
     fn pair_content (_:c_short,_:short_p,_:short_p) -> c_int;
@@ -202,7 +204,7 @@ extern {
     fn scr_init (_:char_p) -> c_int;
     fn scrl (_:c_int) -> c_int;
     fn scroll (_:WINDOW_p) -> c_int;
-    fn scrollok (_:WINDOW_p,_:bool) -> c_int;
+    fn scrollok (_:WINDOW_p,_:bool_t) -> c_int;
     fn scr_restore (_:char_p) -> c_int;
     fn scr_set (_:char_p) -> c_int;
     fn setscrreg (_:c_int,_:c_int) -> c_int;
@@ -228,7 +230,7 @@ extern {
     fn start_color () -> c_int;
     fn subpad (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:c_int) -> WINDOW_p;
     fn subwin (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:c_int) -> WINDOW_p;
-    fn syncok (_:WINDOW_p, _:bool) -> c_int;
+    fn syncok (_:WINDOW_p, _:bool_t) -> c_int;
     fn termattrs () -> chtype;
     fn termname () -> char_p;
     fn timeout (_:c_int);
@@ -237,7 +239,7 @@ extern {
     fn typeahead (_:c_int) -> c_int;
     fn ungetch (_:c_int) -> c_int;
     fn untouchwin (_:WINDOW_p) -> c_int;
-    fn use_env (_:bool);
+    fn use_env (_:bool_t);
     fn vidattr (_:chtype) -> c_int;
     //  fn vidputs (_:chtype, extern  fn f(c_int) -> c_int) -> c_int;
     fn vidputs (_:chtype, f:*u8) -> c_int;
@@ -330,19 +332,19 @@ extern {
  */
 extern {
 /*
-extern NCURSES_EXPORT(bool) is_term_resized (int, int);
+extern NCURSES_EXPORT(bool_t) is_term_resized (int, int);
 extern NCURSES_EXPORT(char *) keybound (int, int);
 extern NCURSES_EXPORT(const char *) curses_version (void);
 extern NCURSES_EXPORT(int) assume_default_colors (int, int);
 extern NCURSES_EXPORT(int) define_key (const char *, int);
 extern NCURSES_EXPORT(int) key_defined (const char *);
-extern NCURSES_EXPORT(int) keyok (int, bool);
+extern NCURSES_EXPORT(int) keyok (int, bool_t);
 extern NCURSES_EXPORT(int) resize_term (int, int);
 extern NCURSES_EXPORT(int) resizeterm (int, int);
 extern NCURSES_EXPORT(int) set_escdelay (int);
 extern NCURSES_EXPORT(int) set_tabsize (int);
 extern NCURSES_EXPORT(int) use_default_colors (void);
-extern NCURSES_EXPORT(int) use_extended_names (bool);
+extern NCURSES_EXPORT(int) use_extended_names (bool_t);
 extern NCURSES_EXPORT(int) use_legacy_coding (int);
 //typedef int (*NCURSES_WINDOW_CB)(WINDOW *, void *);
 //extern NCURSES_EXPORT(int) use_screen (SCREEN *, NCURSES_SCREEN_CB, void *);
@@ -359,16 +361,16 @@ extern NCURSES_EXPORT(void) nofilter(void);
  */
 extern {
     fn wgetparent (_:WINDOW_p) -> WINDOW_p;
-    fn is_cleared (_:WINDOW_p) -> bool;
-    fn is_idcok (_:WINDOW_p) -> bool;
-    fn is_idlok (_:WINDOW_p) -> bool;
-    fn is_immedok (_:WINDOW_p) -> bool;
-    fn is_keypad (_:WINDOW_p) -> bool;
-    fn is_leaveok (_:WINDOW_p) -> bool;
-    fn is_nodelay (_:WINDOW_p) -> bool;
-    fn is_notimeout (_:WINDOW_p) -> bool;
-    fn is_scrollok (_:WINDOW_p) -> bool;
-    fn is_syncok (_:WINDOW_p) -> bool;
+    fn is_cleared (_:WINDOW_p) -> bool_t;
+    fn is_idcok (_:WINDOW_p) -> bool_t;
+    fn is_idlok (_:WINDOW_p) -> bool_t;
+    fn is_immedok (_:WINDOW_p) -> bool_t;
+    fn is_keypad (_:WINDOW_p) -> bool_t;
+    fn is_leaveok (_:WINDOW_p) -> bool_t;
+    fn is_nodelay (_:WINDOW_p) -> bool_t;
+    fn is_notimeout (_:WINDOW_p) -> bool_t;
+    fn is_scrollok (_:WINDOW_p) -> bool_t;
+    fn is_syncok (_:WINDOW_p) -> bool_t;
     fn wgetscrreg (_:WINDOW_p, _:*c_int, _:*c_int) -> c_int;
 }
 
@@ -419,7 +421,7 @@ unsafe fn getparyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getpary(win
 #[fixed_stack_segment]
 unsafe fn getsyx(y:&mut c_int, x:&mut c_int) {
     if newscr != (0 as WINDOW_p) {
-        if is_leaveok(newscr) {
+        if is_leaveok(newscr) != 0 {
             *x = -1 as c_int;
             *y = -1 as c_int;
         } else {
@@ -432,9 +434,9 @@ unsafe fn getsyx(y:&mut c_int, x:&mut c_int) {
 unsafe fn setsyx(y:&mut c_int,x:&mut c_int) {
     if newscr != (0 as WINDOW_p) {
         if *y == -1 && *x == -1 {
-            leaveok(newscr, true);
+            leaveok(newscr, true as c_char);
         } else {
-            leaveok(newscr, false);
+            leaveok(newscr, false as c_char);
             wmove(newscr, *y, *x);
         }
     }
