@@ -1,0 +1,10 @@
+ncurses-intro
+ncurses-intro-test
+*~
+ncurses-lib-built
+ncurses-lib-core-built
+hello3
+hello4
+hello5
+*.dylib
+*.dSYM

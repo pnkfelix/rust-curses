@@ -53,7 +53,7 @@ extern {
     fn border (_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
     fn box (_:WINDOW_p, _:chtype, _:chtype) -> c_int;
     fn can_change_color () -> bool_t;
-    fn cbreak () -> c_int;
+    pub fn cbreak () -> c_int;
     fn chgat (_:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
     fn clear () -> c_int;
     fn clearok (_:WINDOW_p,_:bool_t) -> c_int;
@@ -74,10 +74,10 @@ extern {
     fn derwin (_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int) -> *WINDOW;
     fn doupdate () -> c_int;
     fn dupwin (_:WINDOW_p) -> *WINDOW;
-    fn echo () -> c_int;
+    pub fn echo () -> c_int;
     fn echochar (_:chtype) -> c_int;
     fn erase () -> c_int;
-    fn endwin () -> c_int;
+    pub fn endwin () -> c_int;
     fn erasechar () -> c_char;
     fn filter ();
     fn flash () -> c_int;
@@ -88,7 +88,7 @@ extern {
     fn getstr (_:char_p) -> c_int;
     fn getwin (_:FILE_p) -> *WINDOW;
     fn halfdelay (_:c_int) -> c_int;
-    fn has_colors () -> bool_t;
+    pub fn has_colors () -> bool_t;
     fn has_ic () -> bool_t;
     fn has_il () -> bool_t;
     fn hline (_:chtype, _:c_int) -> c_int;
@@ -100,7 +100,7 @@ extern {
     fn inchstr (_:chtype_p) -> c_int;
     fn initscr () -> *WINDOW;
     fn init_color (_:c_short,_:c_short,_:c_short,_:c_short) -> c_int;
-    fn init_pair (_:c_short,_:c_short,_:c_short) -> c_int;
+    pub fn init_pair (_:c_short,_:c_short,_:c_short) -> c_int;
     fn innstr (_:char_p, _:c_int) -> c_int;
     fn insch (_:chtype) -> c_int;
     fn insdelln (_:c_int) -> c_int;
@@ -113,7 +113,7 @@ extern {
     fn is_linetouched (_:WINDOW_p,_:c_int) -> bool_t;
     fn is_wintouched (_:WINDOW_p) -> bool_t;
     fn keyname (_:c_int) -> *c_char;
-    fn keypad (_:WINDOW_p, _:bool_t) -> c_int;
+    pub fn keypad (_:WINDOW_p, _:bool_t) -> c_int;
     fn killchar () -> c_char;
     fn leaveok (_:WINDOW_p,_:bool_t) -> c_int;
     fn longname () -> *c_char;
@@ -175,7 +175,7 @@ extern {
     fn nocbreak () -> c_int;
     fn nodelay (_:WINDOW_p,_:bool_t) -> c_int;
     fn noecho () -> c_int;
-    fn nonl () -> c_int;
+    pub fn nonl () -> c_int;
     fn noqiflush ();
     fn noraw () -> c_int;
     fn notimeout (_:WINDOW_p,_:bool_t) -> c_int;
@@ -227,7 +227,7 @@ extern {
     fn slk_touch () -> c_int;
     fn standout () -> c_int;
     fn standend () -> c_int;
-    fn start_color () -> c_int;
+    pub fn start_color () -> c_int;
     fn subpad (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:c_int) -> WINDOW_p;
     fn subwin (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:c_int) -> WINDOW_p;
     fn syncok (_:WINDOW_p, _:bool_t) -> c_int;
