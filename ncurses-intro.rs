@@ -61,9 +61,9 @@ fn main() {
         sig::signal(sig::INT, finish);
         let mut scr = context.stdscr();
         context.keypad(&mut scr, true);
-        context.nonl();
-        context.cbreak();
-        context.echo();
+        context.nonl_mode();
+        context.cbreak_mode();
+        context.echo_mode();
 
         if context.has_colors() {
             context.start_color();

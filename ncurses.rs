@@ -9,14 +9,16 @@ use ncurses_core::{WINDOW_p, SCREEN_p};
 mod ncurses_core;
 
 pub struct Context<'a> {
-    window: window,
+    window: Window,
     priv force_new: (),
     priv on_getch_err_do: chars::getch_err_response<'a>,
 }
 
 impl<'a> Context<'a> {
     pub fn new() -> Context {
-        Context{ window: initscr(), force_new: (), on_getch_err_do: chars::Immed(chars::Fail) }
+        Context{ window: initscr(),
+                 force_new: (),
+                 on_getch_err_do: chars::Immed(chars::Fail) }
     }
 }
 
@@ -27,16 +29,16 @@ impl<'a> Drop for Context<'a> {
 /// Describes a sub-rectangle of the screen (possibly in its
 /// entirety), that you can write to and scroll independently of other
 /// windows on the screen.
-pub struct window { priv ptr: WINDOW_p }
+pub struct Window { priv ptr: WINDOW_p }
 
 /// These are windows as large as the terminal screen (upper-left to
 /// lower-right).  `stdscr` is one such screen; it is the default for
 /// output.  There is a special screen, the "terminal screen", that
 /// corresponds to ncurses' model of what the user sees now.  (It
 /// might also correspond to `curscr`.
-pub struct screen { priv ptr: SCREEN_p }
+pub struct Screen { priv ptr: SCREEN_p }
 
-impl screen {
+impl Screen {
     unsafe fn wnd_ptr(&self) -> WINDOW_p {
         self.ptr as WINDOW_p
     }
@@ -81,7 +83,10 @@ macro_rules! wrap {
 
 pub mod attrs {
     use std::libc;
+    use std::cast;
     use nc = ncurses_core;
+
+    use super::colors;
 
     pub enum display {
         normal = nc::A_NORMAL, //        Normal display (no highlight)
@@ -97,9 +102,19 @@ pub mod attrs {
         // not an enum // A_CHARTEXT      Bit-mask to extract a character
     }
 
+    static all_display_attrs: [display, ..10] = [
+        normal, standout, underline, reverse,
+        blink, dim, bold, protect,
+        invis, altcharset
+            ];
+
     pub enum attr {
         display(display),
         color_pair(super::colors::pair_num),   // Color-pair number n
+    }
+
+    pub struct attr_set {
+        priv state: libc::c_int
     }
 
     fn encode_one(a: attr) -> libc::c_int {
@@ -111,15 +126,53 @@ pub mod attrs {
         }
     }
 
-    fn encode(attrs: &[attr]) -> libc::c_int {
+    fn encode_attrs(attrs: &[attr]) -> libc::c_int {
         let mut accum: libc::c_int = 0;
         for a in attrs.iter() { accum = accum | encode_one(*a) }
         accum
     }
 
+    fn encode_set(attr_set: &attr_set) -> libc::c_int {
+        attr_set.state
+    }
+
+    impl attr_set {
+        pub fn encode(&self) -> libc::c_int {
+            encode_set(self)
+        }
+        fn new(attrs: &[attr]) -> attr_set {
+            attr_set { state: encode_attrs(attrs) }
+        }
+        fn contents(&self) -> ~[attr] {
+            let mut accum = ~[];
+            for &a in all_display_attrs.iter() {
+                let i: i32 = unsafe { cast::transmute(a) };
+                if 0 != (i as libc::c_int & self.state) {
+                    accum.push(display(a));
+                }
+            }
+            for i in range(0, colors::color_pair_count()) {
+                let i = i as i16;
+                let p = unsafe { nc::COLOR_PAIR(i as libc::c_int) };
+                if 0 != (p & self.state) {
+                    accum.push(color_pair(i))
+                }
+            }
+            accum
+        }
+    }
+
+    trait EncodesAttrs { fn encode(&self) -> libc::c_int; }
+
+    impl<'a> EncodesAttrs for &'a [attr] {
+        fn encode(&self) -> libc::c_int {
+            encode_attrs(*self)
+        }
+    }
+
     impl<'a> super::Context<'a> {
         pub fn attrset(&mut self, attrs: &[attr]) {
-            let i = encode(attrs);
+            let i = encode_attrs(attrs);
             unsafe { fail_if_err!(nc::attrset(i)); }
         }
     }
@@ -129,9 +182,29 @@ pub mod mode {
     use nc = ncurses_core;
     use super::Context;
 
-    wrap!(cbreak)
-    wrap!(echo)
-    wrap!(nonl)
+    // wrap!(cbreak)
+    impl<'a> super::Context<'a> {
+        #[fixed_stack_segment]
+        pub fn cbreak_mode(&mut self) {
+            unsafe { fail_if_err!(nc::nonl()); }
+        }
+    }
+
+    // wrap!(nonl)
+    impl<'a> super::Context<'a> {
+        #[fixed_stack_segment]
+        pub fn nonl_mode(&mut self) {
+            unsafe { fail_if_err!(nc::nonl()); }
+        }
+    }
+
+    impl<'a> super::Context<'a> {
+        #[fixed_stack_segment]
+        pub fn echo_mode(&mut self) {
+            unsafe { fail_if_err!(nc::echo()); }
+        }
+    }
+
 }
 
 #[fixed_stack_segment]
@@ -139,16 +212,17 @@ fn endwin() {
     unsafe { fail_if_err!(nc::endwin()); }
 }
 
-fn initscr() -> window {
+fn initscr() -> Window {
     let result;
     unsafe { result = fail_if_null!(nc::initscr()); }
-    window { ptr: result }
+    Window { ptr: result }
 }
 
 pub mod chars {
     use nc = ncurses_core;
-    use std::libc::c_int;
+    use std::libc::{c_int, c_uint};
     use x = std::cast::transmute;
+    use super::attrs;
 
     pub trait FromCInt { fn from_c_int(i:c_int) -> Self; }
 
@@ -320,7 +394,7 @@ pub mod chars {
         fn from_c_int(i:c_int) -> event { let i = i as i16; assert!(event::covers(i as i32)); unsafe { x(i) } }
     }
 
-    enum ch {
+    enum raw_ch {
         ascii_ch(u8),
         move_ch(move_key),
         fcn_ch(fcn_key),
@@ -330,14 +404,67 @@ pub mod chars {
         event_ch(event)
     }
 
-    pub enum getch_err_act { Fail, Retry, Return(ch) }
+    enum ch {
+        ch(raw_ch),
+        ch_with_attr(raw_ch, attrs::attr_set)
+    }
+
+    fn encode_raw(c:raw_ch) -> nc::chtype {
+        match c {
+            ascii_ch(bk)  => bk as nc::chtype,
+            move_ch(mk)   => mk as nc::chtype,
+            fcn_ch(fk)    => fk as nc::chtype,
+            reset_ch(rk)  => rk as nc::chtype,
+            action_ch(ak) => ak as nc::chtype,
+            shift_ch(sk)  => sk as nc::chtype,
+            event_ch(ek)  => ek as nc::chtype,
+        }
+    }
+    fn encode(c:ch) -> nc::chtype {
+        match c {
+            ch(rc)                  => encode_raw(rc),
+            ch_with_attr(rc, attrs) => encode_raw(rc) | (attrs.encode() as c_uint)
+        }
+    }
+
+    impl<'a> super::Context<'a> {
+        pub fn addch(&mut self, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::addch(c)); }
+        }
+        pub fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::mvaddch(y, x, c)); }
+        }
+        pub fn echo(&mut self, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::echochar(c)); }
+        }
+    }
+
+    impl super::Window {
+        pub fn addch(&mut self, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::waddch(self.ptr, c)); }
+        }
+        pub fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::mvwaddch(self.ptr, y, x, c)); }
+        }
+        pub fn echo(&mut self, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::wechochar(self.ptr, c)); }
+        }
+    }
+
+    pub enum getch_err_act { Fail, Retry, Return(raw_ch) }
 
     pub enum getch_err_response<'a> {
         Immed(getch_err_act),
         Delay(&'static fn:Send() -> getch_err_act),
     }
 
-    pub fn getch_result_to_ch(result: c_int) -> ch {
+    pub fn getch_result_to_ch(result: c_int) -> raw_ch {
         if 0 <= result && result < 0x100        { ascii_ch(result as u8) }
             else if move_key::covers(result)    { move_ch(FromCInt::from_c_int(result)) }
             else if fcn_key::covers(result)     { fcn_ch(FromCInt::from_c_int(result)) }
@@ -353,7 +480,7 @@ pub mod chars {
         pub fn on_getch_err(&mut self, value: getch_err_response<'a>) {
             self.on_getch_err_do = value;
         }
-        pub fn getch(&mut self) -> ch {
+        pub fn getch(&mut self) -> raw_ch {
             let mut result : c_int;
             'getch: loop {
                 result = unsafe { nc::getch() };
@@ -365,7 +492,7 @@ pub mod chars {
                     match act {
                         Fail       => fail!("ncurses::getch"),
                         Retry      => continue 'getch,
-                        Return(ch) => return ch,
+                        Return(c)  => return c,
                     }
                 } else {
                     return getch_result_to_ch(result);
@@ -377,8 +504,9 @@ pub mod chars {
 
 pub mod colors {
     use nc = ncurses_core;
+    use std::libc;
 
-    pub type pair_num = i16;
+    pub type pair_num = libc::c_short;
 
     pub enum color {
         Black = nc::COLOR_BLACK,
@@ -399,30 +527,30 @@ pub mod colors {
 
         #[fixed_stack_segment]
         pub fn init_pair(&mut self, pair: pair_num, fg: color, bg: color) {
-            assert!(pair < self.color_pair_count());
+            assert!((pair as i32) < color_pair_count());
             unsafe { fail_if_err!(nc::init_pair(pair, fg as i16, bg as i16)); }
-        }
-
-        pub fn color_pair_count(&self) -> i16 {
-            nc::COLOR_PAIRS as i16
         }
 
         #[fixed_stack_segment]
         pub fn start(&mut self) { self.start_color(); }
     }
     wrap!(start_color)
+
+    pub fn color_pair_count() -> libc::c_int {
+        nc::COLOR_PAIRS
+    }
 }
 
 
 impl<'a> Context<'a> {
     #[fixed_stack_segment]
-    pub fn keypad(&mut self, s:&mut screen, enabled: bool) {
+    pub fn keypad(&mut self, s:&mut Screen, enabled: bool) {
         unsafe {
             fail_if_err!(nc::keypad(s.wnd_ptr(), enabled as nc::NCURSES_BOOL));
         }
     }
 
-    pub fn stdscr(&self) -> screen {
-        screen { ptr: nc::stdscr as SCREEN_p}
+    pub fn stdscr(&self) -> Screen {
+        Screen { ptr: nc::stdscr as SCREEN_p}
     }
 }

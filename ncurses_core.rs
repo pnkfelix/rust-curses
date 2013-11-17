@@ -36,7 +36,7 @@ extern {
     pub static LINES : c_int;
     pub static TABSIZE : c_int;
 
-    fn addch (_:chtype) -> c_int;
+    pub fn addch (_:chtype) -> c_int;
     fn addchnstr (_:*chtype, _:c_int) -> c_int;
     fn addchstr (_:*chtype) -> c_int;
     fn addnstr (_:*c_char, _:c_int) -> c_int;
@@ -77,7 +77,7 @@ extern {
     fn doupdate () -> c_int;
     fn dupwin (_:WINDOW_p) -> *WINDOW;
     pub fn echo () -> c_int;
-    fn echochar (_:chtype) -> c_int;
+    pub fn echochar (_:chtype) -> c_int;
     fn erase () -> c_int;
     pub fn endwin () -> c_int;
     fn erasechar () -> c_char;
@@ -121,7 +121,7 @@ extern {
     fn longname () -> *c_char;
     fn meta (_:WINDOW_p,_:bool_t) -> c_int;
     fn move (_:c_int, _:c_int) -> c_int;
-    fn mvaddch (_:c_int, _:c_int, _:chtype) -> c_int;
+    pub fn mvaddch (_:c_int, _:c_int, _:chtype) -> c_int;
     fn mvaddchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
     fn mvaddchstr (_:c_int, _:c_int, _:chtype_p) -> c_int;
     fn mvaddnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
@@ -145,7 +145,7 @@ extern {
     fn mvprintw (_:c_int, _:c_int, _:char_p) -> c_int;
     //  fn mvscanw (_:c_int,_:c_int, _:char_p) -> c_int;
     fn mvvline (_:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
-    fn mvwaddch (_:WINDOW_p, _:c_int, _:c_int, _:chtype) -> c_int;
+    pub fn mvwaddch (_:WINDOW_p, _:c_int, _:c_int, _:chtype) -> c_int;
     fn mvwaddchnstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
     fn mvwaddchstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p) -> c_int;
     fn mvwaddnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
@@ -250,7 +250,7 @@ extern {
     fn vw_printw (_:WINDOW_p, _:char_p,_:va_list) -> c_int;
     //  fn vwscanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
     //  fn vw_scanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
-    fn waddch (_:WINDOW_p, _:chtype) -> c_int;
+    pub fn waddch (_:WINDOW_p, _:chtype) -> c_int;
     fn waddchnstr (_:WINDOW_p,_:chtype_p,_:c_int) -> c_int;
     fn waddchstr (_:WINDOW_p,_:chtype_p) -> c_int;
     fn waddnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
@@ -273,7 +273,7 @@ extern {
     fn wcursyncup (_:WINDOW_p);
     fn wdelch (_:WINDOW_p) -> c_int;
     fn wdeleteln (_:WINDOW_p) -> c_int;
-    fn wechochar (_:WINDOW_p, _:chtype) -> c_int;
+    pub fn wechochar (_:WINDOW_p, _:chtype) -> c_int;
     fn werase (_:WINDOW_p) -> c_int;
     fn wgetch (_:WINDOW_p) -> c_int;
     fn wgetnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
