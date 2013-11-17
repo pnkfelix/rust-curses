@@ -1,3 +1,5 @@
+#[feature(macro_rules)];
+
 #[link(name="ncurses_core",vers="5.7")];
 use std::libc::{c_char, c_int, c_short, c_uchar, c_uint, c_void,FILE};
 
@@ -41,7 +43,7 @@ extern {
     fn addstr (_:*c_char) -> c_int;
     fn attroff (_:NCURSES_ATTR_T) -> c_int;
     fn attron (_:NCURSES_ATTR_T) -> c_int;
-    fn attrset (_:NCURSES_ATTR_T) -> c_int;
+    pub fn attrset (_:NCURSES_ATTR_T) -> c_int;
     fn attr_get (_:attr_t_p, _:short_p, _:void_p) -> c_int;
     fn attr_off (_:attr_t, _:void_p) -> c_int;
     fn attr_on (_:attr_t, _:void_p) -> c_int;
@@ -61,7 +63,7 @@ extern {
     fn clrtoeol () -> c_int;
     fn color_content (_:c_short,_:short_p,_:short_p,_:short_p) -> c_int;
     fn color_set (_:c_short,_:void_p) -> c_int;
-    fn COLOR_PAIR (_:c_int) -> c_int;
+    pub fn COLOR_PAIR (_:c_int) -> c_int;
     fn copywin (_:WINDOW_p,_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
     fn curs_set (_:c_int) -> c_int;
     fn def_prog_mode () -> c_int;
@@ -83,7 +85,7 @@ extern {
     fn flash () -> c_int;
     fn flushinp () -> c_int;
     fn getbkgd (_:WINDOW_p) -> chtype;
-    fn getch () -> c_int;
+    pub fn getch () -> c_int;
     fn getnstr (_:char_p, _:c_int) -> c_int;
     fn getstr (_:char_p) -> c_int;
     fn getwin (_:FILE_p) -> *WINDOW;
@@ -98,7 +100,7 @@ extern {
     fn inch () -> chtype;
     fn inchnstr (_:chtype_p, _:c_int) -> c_int;
     fn inchstr (_:chtype_p) -> c_int;
-    fn initscr () -> *WINDOW;
+    pub fn initscr () -> *WINDOW;
     fn init_color (_:c_short,_:c_short,_:c_short,_:c_short) -> c_int;
     pub fn init_pair (_:c_short,_:c_short,_:c_short) -> c_int;
     fn innstr (_:char_p, _:c_int) -> c_int;
@@ -378,26 +380,30 @@ extern {
 
 pub static NCURSES_ATTR_SHIFT  : uint =       8;
 fn NCURSES_BITS(mask:uint,shift:uint) -> uint { ((mask) << ((shift) + NCURSES_ATTR_SHIFT) as i32) }
-
-pub fn A_NORMAL() -> c_int      { (1u - 1u) as c_int }
-pub fn A_ATTRIBUTES() -> c_int  { NCURSES_BITS(!(1u - 1u),0)  as c_int }
-pub fn A_CHARTEXT() -> c_int    { (NCURSES_BITS(1u,0) - 1u)  as c_int }
-pub fn A_COLOR() -> c_int       { NCURSES_BITS(((1u) << 8) - 1u,0)  as c_int }
-pub fn A_STANDOUT() -> c_int    { NCURSES_BITS(1u,8)   as c_int }
-pub fn A_UNDERLINE() -> c_int   { NCURSES_BITS(1u,9)   as c_int }
-pub fn A_REVERSE() -> c_int     { NCURSES_BITS(1u,10)  as c_int }
-pub fn A_BLINK() -> c_int       { NCURSES_BITS(1u,11)  as c_int }
-pub fn A_DIM() -> c_int         { NCURSES_BITS(1u,12)  as c_int }
-pub fn A_BOLD() -> c_int        { NCURSES_BITS(1u,13)  as c_int }
-pub fn A_ALTCHARSET() -> c_int  { NCURSES_BITS(1u,14)  as c_int }
-pub fn A_INVIS() -> c_int       { NCURSES_BITS(1u,15)  as c_int }
-pub fn A_PROTECT() -> c_int     { NCURSES_BITS(1u,16)  as c_int }
-pub fn A_HORIZONTAL() -> c_int  { NCURSES_BITS(1u,17)  as c_int }
-pub fn A_LEFT() -> c_int        { NCURSES_BITS(1u,18)  as c_int }
-pub fn A_LOW() -> c_int         { NCURSES_BITS(1u,19)  as c_int }
-pub fn A_RIGHT() -> c_int       { NCURSES_BITS(1u,20)  as c_int }
-pub fn A_TOP() -> c_int         { NCURSES_BITS(1u,21)  as c_int }
-pub fn A_VERTICAL() -> c_int    { NCURSES_BITS(1u,22)  as c_int }
+macro_rules! ncurses_bits {
+    ($mask:expr, $shift:expr)
+        =>
+        ( (($mask) << (($shift) + NCURSES_ATTR_SHIFT) as i32) )
+}
+pub static A_NORMAL: c_int     = (1u - 1u) as c_int;
+pub static A_ATTRIBUTES: c_int = ncurses_bits!(!(1u - 1u),0)  as c_int;
+pub static A_CHARTEXT: c_int   = (ncurses_bits!(1u,0) - 1u)  as c_int;
+pub static A_COLOR: c_int      = ncurses_bits!(((1u) << 8) - 1u,0)  as c_int;
+pub static A_STANDOUT: c_int   = ncurses_bits!(1u,8)   as c_int;
+pub static A_UNDERLINE: c_int  = ncurses_bits!(1u,9)   as c_int;
+pub static A_REVERSE: c_int    = ncurses_bits!(1u,10)  as c_int;
+pub static A_BLINK: c_int      = ncurses_bits!(1u,11)  as c_int;
+pub static A_DIM: c_int        = ncurses_bits!(1u,12)  as c_int;
+pub static A_BOLD: c_int       = ncurses_bits!(1u,13)  as c_int;
+pub static A_ALTCHARSET: c_int = ncurses_bits!(1u,14)  as c_int;
+pub static A_INVIS: c_int      = ncurses_bits!(1u,15)  as c_int;
+pub static A_PROTECT: c_int    = ncurses_bits!(1u,16)  as c_int;
+pub static A_HORIZONTAL: c_int = ncurses_bits!(1u,17)  as c_int;
+pub static A_LEFT: c_int       = ncurses_bits!(1u,18)  as c_int;
+pub static A_LOW: c_int        = ncurses_bits!(1u,19)  as c_int;
+pub static A_RIGHT: c_int      = ncurses_bits!(1u,20)  as c_int;
+pub static A_TOP: c_int        = ncurses_bits!(1u,21)  as c_int;
+pub static A_VERTICAL: c_int   = ncurses_bits!(1u,22)  as c_int;
 
 /*
  * Most of the pseudo functions are macros that either provide compatibility
@@ -530,7 +536,7 @@ unsafe fn ACS_SBSB() -> c_uchar { ACS_VLINE() }
 unsafe fn ACS_SSSS() -> c_uchar { ACS_PLUS() }
 
 
-pub static ERR:c_int =     (-1);
+pub static ERR:c_int =     (-1 as c_int);
 
 pub static OK:c_int =      (0);
 
@@ -567,120 +573,120 @@ pub static _NEWINDEX:c_int = -1;
  *
  * A few key codes do not depend upon the terminfo entry.
  */
-pub static KEY_CODE_YES:c_int = 0x100;      /* A wchar_t contains a key code */
-pub static KEY_MIN:c_int =      0x101;      /* Minimum curses key */
-pub static KEY_BREAK:c_int =    0x101;      /* Break key (unreliable) */
-pub static KEY_SRESET:c_int =   0x158;      /* Soft (partial) reset (unreliable) */
-pub static KEY_RESET:c_int =    0x159;      /* Reset or hard reset (unreliable) */
+pub static KEY_CODE_YES:c_int = 0o400;      /* A wchar_t contains a key code */
+pub static KEY_MIN:c_int =      0o401;      /* Minimum curses key */
+pub static KEY_BREAK:c_int =    0o401;      /* Break key (unreliable) */
+pub static KEY_SRESET:c_int =   0o530;      /* Soft (partial) reset (unreliable) */
+pub static KEY_RESET:c_int =    0o531;      /* Reset or hard reset (unreliable) */
 /*
  * These definitions were generated by /tmp/ncurses-27.roots/ncurses-27/ncurses/include/MKkey_defs.sh /tmp/ncurses-27.roots/ncurses-27/ncurses/include/Caps
  */
-pub static KEY_DOWN:c_int      = 0x102; /* down-arrow key */
-pub static KEY_UP:c_int        = 0x103; /* up-arrow key */
-pub static KEY_LEFT:c_int      = 0x104; /* left-arrow key */
-pub static KEY_RIGHT:c_int     = 0x105; /* right-arrow key */
-pub static KEY_HOME:c_int      = 0x106; /* home key */
-pub static KEY_BACKSPACE:c_int = 0x107; /* backspace key */
-pub static KEY_F0:c_int        = 0x108;/* Function keys.  Space for 64 */
-pub static KEY_F1:c_int        = 0x109;
-pub static KEY_F2:c_int        = 0x10a;
-pub static KEY_F3:c_int        = 0x10b;
-pub static KEY_F4:c_int        = 0x10c;
-pub static KEY_F5:c_int        = 0x10d;
-pub static KEY_F6:c_int        = 0x10e;
-pub static KEY_F7:c_int        = 0x10f;
-pub static KEY_F8:c_int        = 0x110;
-pub static KEY_F9:c_int        = 0x111;
-pub static KEY_F10:c_int       = 0x112;
-pub static KEY_F11:c_int       = 0x113;
-pub static KEY_F12:c_int       = 0x114;
-pub static KEY_F13:c_int       = 0x115;
-pub static KEY_F14:c_int       = 0x116;
-pub static KEY_F15:c_int       = 0x117;
+pub static KEY_DOWN:c_int      = 0o402; /* down-arrow key */
+pub static KEY_UP:c_int        = 0o403; /* up-arrow key */
+pub static KEY_LEFT:c_int      = 0o404; /* left-arrow key */
+pub static KEY_RIGHT:c_int     = 0o405; /* right-arrow key */
+pub static KEY_HOME:c_int      = 0o406; /* home key */
+pub static KEY_BACKSPACE:c_int = 0o407; /* backspace key */
+pub static KEY_F0:c_int        = 0o410;/* Function keys.  Space for 64 */
+pub static KEY_F1:c_int        = KEY_F0 + 1;
+pub static KEY_F2:c_int        = KEY_F0 + 2;
+pub static KEY_F3:c_int        = KEY_F0 + 3;
+pub static KEY_F4:c_int        = KEY_F0 + 4;
+pub static KEY_F5:c_int        = KEY_F0 + 5;
+pub static KEY_F6:c_int        = KEY_F0 + 6;
+pub static KEY_F7:c_int        = KEY_F0 + 7;
+pub static KEY_F8:c_int        = KEY_F0 + 8;
+pub static KEY_F9:c_int        = KEY_F0 + 9;
+pub static KEY_F10:c_int       = KEY_F0 + 10;
+pub static KEY_F11:c_int       = KEY_F0 + 11;
+pub static KEY_F12:c_int       = KEY_F0 + 12;
+pub static KEY_F13:c_int       = KEY_F0 + 13;
+pub static KEY_F14:c_int       = KEY_F0 + 14;
+pub static KEY_F15:c_int       = KEY_F0 + 15;
 //pub static KEY_F(n) (KEY_F0+(n))      /* Value of function key n */
 
-pub static KEY_DL:c_int        = 0x148; /* delete-line key */
-pub static KEY_IL:c_int        = 0x149; /* insert-line key */
-pub static KEY_DC:c_int        = 0x150; /* delete-character key */
-pub static KEY_IC:c_int        = 0x151; /* insert-character key */
-pub static KEY_EIC:c_int       = 0x152; /* sent by rmir or smir in insert mode */
-pub static KEY_CLEAR:c_int     = 0x14d; /* clear-screen or erase key */
-pub static KEY_EOS:c_int       = 0x14e; /* clear-to-end-of-screen key */
-pub static KEY_EOL:c_int       = 0x14f; /* clear-to-end-of-line key */
-pub static KEY_SF:c_int        = 0x150; /* scroll-forward key */
-pub static KEY_SR:c_int        = 0x151; /* scroll-backward key */
-pub static KEY_NPAGE:c_int     = 0x152; /* next-page key */
-pub static KEY_PPAGE:c_int     = 0x153; /* previous-page key */
-pub static KEY_STAB:c_int      = 0x154; /* set-tab key */
-pub static KEY_CTAB:c_int      = 0x155; /* clear-tab key */
-pub static KEY_CATAB:c_int     = 0x156; /* clear-all-tabs key */
-pub static KEY_ENTER:c_int     = 0x157; /* enter/send key */
-pub static KEY_PRINT:c_int     = 0x15a; /* print key */
-pub static KEY_LL:c_int        = 0x15b; /* lower-left key (home down) */
-pub static KEY_A1:c_int        = 0x15c; /* upper left of keypad */
-pub static KEY_A3:c_int        = 0x15d; /* upper right of keypad */
-pub static KEY_B2:c_int        = 0x15e; /* center of keypad */
-pub static KEY_C1:c_int        = 0x15f; /* lower left of keypad */
-pub static KEY_C3:c_int        = 0x160; /* lower right of keypad */
-pub static KEY_BTAB:c_int      = 0x161; /* back-tab key */
-pub static KEY_BEG:c_int       = 0x162; /* begin key */
-pub static KEY_CANCEL:c_int    = 0x163; /* cancel key */
-pub static KEY_CLOSE:c_int     = 0x164; /* close key */
-pub static KEY_COMMAND:c_int   = 0x165; /* command key */
-pub static KEY_COPY:c_int      = 0x166; /* copy key */
-pub static KEY_CREATE:c_int    = 0x167; /* create key */
-pub static KEY_END:c_int       = 0x168; /* end key */
-pub static KEY_EXIT:c_int      = 0x169; /* exit key */
-pub static KEY_FIND:c_int      = 0x16a; /* find key */
-pub static KEY_HELP:c_int      = 0x16b; /* help key */
-pub static KEY_MARK:c_int      = 0x16c; /* mark key */
-pub static KEY_MESSAGE:c_int   = 0x16d; /* message key */
-pub static KEY_MOVE:c_int      = 0x16e; /* move key */
-pub static KEY_NEXT:c_int      = 0x16f; /* next key */
-pub static KEY_OPEN:c_int      = 0x170; /* open key */
-pub static KEY_OPTIONS:c_int   = 0x171; /* options key */
-pub static KEY_PREVIOUS:c_int  = 0x172; /* previous key */
-pub static KEY_REDO:c_int      = 0x173; /* redo key */
-pub static KEY_REFERENCE:c_int = 0x174; /* reference key */
-pub static KEY_REFRESH:c_int   = 0x175; /* refresh key */
-pub static KEY_REPLACE:c_int   = 0x176; /* replace key */
-pub static KEY_RESTART:c_int   = 0x177; /* restart key */
-pub static KEY_RESUME:c_int    = 0x178; /* resume key */
-pub static KEY_SAVE:c_int      = 0x179; /* save key */
-pub static KEY_SBEG:c_int      = 0x17a; /* shifted begin key */
-pub static KEY_SCANCEL:c_int   = 0x17b; /* shifted cancel key */
-pub static KEY_SCOMMAND:c_int  = 0x17c; /* shifted command key */
-pub static KEY_SCOPY:c_int     = 0x17d; /* shifted copy key */
-pub static KEY_SCREATE:c_int   = 0x17e; /* shifted create key */
-pub static KEY_SDC:c_int       = 0x17f; /* shifted delete-character key */
-pub static KEY_SDL:c_int       = 0x180; /* shifted delete-line key */
-pub static KEY_SELECT:c_int    = 0x181; /* select key */
-pub static KEY_SEND:c_int      = 0x182; /* shifted end key */
-pub static KEY_SEOL:c_int      = 0x183; /* shifted clear-to-end-of-line key */
-pub static KEY_SEXIT:c_int     = 0x184; /* shifted exit key */
-pub static KEY_SFIND:c_int     = 0x185; /* shifted find key */
-pub static KEY_SHELP:c_int     = 0x186; /* shifted help key */
-pub static KEY_SHOME:c_int     = 0x187; /* shifted home key */
-pub static KEY_SIC:c_int       = 0x188; /* shifted insert-character key */
-pub static KEY_SLEFT:c_int     = 0x189; /* shifted left-arrow key */
-pub static KEY_SMESSAGE:c_int  = 0x18a; /* shifted message key */
-pub static KEY_SMOVE:c_int     = 0x18b; /* shifted move key */
-pub static KEY_SNEXT:c_int     = 0x18c; /* shifted next key */
-pub static KEY_SOPTIONS:c_int  = 0x18d; /* shifted options key */
-pub static KEY_SPREVIOUS:c_int = 0x18e; /* shifted previous key */
-pub static KEY_SPRINT:c_int    = 0x18f; /* shifted print key */
-pub static KEY_SREDO:c_int     = 0x190; /* shifted redo key */
-pub static KEY_SREPLACE:c_int  = 0x191; /* shifted replace key */
-pub static KEY_SRIGHT:c_int    = 0x192; /* shifted right-arrow key */
-pub static KEY_SRSUME:c_int    = 0x193; /* shifted resume key */
-pub static KEY_SSAVE:c_int     = 0x194; /* shifted save key */
-pub static KEY_SSUSPEND:c_int  = 0x195; /* shifted suspend key */
-pub static KEY_SUNDO:c_int     = 0x196; /* shifted undo key */
-pub static KEY_SUSPEND:c_int   = 0x197; /* suspend key */
-pub static KEY_UNDO:c_int      = 0x198; /* undo key */
-pub static KEY_MOUSE:c_int     = 0x199; /* Mouse event has occurred */
-pub static KEY_RESIZE:c_int    = 0x19a; /* Terminal resize event */
-pub static KEY_EVENT:c_int     = 0x19b; /* We were interrupted by an event */
+pub static KEY_DL:c_int        = 0o510; /* delete-line key */
+pub static KEY_IL:c_int        = 0o511; /* insert-line key */
+pub static KEY_DC:c_int        = 0o512; /* delete-character key */
+pub static KEY_IC:c_int        = 0o513; /* insert-character key */
+pub static KEY_EIC:c_int       = 0o514; /* sent by rmir or smir in insert mode */
+pub static KEY_CLEAR:c_int     = 0o515; /* clear-screen or erase key */
+pub static KEY_EOS:c_int       = 0o516; /* clear-to-end-of-screen key */
+pub static KEY_EOL:c_int       = 0o517; /* clear-to-end-of-line key */
+pub static KEY_SF:c_int        = 0o520; /* scroll-forward key */
+pub static KEY_SR:c_int        = 0o521; /* scroll-backward key */
+pub static KEY_NPAGE:c_int     = 0o522; /* next-page key */
+pub static KEY_PPAGE:c_int     = 0o523; /* previous-page key */
+pub static KEY_STAB:c_int      = 0o524; /* set-tab key */
+pub static KEY_CTAB:c_int      = 0o525; /* clear-tab key */
+pub static KEY_CATAB:c_int     = 0o526; /* clear-all-tabs key */
+pub static KEY_ENTER:c_int     = 0o527; /* enter/send key */
+pub static KEY_PRINT:c_int     = 0o532; /* print key */
+pub static KEY_LL:c_int        = 0o533; /* lower-left key (home down) */
+pub static KEY_A1:c_int        = 0o534; /* upper left of keypad */
+pub static KEY_A3:c_int        = 0o535; /* upper right of keypad */
+pub static KEY_B2:c_int        = 0o536; /* center of keypad */
+pub static KEY_C1:c_int        = 0o537; /* lower left of keypad */
+pub static KEY_C3:c_int        = 0o540; /* lower right of keypad */
+pub static KEY_BTAB:c_int      = 0o541; /* back-tab key */
+pub static KEY_BEG:c_int       = 0o542; /* begin key */
+pub static KEY_CANCEL:c_int    = 0o543; /* cancel key */
+pub static KEY_CLOSE:c_int     = 0o544; /* close key */
+pub static KEY_COMMAND:c_int   = 0o545; /* command key */
+pub static KEY_COPY:c_int      = 0o546; /* copy key */
+pub static KEY_CREATE:c_int    = 0o547; /* create key */
+pub static KEY_END:c_int       = 0o550; /* end key */
+pub static KEY_EXIT:c_int      = 0o551; /* exit key */
+pub static KEY_FIND:c_int      = 0o552; /* find key */
+pub static KEY_HELP:c_int      = 0o553; /* help key */
+pub static KEY_MARK:c_int      = 0o554; /* mark key */
+pub static KEY_MESSAGE:c_int   = 0o555; /* message key */
+pub static KEY_MOVE:c_int      = 0o556; /* move key */
+pub static KEY_NEXT:c_int      = 0o557; /* next key */
+pub static KEY_OPEN:c_int      = 0o560; /* open key */
+pub static KEY_OPTIONS:c_int   = 0o561; /* options key */
+pub static KEY_PREVIOUS:c_int  = 0o562; /* previous key */
+pub static KEY_REDO:c_int      = 0o563; /* redo key */
+pub static KEY_REFERENCE:c_int = 0o564; /* reference key */
+pub static KEY_REFRESH:c_int   = 0o565; /* refresh key */
+pub static KEY_REPLACE:c_int   = 0o566; /* replace key */
+pub static KEY_RESTART:c_int   = 0o567; /* restart key */
+pub static KEY_RESUME:c_int    = 0o570; /* resume key */
+pub static KEY_SAVE:c_int      = 0o571; /* save key */
+pub static KEY_SBEG:c_int      = 0o572; /* shifted begin key */
+pub static KEY_SCANCEL:c_int   = 0o573; /* shifted cancel key */
+pub static KEY_SCOMMAND:c_int  = 0o574; /* shifted command key */
+pub static KEY_SCOPY:c_int     = 0o575; /* shifted copy key */
+pub static KEY_SCREATE:c_int   = 0o576; /* shifted create key */
+pub static KEY_SDC:c_int       = 0o577; /* shifted delete-character key */
+pub static KEY_SDL:c_int       = 0o600; /* shifted delete-line key */
+pub static KEY_SELECT:c_int    = 0o601; /* select key */
+pub static KEY_SEND:c_int      = 0o602; /* shifted end key */
+pub static KEY_SEOL:c_int      = 0o603; /* shifted clear-to-end-of-line key */
+pub static KEY_SEXIT:c_int     = 0o604; /* shifted exit key */
+pub static KEY_SFIND:c_int     = 0o605; /* shifted find key */
+pub static KEY_SHELP:c_int     = 0o606; /* shifted help key */
+pub static KEY_SHOME:c_int     = 0o607; /* shifted home key */
+pub static KEY_SIC:c_int       = 0o610; /* shifted insert-character key */
+pub static KEY_SLEFT:c_int     = 0o611; /* shifted left-arrow key */
+pub static KEY_SMESSAGE:c_int  = 0o612; /* shifted message key */
+pub static KEY_SMOVE:c_int     = 0o613; /* shifted move key */
+pub static KEY_SNEXT:c_int     = 0o614; /* shifted next key */
+pub static KEY_SOPTIONS:c_int  = 0o615; /* shifted options key */
+pub static KEY_SPREVIOUS:c_int = 0o616; /* shifted previous key */
+pub static KEY_SPRINT:c_int    = 0o617; /* shifted print key */
+pub static KEY_SREDO:c_int     = 0o620; /* shifted redo key */
+pub static KEY_SREPLACE:c_int  = 0o621; /* shifted replace key */
+pub static KEY_SRIGHT:c_int    = 0o622; /* shifted right-arrow key */
+pub static KEY_SRSUME:c_int    = 0o623; /* shifted resume key */
+pub static KEY_SSAVE:c_int     = 0o624; /* shifted save key */
+pub static KEY_SSUSPEND:c_int  = 0o625; /* shifted suspend key */
+pub static KEY_SUNDO:c_int     = 0o626; /* shifted undo key */
+pub static KEY_SUSPEND:c_int   = 0o627; /* suspend key */
+pub static KEY_UNDO:c_int      = 0o630; /* undo key */
+pub static KEY_MOUSE:c_int     = 0o631; /* Mouse event has occurred */
+pub static KEY_RESIZE:c_int    = 0o632; /* Terminal resize event */
+pub static KEY_EVENT:c_int     = 0o633; /* We were interrupted by an event */
 
 pub static KEY_MAX:c_int       = 0x1ff; /* Maximum key value is 0633 */
 

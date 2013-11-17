@@ -28,7 +28,7 @@ fn main() {
             do "F1 Key pressed".to_c_str().with_ref |m| { printw(m); }
         } else {
             do "The pressed key is ".to_c_str().with_ref |m| { printw(m); }
-            attron(A_BOLD());
+            attron(A_BOLD);
             // FSK: actual invocation was printw("%c", ch);
             // FSK: I am now curious as to whether curses needs to
             // FSK: muck with the internals within format strings,
@@ -36,7 +36,7 @@ fn main() {
             // FSK: will be broken.
             let mychar = std::char::from_u32(ch as u32).unwrap().to_str().to_c_str();
             do mychar.with_ref |m| { printw(m); }
-            attroff(A_BOLD());
+            attroff(A_BOLD);
         }
         refresh();                    // 
         getch();

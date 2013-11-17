@@ -36,19 +36,26 @@ mod signal_h;
 //      (bool, TRUE, FALSE, ERR, OK).
 //
 //      Those all sound adaptable to a Rusty way of doing things.
-
+//
+// Howver, there is also the pesky initialization (initscr) and
+// destruction (endwin) functions.  Those lead me to think that I
+// actually want an RAII style system here, potentially with either a
+// global lock or just outright failing if it is initialized more than
+// once in a process.
 
 fn main() {
-    use ncurses::{keypad, stdscr};
+    use ncurses::{initscr, keypad, stdscr};
     use ncurses::mode::{cbreak,echo,nonl};
     use ncurses::colors::{has_colors, start_color, init_pair};
     use ncurses::colors;
-    // use ncurses::{getch, attrset};
+    use ncurses::chars::{getch};
+    use ncurses::attrs;
 
-    let num : int;
+    let mut num : colors::pair_num = 0;
 
     unsafe {
         sig::signal(sig::INT, finish);
+        initscr();
         let mut scr = stdscr();
         keypad(&mut scr, true);
         nonl();
@@ -68,19 +75,19 @@ fn main() {
             init_pair(7, colors::White,   colors::Black);
         }
 
-/*
+
         loop {
             let c = getch();
-            attrset(COLOR_PAIR(num % 8));
+            attrs::set([attrs::color_pair(num % 8)]);
             num = num + 1;
 
             // process the command keystroke
         }
-*/
+
     }
 }
 
-extern "C" fn finish(sig:libc::c_int)
+extern "C" fn finish(_sig:libc::c_int)
 {
     ncurses::endwin();
 
