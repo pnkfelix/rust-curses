@@ -33,13 +33,6 @@ pub struct Window<'a> {
 // why the ncurses-intro was introducing this distinction in the first
 // place, then maybe I will find place for this to be revised as doc.
 
-pub struct Screen { priv ptr: SCREEN_p }
-
-impl Screen {
-    unsafe fn wnd_ptr(&self) -> WINDOW_p {
-        self.ptr as WINDOW_p
-    }
-}
 
 macro_rules! fail_if_null {
     ($e:expr) => {
@@ -723,15 +716,45 @@ pub mod output {
     }
 }
 
+mod screens {
+    // use std::io::native::file::CFile;
+    use std::libc::types::common::c95::FILE;
+    use std::libc;
+    use nc = ncurses_core;
+    use ncurses_core::{WINDOW_p, SCREEN_p};
+    type FilePtr = *FILE;
+
+    struct Screen { ptr: SCREEN_p }
+
+    impl Screen {
+        pub unsafe fn wnd_ptr(&self) -> WINDOW_p {
+            self.ptr as WINDOW_p
+        }
+    }
+
+    fn newterm(type_: *libc::c_char, out_: FilePtr, in_: FilePtr) -> Screen {
+        let p = unsafe { nc::newterm(type_, out_, in_) };
+        Screen { ptr: p }
+    }
+    fn set_term(s: Screen) -> Screen {
+        let old_p = unsafe { nc::set_term(s.ptr) };
+        Screen { ptr: old_p }
+    }
+    fn delscreen(s: Screen) {
+        unsafe { nc::delscreen(s.ptr); }
+    }
+
+}
+
 impl<'a> Context<'a> {
     #[fixed_stack_segment]
-    pub fn keypad(&mut self, s:&mut Screen, enabled: bool) {
+    pub fn keypad(&mut self, s:&mut self::screens::Screen, enabled: bool) {
         unsafe {
             fail_if_err!(nc::keypad(s.wnd_ptr(), enabled as nc::NCURSES_BOOL));
         }
     }
 
-    pub fn stdscr(&self) -> Screen {
-        Screen { ptr: nc::stdscr as SCREEN_p}
+    pub fn stdscr(&self) -> self::screens::Screen {
+        self::screens::Screen { ptr: nc::stdscr as SCREEN_p}
     }
 }

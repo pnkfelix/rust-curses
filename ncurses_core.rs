@@ -71,7 +71,7 @@ extern {
     fn def_shell_mode () -> c_int;
     fn delay_output (_:c_int) -> c_int;
     fn delch () -> c_int;
-    fn delscreen (_:SCREEN_p);
+    pub fn delscreen (_:SCREEN_p);
     fn delwin (_:WINDOW_p) -> c_int;
     fn deleteln () -> c_int;
     fn derwin (_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int) -> *WINDOW;
@@ -172,7 +172,7 @@ extern {
     fn mvwvline (_:WINDOW_p, _:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
     fn napms (_:c_int) -> c_int;
     fn newpad (_:c_int,_:c_int) -> *WINDOW;
-    fn newterm (_:char_p,_:FILE_p,_:FILE_p) -> *SCREEN;
+    pub fn newterm (_:char_p,_:FILE_p,_:FILE_p) -> *SCREEN;
     fn newwin (_:c_int,_:c_int,_:c_int,_:c_int) -> *WINDOW;
     pub fn nl () -> c_int;
     pub fn nocbreak () -> c_int;
@@ -211,7 +211,7 @@ extern {
     fn scr_restore (_:char_p) -> c_int;
     fn scr_set (_:char_p) -> c_int;
     fn setscrreg (_:c_int,_:c_int) -> c_int;
-    fn set_term (_:SCREEN_p) -> SCREEN_p;
+    pub fn set_term (_:SCREEN_p) -> SCREEN_p;
     fn slk_attroff (_:chtype) -> c_int;
     fn slk_attr_off (_:attr_t, _:void_p) -> c_int;
     fn slk_attron (_:chtype) -> c_int;

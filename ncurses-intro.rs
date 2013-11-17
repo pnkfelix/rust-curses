@@ -60,6 +60,9 @@ fn main() {
     unsafe {
         finished = false;
         sig::signal(sig::INT, finish);
+
+        // Danger, danger: privacy bug alert!
+        // let mut scr : ncurses::screens::Screen = context.stdscr();
         let mut scr = context.stdscr();
 
         // N.B. on the below: "Since the screen package needs to know
