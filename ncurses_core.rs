@@ -120,7 +120,7 @@ extern {
     fn leaveok (_:WINDOW_p,_:bool_t) -> c_int;
     fn longname () -> *c_char;
     fn meta (_:WINDOW_p,_:bool_t) -> c_int;
-    fn move (_:c_int, _:c_int) -> c_int;
+    pub fn move (_:c_int, _:c_int) -> c_int;
     pub fn mvaddch (_:c_int, _:c_int, _:chtype) -> c_int;
     fn mvaddchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
     fn mvaddchstr (_:c_int, _:c_int, _:chtype_p) -> c_int;
@@ -289,7 +289,7 @@ extern {
     fn winsnstr (_:WINDOW_p, _:char_p,_:c_int) -> c_int;
     fn winsstr (_:WINDOW_p, _:char_p) -> c_int;
     fn winstr (_:WINDOW_p, _:char_p) -> c_int;
-    fn wmove (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
+    pub fn wmove (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
     fn wnoutrefresh (_:WINDOW_p) -> c_int;
     fn wprintw (_:WINDOW_p, _:char_p) -> c_int;
     fn wredrawln (_:WINDOW_p,_:c_int,_:c_int) -> c_int;

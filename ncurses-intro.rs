@@ -47,9 +47,10 @@ fn main() {
     use ncurses::chars;
     #[allow(unused_imports)] // Issue #10534
     // use ncurses::chars::{Immed, Return}
-    use ncurses::chars::{Delay, Fail, Retry};
+    use ncurses::input::{Delay, Fail, Retry};
     use ncurses::colors;
     // use ncurses::chars::{getch};
+    use ncurses::input;
     use ncurses::attrs;
 
     let mut num : colors::pair_num = 0;
@@ -80,7 +81,7 @@ fn main() {
 
         // context.on_getch_err(Immed(Retry));
         context.on_getch_err(Delay(inspect_errno));
-        fn inspect_errno() -> chars::getch_err_act {
+        fn inspect_errno() -> input::getch_err_act {
             match os::errno() as libc::c_int {
                 libc::EINTR => Retry,
                 _ => Fail,
@@ -92,6 +93,8 @@ fn main() {
             num = num + 1;
 
             // process the command keystroke
+
+            context.addch(chars::ch(c));
         }
 
         os::set_exit_status(0);

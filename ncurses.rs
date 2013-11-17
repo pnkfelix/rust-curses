@@ -11,14 +11,14 @@ mod ncurses_core;
 pub struct Context<'a> {
     window: Window,
     priv force_new: (),
-    priv on_getch_err_do: chars::getch_err_response<'a>,
+    priv on_getch_err_do: input::getch_err_response<'a>,
 }
 
 impl<'a> Context<'a> {
     pub fn new() -> Context {
         Context{ window: initscr(),
                  force_new: (),
-                 on_getch_err_do: chars::Immed(chars::Fail) }
+                 on_getch_err_do: input::Immed(input::Fail) }
     }
 }
 
@@ -226,13 +226,13 @@ pub mod chars {
 
     pub trait FromCInt { fn from_c_int(i:c_int) -> Self; }
 
-    enum move_key {
+    pub enum move_key {
         down = nc::KEY_DOWN , up = nc::KEY_UP, left = nc::KEY_LEFT, right = nc::KEY_RIGHT,
         home = nc::KEY_HOME, backspace = nc::KEY_BACKSPACE
     }
 
     impl move_key {
-        fn covers(i:c_int) -> bool { nc::KEY_DOWN <= i && i <= nc::KEY_BACKSPACE }
+        pub fn covers(i:c_int) -> bool { nc::KEY_DOWN <= i && i <= nc::KEY_BACKSPACE }
     }
     impl FromCInt for move_key {
         fn from_c_int(i:c_int) -> move_key {
@@ -240,7 +240,7 @@ pub mod chars {
         }
     }
 
-    enum fcn_key {
+    pub enum fcn_key {
         f0  = nc::KEY_F0,  f1  = nc::KEY_F1,  f2  = nc::KEY_F2,  f3  = nc::KEY_F3,
         f4  = nc::KEY_F4,  f5  = nc::KEY_F5,  f6  = nc::KEY_F6,  f7  = nc::KEY_F7,
         f8  = nc::KEY_F8,  f9  = nc::KEY_F9,  f10 = nc::KEY_F10, f11 = nc::KEY_F11,
@@ -248,7 +248,7 @@ pub mod chars {
     }
 
     impl fcn_key {
-        fn covers(i:c_int) -> bool { nc::KEY_F0 <= i && i <= nc::KEY_F15 }
+        pub fn covers(i:c_int) -> bool { nc::KEY_F0 <= i && i <= nc::KEY_F15 }
     }
     impl FromCInt for fcn_key {
         fn from_c_int(i:c_int) -> fcn_key {
@@ -256,13 +256,13 @@ pub mod chars {
         }
     }
 
-    enum reset_key {
+    pub enum reset_key {
         // all of these are listed as "unreliable" in the header
         break_ = nc::KEY_BREAK, sreset = nc::KEY_SRESET, reset = nc::KEY_RESET
     }
 
     impl reset_key {
-        fn covers(i:c_int) -> bool {
+        pub fn covers(i:c_int) -> bool {
             match i { nc::KEY_BREAK | nc::KEY_SRESET | nc::KEY_RESET => true, _ => false }
         }
     }
@@ -272,7 +272,7 @@ pub mod chars {
         }
     }
 
-    enum action_key {
+    pub enum action_key {
         delete_line = nc::KEY_DL,
         insert_line = nc::KEY_IL,
         delete_char = nc::KEY_DC,
@@ -326,7 +326,7 @@ pub mod chars {
     }
 
     impl action_key {
-        fn covers(i:c_int) -> bool { // ugh
+        pub fn covers(i:c_int) -> bool { // ugh
             (nc::KEY_DL <= i && i <= nc::KEY_EIC)
                 || (nc::KEY_CLEAR <= i && i <= nc::KEY_ENTER)
                 || (nc::KEY_PRINT <= i && i <= nc::KEY_SAVE)
@@ -339,7 +339,7 @@ pub mod chars {
         }
     }
 
-    enum shifted_key {
+    pub enum shifted_key {
         shifted_begin = nc::KEY_SBEG,
         shifted_cancel = nc::KEY_SCANCEL,
         shifted_command = nc::KEY_SCOMMAND,
@@ -372,20 +372,20 @@ pub mod chars {
     }
 
     impl shifted_key {
-        fn covers(i:c_int) -> bool { nc::KEY_SBEG <= i && i <= nc::KEY_SUNDO }
+        pub fn covers(i:c_int) -> bool { nc::KEY_SBEG <= i && i <= nc::KEY_SUNDO }
     }
     impl FromCInt for shifted_key {
         fn from_c_int(i:c_int) -> shifted_key { let i = i as i16; assert!(shifted_key::covers(i as i32)); unsafe { x(i) } }
     }
 
-    enum event {
+    pub enum event {
         mouse = nc::KEY_MOUSE, // /* Mouse event has occurred */
         resize = nc::KEY_RESIZE, // /* Terminal resize event */
         event = nc::KEY_EVENT, // /* We were interrupted by an event */
     }
 
     impl event {
-        fn covers(i:c_int) -> bool {
+        pub fn covers(i:c_int) -> bool {
             match i { nc::KEY_MOUSE | nc::KEY_RESIZE | nc::KEY_EVENT => true, _ => false }
         }
     }
@@ -394,7 +394,7 @@ pub mod chars {
         fn from_c_int(i:c_int) -> event { let i = i as i16; assert!(event::covers(i as i32)); unsafe { x(i) } }
     }
 
-    enum raw_ch {
+    pub enum raw_ch {
         ascii_ch(u8),
         move_ch(move_key),
         fcn_ch(fcn_key),
@@ -404,7 +404,7 @@ pub mod chars {
         event_ch(event)
     }
 
-    enum ch {
+    pub enum ch {
         ch(raw_ch),
         ch_with_attr(raw_ch, attrs::attr_set)
     }
@@ -420,42 +420,60 @@ pub mod chars {
             event_ch(ek)  => ek as nc::chtype,
         }
     }
-    fn encode(c:ch) -> nc::chtype {
+    pub fn encode(c:ch) -> nc::chtype {
         match c {
             ch(rc)                  => encode_raw(rc),
             ch_with_attr(rc, attrs) => encode_raw(rc) | (attrs.encode() as c_uint)
         }
     }
+}
+
+pub mod colors {
+    use nc = ncurses_core;
+    use std::libc;
+
+    pub type pair_num = libc::c_short;
+
+    pub enum color {
+        Black = nc::COLOR_BLACK,
+        Red = nc::COLOR_RED,
+        Green = nc::COLOR_GREEN,
+        Yellow = nc::COLOR_YELLOW,
+        Blue = nc::COLOR_BLUE,
+        Magenta = nc::COLOR_MAGENTA,
+        Cyan = nc::COLOR_CYAN,
+        White = nc::COLOR_WHITE,
+    }
 
     impl<'a> super::Context<'a> {
-        pub fn addch(&mut self, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::addch(c)); }
+        #[fixed_stack_segment]
+        pub fn has_colors(&self) -> bool {
+            unsafe { nc::has_colors() != 0 }
         }
-        pub fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::mvaddch(y, x, c)); }
-        }
-        pub fn echo(&mut self, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::echochar(c)); }
-        }
-    }
 
-    impl super::Window {
-        pub fn addch(&mut self, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::waddch(self.ptr, c)); }
+        #[fixed_stack_segment]
+        pub fn init_pair(&mut self, pair: pair_num, fg: color, bg: color) {
+            assert!((pair as i32) < color_pair_count());
+            unsafe { fail_if_err!(nc::init_pair(pair, fg as i16, bg as i16)); }
         }
-        pub fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::mvwaddch(self.ptr, y, x, c)); }
-        }
-        pub fn echo(&mut self, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::wechochar(self.ptr, c)); }
-        }
+
+        #[fixed_stack_segment]
+        pub fn start(&mut self) { self.start_color(); }
     }
+    wrap!(start_color)
+
+    pub fn color_pair_count() -> libc::c_int {
+        nc::COLOR_PAIRS
+    }
+}
+
+pub mod input {
+    use nc = ncurses_core;
+    use std::libc::c_int;
+    use super::chars::{raw_ch,ascii_ch,
+                       move_ch,fcn_ch,reset_ch,action_ch,shift_ch,event_ch,
+                       move_key,fcn_key,reset_key,action_key,shifted_key,event,
+                       FromCInt};
 
     pub enum getch_err_act { Fail, Retry, Return(raw_ch) }
 
@@ -502,45 +520,58 @@ pub mod chars {
     }
 }
 
-pub mod colors {
+pub mod moves {
     use nc = ncurses_core;
-    use std::libc;
-
-    pub type pair_num = libc::c_short;
-
-    pub enum color {
-        Black = nc::COLOR_BLACK,
-        Red = nc::COLOR_RED,
-        Green = nc::COLOR_GREEN,
-        Yellow = nc::COLOR_YELLOW,
-        Blue = nc::COLOR_BLUE,
-        Magenta = nc::COLOR_MAGENTA,
-        Cyan = nc::COLOR_CYAN,
-        White = nc::COLOR_WHITE,
-    }
+    use std::libc::c_int;
 
     impl<'a> super::Context<'a> {
-        #[fixed_stack_segment]
-        pub fn has_colors(&self) -> bool {
-            unsafe { nc::has_colors() != 0 }
+        fn move(&mut self, y: c_int, x: c_int) {
+            unsafe { fail_if_err!(nc::move(y, x)); }
         }
-
-        #[fixed_stack_segment]
-        pub fn init_pair(&mut self, pair: pair_num, fg: color, bg: color) {
-            assert!((pair as i32) < color_pair_count());
-            unsafe { fail_if_err!(nc::init_pair(pair, fg as i16, bg as i16)); }
-        }
-
-        #[fixed_stack_segment]
-        pub fn start(&mut self) { self.start_color(); }
     }
-    wrap!(start_color)
 
-    pub fn color_pair_count() -> libc::c_int {
-        nc::COLOR_PAIRS
+    impl super::Window {
+        fn move(&mut self, y: c_int, x: c_int) {
+            unsafe { fail_if_err!(nc::wmove(self.ptr, y, x)); }
+        }
     }
 }
 
+pub mod output {
+    use nc = ncurses_core;
+    use std::libc::c_int;
+    use super::chars::{ch,encode};
+
+    impl<'a> super::Context<'a> {
+        pub fn addch(&mut self, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::addch(c)); }
+        }
+        pub fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::mvaddch(y, x, c)); }
+        }
+        pub fn echo(&mut self, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::echochar(c)); }
+        }
+    }
+
+    impl super::Window {
+        pub fn addch(&mut self, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::waddch(self.ptr, c)); }
+        }
+        pub fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::mvwaddch(self.ptr, y, x, c)); }
+        }
+        pub fn echo(&mut self, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::wechochar(self.ptr, c)); }
+        }
+    }
+}
 
 impl<'a> Context<'a> {
     #[fixed_stack_segment]
