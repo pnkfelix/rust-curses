@@ -275,7 +275,7 @@ extern {
     fn wdeleteln (_:WINDOW_p) -> c_int;
     pub fn wechochar (_:WINDOW_p, _:chtype) -> c_int;
     fn werase (_:WINDOW_p) -> c_int;
-    fn wgetch (_:WINDOW_p) -> c_int;
+    pub fn wgetch (_:WINDOW_p) -> c_int;
     fn wgetnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
     fn wgetstr (_:WINDOW_p, _:char_p) -> c_int;
     fn whline (_:WINDOW_p, _:chtype, _:c_int) -> c_int;

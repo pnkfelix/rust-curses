@@ -61,10 +61,23 @@ fn main() {
         finished = false;
         sig::signal(sig::INT, finish);
         let mut scr = context.stdscr();
-        context.keypad(&mut scr, true);
+
+        // N.B. on the below: "Since the screen package needs to know
+        // what is on the terminal at all times, if characters are to
+        // be echoed, the tty must be in raw or cbreak mode. Since
+        // initially the terminal has echoing enabled and is in
+        // ordinary ``cooked'' mode, one or the other has to changed
+        // before calling getch(); otherwise, the program's output
+        // will be unpredictable."
+
         context.set_nl(false);
         context.set_cbreak(true);
         context.set_echo(false);
+
+        // This turns on automatic conversion of character-sequences
+        // for arrow + function keys into pseudo-character values
+        // representing the corresponding arrow or function key.
+        context.keypad(&mut scr, true);
 
         if context.has_colors() {
             context.start_color();

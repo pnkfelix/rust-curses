@@ -9,27 +9,17 @@ use ncurses_core::{WINDOW_p, SCREEN_p};
 mod ncurses_core;
 
 pub struct Context<'a> {
-    window: Window,
     priv force_new: (),
     priv on_getch_err_do: input::getch_err_response<'a>,
-}
-
-impl<'a> Context<'a> {
-    pub fn new() -> Context {
-        Context{ window: initscr(),
-                 force_new: (),
-                 on_getch_err_do: input::Immed(input::Fail) }
-    }
-}
-
-impl<'a> Drop for Context<'a> {
-    fn drop(&mut self) { endwin(); }
 }
 
 /// Describes a sub-rectangle of the screen (possibly in its
 /// entirety), that you can write to and scroll independently of other
 /// windows on the screen.
-pub struct Window { priv ptr: WINDOW_p }
+pub struct Window<'a> {
+    priv ptr: WINDOW_p,
+    priv ctxt: &'a Context<'a>,
+}
 
 /// These are windows as large as the terminal screen (upper-left to
 /// lower-right).  `stdscr` is one such screen; it is the default for
@@ -224,10 +214,25 @@ fn endwin() {
     unsafe { fail_if_err!(nc::endwin()); }
 }
 
-fn initscr() -> Window {
-    let result;
-    unsafe { result = fail_if_null!(nc::initscr()); }
-    Window { ptr: result }
+impl<'a> Context<'a> {
+    pub fn new() -> Context {
+        let c = Context{ force_new: (),
+                         on_getch_err_do: input::Immed(input::Fail) };
+        c.initscr();
+        c
+    }
+}
+
+impl<'a> Drop for Context<'a> {
+    fn drop(&mut self) { endwin(); }
+}
+
+impl<'a> Context<'a> {
+    fn initscr(&'a self) -> Window<'a> {
+        let result;
+        unsafe { result = fail_if_null!(nc::initscr()); }
+        Window { ptr: result, ctxt: self }
+    }
 }
 
 pub mod chars {
@@ -530,6 +535,28 @@ pub mod input {
             }
         }
     }
+
+    impl<'a> super::Window<'a> {
+        pub fn getch(&mut self) -> raw_ch {
+            let mut result : c_int;
+            'getch: loop {
+                result = unsafe { nc::wgetch(self.ptr) };
+                if result == nc::ERR {
+                    let act = match &self.ctxt.on_getch_err_do {
+                        &Immed(ref act) => *act,
+                        &Delay(ref call) => (*call)(),
+                    };
+                    match act {
+                        Fail       => fail!("ncurses::getch"),
+                        Retry      => continue 'getch,
+                        Return(c)  => return c,
+                    }
+                } else {
+                    return getch_result_to_ch(result);
+                }
+            }
+        }
+    }
 }
 
 pub mod moves {
@@ -542,7 +569,7 @@ pub mod moves {
         }
     }
 
-    impl super::Window {
+    impl<'a> super::Window<'a> {
         fn move(&mut self, y: c_int, x: c_int) {
             unsafe { fail_if_err!(nc::wmove(self.ptr, y, x)); }
         }
@@ -572,7 +599,7 @@ pub mod output {
         }
     }
 
-    impl super::Window {
+    impl<'a> super::Window<'a> {
         pub fn addch(&mut self, c: ch) {
             let c = encode(c);
             unsafe { fail_if_err!(nc::waddch(self.ptr, c)); }
@@ -589,7 +616,7 @@ pub mod output {
             unsafe { fail_if_err!(nc::wrefresh(self.ptr)); }
         }
     }
-    impl super::Window {
+    impl<'a> super::Window<'a> {
         pub fn touch(&mut self) {
             unsafe { fail_if_err!(nc::touchwin(self.ptr)); }
         }
