@@ -95,6 +95,7 @@ fn main() {
             // process the command keystroke
 
             context.addch(chars::ch(c));
+            context.refresh();
         }
 
         os::set_exit_status(0);

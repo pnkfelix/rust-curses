@@ -555,6 +555,9 @@ pub mod output {
             let c = encode(c);
             unsafe { fail_if_err!(nc::echochar(c)); }
         }
+        pub fn refresh(&mut self) {
+            unsafe { fail_if_err!(nc::refresh()); }
+        }
     }
 
     impl super::Window {
@@ -569,6 +572,17 @@ pub mod output {
         pub fn echo(&mut self, c: ch) {
             let c = encode(c);
             unsafe { fail_if_err!(nc::wechochar(self.ptr, c)); }
+        }
+        pub fn refresh(&mut self) {
+            unsafe { fail_if_err!(nc::wrefresh(self.ptr)); }
+        }
+    }
+    impl super::Window {
+        pub fn touch(&mut self) {
+            unsafe { fail_if_err!(nc::touchwin(self.ptr)); }
+        }
+        pub fn untouch(&mut self) {
+            unsafe { fail_if_err!(nc::untouchwin(self.ptr)); }
         }
     }
 }

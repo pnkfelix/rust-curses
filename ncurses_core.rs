@@ -194,7 +194,7 @@ extern {
     fn qiflush ();
     fn raw () -> c_int;
     fn redrawwin (_:WINDOW_p) -> c_int;
-    fn refresh () -> c_int;
+    pub fn refresh () -> c_int;
     fn resetty () -> c_int;
     fn reset_prog_mode () -> c_int;
     fn reset_shell_mode () -> c_int;
@@ -237,10 +237,10 @@ extern {
     fn termname () -> char_p;
     fn timeout (_:c_int);
     fn touchline (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
-    fn touchwin (_:WINDOW_p) -> c_int;
+    pub fn touchwin (_:WINDOW_p) -> c_int;
     fn typeahead (_:c_int) -> c_int;
     fn ungetch (_:c_int) -> c_int;
-    fn untouchwin (_:WINDOW_p) -> c_int;
+    pub fn untouchwin (_:WINDOW_p) -> c_int;
     fn use_env (_:bool_t);
     fn vidattr (_:chtype) -> c_int;
     //  fn vidputs (_:chtype, extern  fn f(c_int) -> c_int) -> c_int;
@@ -293,7 +293,7 @@ extern {
     fn wnoutrefresh (_:WINDOW_p) -> c_int;
     fn wprintw (_:WINDOW_p, _:char_p) -> c_int;
     fn wredrawln (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
-    fn wrefresh (_:WINDOW_p) -> c_int;
+    pub fn wrefresh (_:WINDOW_p) -> c_int;
     //  fn wscanw (_:WINDOW_p, _:NCURSES_CONST char_p) -> c_int;
     fn wscrl (_:WINDOW_p,_:c_int) -> c_int;
     fn wsetscrreg (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
