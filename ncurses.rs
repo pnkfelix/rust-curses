@@ -70,9 +70,11 @@ macro_rules! fail_if_err {
 
 macro_rules! wrap {
     ($i:ident) => {
-        #[fixed_stack_segment]
-        pub fn $i() {
-            unsafe { fail_if_err!(nc::$i()); }
+        impl<'a> super::Context<'a> {
+            #[fixed_stack_segment]
+            pub fn $i(&mut self) {
+                unsafe { fail_if_err!(nc::$i()); }
+            }
         }
     }
 }
@@ -115,14 +117,17 @@ pub mod attrs {
         accum
     }
 
-    pub fn set(attrs: &[attr]) {
-        let i = encode(attrs);
-        unsafe { fail_if_err!(nc::attrset(i)); }
+    impl<'a> super::Context<'a> {
+        pub fn attrset(&mut self, attrs: &[attr]) {
+            let i = encode(attrs);
+            unsafe { fail_if_err!(nc::attrset(i)); }
+        }
     }
 }
 
 pub mod mode {
     use nc = ncurses_core;
+    use super::Context;
 
     wrap!(cbreak)
     wrap!(echo)
@@ -386,34 +391,38 @@ pub mod colors {
         White = nc::COLOR_WHITE,
     }
 
-    #[fixed_stack_segment]
-    pub fn has_colors() -> bool {
-        unsafe { nc::has_colors() != 0 }
-    }
+    impl<'a> super::Context<'a> {
+        #[fixed_stack_segment]
+        pub fn has_colors(&self) -> bool {
+            unsafe { nc::has_colors() != 0 }
+        }
 
-    #[fixed_stack_segment]
-    pub fn init_pair(pair: pair_num, fg: color, bg: color) {
-        assert!(pair < color_pair_count());
-        unsafe { fail_if_err!(nc::init_pair(pair, fg as i16, bg as i16)); }
-    }
+        #[fixed_stack_segment]
+        pub fn init_pair(&mut self, pair: pair_num, fg: color, bg: color) {
+            assert!(pair < self.color_pair_count());
+            unsafe { fail_if_err!(nc::init_pair(pair, fg as i16, bg as i16)); }
+        }
 
-    pub fn color_pair_count() -> i16 {
-        nc::COLOR_PAIRS as i16
-    }
+        pub fn color_pair_count(&self) -> i16 {
+            nc::COLOR_PAIRS as i16
+        }
 
-    #[fixed_stack_segment]
-    pub fn start() { start_color(); }
+        #[fixed_stack_segment]
+        pub fn start(&mut self) { self.start_color(); }
+    }
     wrap!(start_color)
 }
 
 
-#[fixed_stack_segment]
-pub fn keypad(s:&mut screen, enabled: bool) {
-    unsafe {
-        fail_if_err!(nc::keypad(s.wnd_ptr(), enabled as nc::NCURSES_BOOL));
+impl<'a> Context<'a> {
+    #[fixed_stack_segment]
+    pub fn keypad(&mut self, s:&mut screen, enabled: bool) {
+        unsafe {
+            fail_if_err!(nc::keypad(s.wnd_ptr(), enabled as nc::NCURSES_BOOL));
+        }
     }
-}
 
-pub fn stdscr() -> screen {
-    screen { ptr: nc::stdscr as SCREEN_p}
+    pub fn stdscr(&self) -> screen {
+        screen { ptr: nc::stdscr as SCREEN_p}
+    }
 }

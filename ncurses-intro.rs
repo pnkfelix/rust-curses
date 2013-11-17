@@ -44,12 +44,10 @@ mod signal_h;
 // once in a process.
 
 fn main() {
-    use ncurses::{keypad, stdscr};
-    use ncurses::mode::{cbreak,echo,nonl};
     use ncurses::chars;
-    #[allow(unused_imports)]
-    use ncurses::chars::{Immed, Delay, Fail, Retry, Return};
-    use ncurses::colors::{has_colors, start_color, init_pair};
+    #[allow(unused_imports)] // Issue #10534
+    // use ncurses::chars::{Immed, Return}
+    use ncurses::chars::{Delay, Fail, Retry};
     use ncurses::colors;
     // use ncurses::chars::{getch};
     use ncurses::attrs;
@@ -61,23 +59,23 @@ fn main() {
     unsafe {
         finished = false;
         sig::signal(sig::INT, finish);
-        let mut scr = stdscr();
-        keypad(&mut scr, true);
-        nonl();
-        cbreak();
-        echo();
+        let mut scr = context.stdscr();
+        context.keypad(&mut scr, true);
+        context.nonl();
+        context.cbreak();
+        context.echo();
 
-        if has_colors() {
-            start_color();
+        if context.has_colors() {
+            context.start_color();
 
             // simple color assignment; color 0 cannot be redefined.
-            init_pair(1, colors::Red,     colors::Black);
-            init_pair(2, colors::Green,   colors::Black);
-            init_pair(3, colors::Yellow,  colors::Black);
-            init_pair(4, colors::Blue,    colors::Black);
-            init_pair(5, colors::Cyan,    colors::Black);
-            init_pair(6, colors::Magenta, colors::Black);
-            init_pair(7, colors::White,   colors::Black);
+            context.init_pair(1, colors::Red,     colors::Black);
+            context.init_pair(2, colors::Green,   colors::Black);
+            context.init_pair(3, colors::Yellow,  colors::Black);
+            context.init_pair(4, colors::Blue,    colors::Black);
+            context.init_pair(5, colors::Cyan,    colors::Black);
+            context.init_pair(6, colors::Magenta, colors::Black);
+            context.init_pair(7, colors::White,   colors::Black);
         }
 
         // context.on_getch_err(Immed(Retry));
@@ -90,7 +88,7 @@ fn main() {
         }
         while !finished {
             let c = context.getch();
-            attrs::set([attrs::color_pair(num % 8)]);
+            context.attrset([attrs::color_pair(num % 8)]);
             num = num + 1;
 
             // process the command keystroke
