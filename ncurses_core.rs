@@ -173,10 +173,10 @@ extern {
     fn newpad (_:c_int,_:c_int) -> *WINDOW;
     fn newterm (_:char_p,_:FILE_p,_:FILE_p) -> *SCREEN;
     fn newwin (_:c_int,_:c_int,_:c_int,_:c_int) -> *WINDOW;
-    fn nl () -> c_int;
-    fn nocbreak () -> c_int;
+    pub fn nl () -> c_int;
+    pub fn nocbreak () -> c_int;
     fn nodelay (_:WINDOW_p,_:bool_t) -> c_int;
-    fn noecho () -> c_int;
+    pub fn noecho () -> c_int;
     pub fn nonl () -> c_int;
     fn noqiflush ();
     fn noraw () -> c_int;

@@ -185,23 +185,35 @@ pub mod mode {
     // wrap!(cbreak)
     impl<'a> super::Context<'a> {
         #[fixed_stack_segment]
-        pub fn cbreak_mode(&mut self) {
-            unsafe { fail_if_err!(nc::nonl()); }
+        pub fn set_cbreak(&mut self, val:bool) {
+            if val {
+                unsafe { fail_if_err!(nc::cbreak()); }
+            } else {
+                unsafe { fail_if_err!(nc::nocbreak()); }
+            }
         }
     }
 
     // wrap!(nonl)
     impl<'a> super::Context<'a> {
         #[fixed_stack_segment]
-        pub fn nonl_mode(&mut self) {
-            unsafe { fail_if_err!(nc::nonl()); }
+        pub fn set_nl(&mut self, val:bool) {
+            if val {
+                unsafe { fail_if_err!(nc::nl()); }
+            } else {
+                unsafe { fail_if_err!(nc::nonl()); }
+            }
         }
     }
 
     impl<'a> super::Context<'a> {
         #[fixed_stack_segment]
-        pub fn echo_mode(&mut self) {
-            unsafe { fail_if_err!(nc::echo()); }
+        pub fn set_echo(&mut self, val:bool) {
+            if val {
+                unsafe { fail_if_err!(nc::echo()); }
+            } else {
+                unsafe { fail_if_err!(nc::noecho()); }
+            }
         }
     }
 
