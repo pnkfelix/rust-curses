@@ -8,6 +8,22 @@ use ncurses_core::{WINDOW_p, SCREEN_p};
 
 mod ncurses_core;
 
+pub struct Context<'a> {
+    window: window,
+    priv force_new: (),
+    priv on_getch_err_do: chars::getch_err_response<'a>,
+}
+
+impl<'a> Context<'a> {
+    pub fn new() -> Context {
+        Context{ window: initscr(), force_new: (), on_getch_err_do: chars::Immed(chars::Fail) }
+    }
+}
+
+impl<'a> Drop for Context<'a> {
+    fn drop(&mut self) { endwin(); }
+}
+
 /// Describes a sub-rectangle of the screen (possibly in its
 /// entirety), that you can write to and scroll independently of other
 /// windows on the screen.
@@ -114,11 +130,11 @@ pub mod mode {
 }
 
 #[fixed_stack_segment]
-pub fn endwin() {
+fn endwin() {
     unsafe { fail_if_err!(nc::endwin()); }
 }
 
-pub fn initscr() -> window {
+fn initscr() -> window {
     let result;
     unsafe { result = fail_if_null!(nc::initscr()); }
     window { ptr: result }
@@ -309,16 +325,48 @@ pub mod chars {
         event_ch(event)
     }
 
-    pub fn getch() -> ch {
-        let result : c_int = unsafe { fail_if_err!(nc::getch()) };
-        if 0 <= result && result < 0x100      { ascii_ch(result as u8) }
+    pub enum getch_err_act { Fail, Retry, Return(ch) }
+
+    pub enum getch_err_response<'a> {
+        Immed(getch_err_act),
+        Delay(&'static fn:Send() -> getch_err_act),
+    }
+
+    pub fn getch_result_to_ch(result: c_int) -> ch {
+        if 0 <= result && result < 0x100        { ascii_ch(result as u8) }
             else if move_key::covers(result)    { move_ch(FromCInt::from_c_int(result)) }
             else if fcn_key::covers(result)     { fcn_ch(FromCInt::from_c_int(result)) }
             else if reset_key::covers(result)   { reset_ch(FromCInt::from_c_int(result)) }
             else if action_key::covers(result)  { action_ch(FromCInt::from_c_int(result)) }
             else if shifted_key::covers(result) { shift_ch(FromCInt::from_c_int(result)) }
             else if event::covers(result)       { event_ch(FromCInt::from_c_int(result)) }
-            else { fail!("unrecognized result from getch: {}", result); }
+            else { fail!("unrecognized result from getch: {}", result);
+        }
+    }
+
+    impl<'a> super::Context<'a> {
+        pub fn on_getch_err(&mut self, value: getch_err_response<'a>) {
+            self.on_getch_err_do = value;
+        }
+        pub fn getch(&mut self) -> ch {
+            let mut result : c_int;
+            'getch: loop {
+                result = unsafe { nc::getch() };
+                if result == nc::ERR {
+                    let act = match &self.on_getch_err_do {
+                        &Immed(ref act) => *act,
+                        &Delay(ref call) => (*call)(),
+                    };
+                    match act {
+                        Fail       => fail!("ncurses::getch"),
+                        Retry      => continue 'getch,
+                        Return(ch) => return ch,
+                    }
+                } else {
+                    return getch_result_to_ch(result);
+                }
+            }
+        }
     }
 }
 

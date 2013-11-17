@@ -44,18 +44,23 @@ mod signal_h;
 // once in a process.
 
 fn main() {
-    use ncurses::{initscr, keypad, stdscr};
+    use ncurses::{keypad, stdscr};
     use ncurses::mode::{cbreak,echo,nonl};
+    use ncurses::chars;
+    #[allow(unused_imports)]
+    use ncurses::chars::{Immed, Delay, Fail, Retry, Return};
     use ncurses::colors::{has_colors, start_color, init_pair};
     use ncurses::colors;
-    use ncurses::chars::{getch};
+    // use ncurses::chars::{getch};
     use ncurses::attrs;
 
     let mut num : colors::pair_num = 0;
 
+    let mut context = ncurses::Context::new();
+
     unsafe {
+        finished = false;
         sig::signal(sig::INT, finish);
-        initscr();
         let mut scr = stdscr();
         keypad(&mut scr, true);
         nonl();
@@ -75,21 +80,31 @@ fn main() {
             init_pair(7, colors::White,   colors::Black);
         }
 
-
-        loop {
-            let c = getch();
+        // context.on_getch_err(Immed(Retry));
+        context.on_getch_err(Delay(inspect_errno));
+        fn inspect_errno() -> chars::getch_err_act {
+            match os::errno() as libc::c_int {
+                libc::EINTR => Retry,
+                _ => Fail,
+            }
+        }
+        while !finished {
+            let c = context.getch();
             attrs::set([attrs::color_pair(num % 8)]);
             num = num + 1;
 
             // process the command keystroke
         }
 
+        os::set_exit_status(0);
     }
 }
 
+static mut finished: bool = false;
+
 extern "C" fn finish(_sig:libc::c_int)
 {
-    ncurses::endwin();
-
-    os::set_exit_status(0);
+    unsafe {
+        finished = true;
+    }
 }
