@@ -13,6 +13,7 @@ type attr_t_p = *attr_t;
 type short_p = *c_short;
 type void_p = *c_void;
 type char_p = *c_char;
+type mut_char_p = *mut c_char;
 type chtype_p = *chtype;
 pub type WINDOW_p = *WINDOW;
 pub type SCREEN_p = *SCREEN;
@@ -86,7 +87,7 @@ extern {
     fn flushinp () -> c_int;
     fn getbkgd (_:WINDOW_p) -> chtype;
     pub fn getch () -> c_int;
-    fn getnstr (_:char_p, _:c_int) -> c_int;
+    pub fn getnstr (_:mut_char_p, _:c_int) -> c_int;
     fn getstr (_:char_p) -> c_int;
     fn getwin (_:FILE_p) -> *WINDOW;
     fn halfdelay (_:c_int) -> c_int;
@@ -276,7 +277,7 @@ extern {
     pub fn wechochar (_:WINDOW_p, _:chtype) -> c_int;
     fn werase (_:WINDOW_p) -> c_int;
     pub fn wgetch (_:WINDOW_p) -> c_int;
-    fn wgetnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
+    pub fn wgetnstr (_:WINDOW_p,_:mut_char_p,_:c_int) -> c_int;
     fn wgetstr (_:WINDOW_p, _:char_p) -> c_int;
     fn whline (_:WINDOW_p, _:chtype, _:c_int) -> c_int;
     fn winch (_:WINDOW_p) -> chtype;

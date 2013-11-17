@@ -72,7 +72,7 @@ fn main() {
 
         context.set_nl(false);
         context.set_cbreak(true);
-        context.set_echo(false);
+        context.set_echo(true);
 
         // This turns on automatic conversion of character-sequences
         // for arrow + function keys into pseudo-character values
@@ -101,7 +101,10 @@ fn main() {
             }
         }
         while !finished {
-            let c = context.getch();
+            // let c = context.getch();
+            let mut b = [0i8, ..16];
+            context.getstr(b.mut_slice_from(0));
+            let c = chars::ascii_ch(b[0]);
             context.attrset([attrs::color_pair(num % 8)]);
             num = num + 1;
 

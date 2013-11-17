@@ -237,7 +237,7 @@ impl<'a> Context<'a> {
 
 pub mod chars {
     use nc = ncurses_core;
-    use std::libc::{c_int, c_uint};
+    use std::libc::{c_int, c_uint, c_char};
     use x = std::cast::transmute;
     use super::attrs;
 
@@ -412,7 +412,7 @@ pub mod chars {
     }
 
     pub enum raw_ch {
-        ascii_ch(u8),
+        ascii_ch(c_char),
         move_ch(move_key),
         fcn_ch(fcn_key),
         reset_ch(reset_key),
@@ -486,7 +486,7 @@ pub mod colors {
 
 pub mod input {
     use nc = ncurses_core;
-    use std::libc::c_int;
+    use std::libc::{c_int,c_char};
     use super::chars::{raw_ch,ascii_ch,
                        move_ch,fcn_ch,reset_ch,action_ch,shift_ch,event_ch,
                        move_key,fcn_key,reset_key,action_key,shifted_key,event,
@@ -500,7 +500,7 @@ pub mod input {
     }
 
     pub fn getch_result_to_ch(result: c_int) -> raw_ch {
-        if 0 <= result && result < 0x100        { ascii_ch(result as u8) }
+        if 0 <= result && result < 0x80        { ascii_ch(result as i8) }
             else if move_key::covers(result)    { move_ch(FromCInt::from_c_int(result)) }
             else if fcn_key::covers(result)     { fcn_ch(FromCInt::from_c_int(result)) }
             else if reset_key::covers(result)   { reset_ch(FromCInt::from_c_int(result)) }
@@ -534,6 +534,25 @@ pub mod input {
                 }
             }
         }
+
+        // (deliberately not using unsafe nc::getstr fcn.)
+
+        pub fn getstr(&mut self, bytes: &mut [c_char]) {
+            bytes.as_mut_buf(|ptr, len| {
+                    let len = len as i32;
+                    if len < 0 { fail!(); }
+                    unsafe { fail_if_err!(nc::getnstr(ptr, len)); }
+                });
+        }
+
+        pub fn getnstr(&mut self, bytes: &mut [c_char], n: uint) {
+            bytes.as_mut_buf(|ptr, len| {
+                    if n > len { fail!(); }
+                    let n = n as i32;
+                    if n < 0 { fail!(); }
+                    unsafe { fail_if_err!(nc::getnstr(ptr, n)); }
+                });
+        }
     }
 
     impl<'a> super::Window<'a> {
@@ -555,6 +574,23 @@ pub mod input {
                     return getch_result_to_ch(result);
                 }
             }
+        }
+
+        pub fn getstr(&mut self, bytes: &mut [c_char]) {
+            bytes.as_mut_buf(|ptr, len| {
+                    let len = len as i32;
+                    if len < 0 { fail!(); }
+                    unsafe { fail_if_err!(nc::wgetnstr(self.ptr, ptr, len)); }
+                });
+        }
+
+        pub fn getnstr(&mut self, bytes: &mut [c_char], n: uint) {
+            bytes.as_mut_buf(|ptr, len| {
+                    if n > len { fail!(); }
+                    let n = n as i32;
+                    if n < 0 { fail!(); }
+                    unsafe { fail_if_err!(nc::wgetnstr(self.ptr, ptr, n)); }
+                });
         }
     }
 }
