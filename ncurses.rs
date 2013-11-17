@@ -250,6 +250,17 @@ pub mod mode {
         }
     }
 
+    impl<'a> super::Context<'a> {
+        #[fixed_stack_segment]
+        pub fn set_raw(&mut self, val:bool) {
+            if val {
+                unsafe { fail_if_err!(nc::raw()); }
+            } else {
+                unsafe { fail_if_err!(nc::noraw()); }
+            }
+        }
+    }
+
 }
 
 #[fixed_stack_segment]

@@ -180,7 +180,7 @@ extern {
     pub fn noecho () -> c_int;
     pub fn nonl () -> c_int;
     fn noqiflush ();
-    fn noraw () -> c_int;
+    pub fn noraw () -> c_int;
     fn notimeout (_:WINDOW_p,_:bool_t) -> c_int;
     fn overlay (_:WINDOW_p,_:WINDOW_p) -> c_int;
     fn overwrite (_:WINDOW_p,_:WINDOW_p) -> c_int;
@@ -193,7 +193,7 @@ extern {
     fn printw (_:char_p) -> c_int;
     fn putwin (_:WINDOW_p, _:FILE_p) -> c_int;
     fn qiflush ();
-    fn raw () -> c_int;
+    pub fn raw () -> c_int;
     fn redrawwin (_:WINDOW_p) -> c_int;
     pub fn refresh () -> c_int;
     fn resetty () -> c_int;
