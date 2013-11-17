@@ -95,8 +95,9 @@ fn main() {
         // context.on_getch_err(Immed(Retry));
         context.on_getch_err(Delay(inspect_errno));
         fn inspect_errno() -> input::getch_err_act {
+            let transient = unsafe { !finished };
             match os::errno() as libc::c_int {
-                libc::EINTR => Retry,
+                libc::EINTR if transient => Retry,
                 _ => Fail,
             }
         }
@@ -105,7 +106,9 @@ fn main() {
             let mut b = [0i8, ..16];
             context.getstr(b.mut_slice_from(0));
             let c = chars::ascii_ch(b[0]);
-            context.attrset([attrs::color_pair(num % 8)]);
+
+            let v = [attrs::color_pair(num % 8)];
+            context.attrset(v.as_slice());
             num = num + 1;
 
             // process the command keystroke

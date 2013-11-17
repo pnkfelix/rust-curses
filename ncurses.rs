@@ -152,7 +152,7 @@ pub mod attrs {
         }
     }
 
-    trait EncodesAttrs { fn encode(&self) -> libc::c_int; }
+    pub trait EncodesAttrs { fn encode(&self) -> libc::c_int; }
 
     impl<'a> EncodesAttrs for &'a [attr] {
         fn encode(&self) -> libc::c_int {
@@ -160,7 +160,13 @@ pub mod attrs {
         }
     }
 
-    impl<'a> super::Context<'a> {
+    impl EncodesAttrs for attr {
+        fn encode(&self) -> libc::c_int {
+            encode_one(*self)
+        }
+    }
+
+     impl<'a> super::Context<'a> {
         pub fn attroff(&mut self, attrs: &[attr]) {
             let i = encode_attrs(attrs);
             unsafe { fail_if_err!(nc::attroff(i)); }
@@ -174,18 +180,32 @@ pub mod attrs {
             unsafe { fail_if_err!(nc::attrset(i)); }
         }
     }
+    impl<'a> super::Context<'a> {
+        pub fn broke_attroff<A:EncodesAttrs>(&mut self, attrs: A) {
+            let i = attrs.encode();
+            unsafe { fail_if_err!(nc::attroff(i)); }
+        }
+        pub fn broke_attron<A:EncodesAttrs>(&mut self, attrs: A) {
+            let i = attrs.encode();
+            unsafe { fail_if_err!(nc::attron(i)); }
+        }
+        pub fn broke_attrset<A:EncodesAttrs>(&mut self, attrs: A) {
+            let i = attrs.encode();
+            unsafe { fail_if_err!(nc::attrset(i)); }
+        }
+    }
 
     impl<'a> super::Window<'a> {
-        pub fn attroff(&mut self, attrs: &[attr]) {
-            let i = encode_attrs(attrs);
+        pub fn attroff<A:EncodesAttrs>(&mut self, attrs: A) {
+            let i = attrs.encode();
             unsafe { fail_if_err!(nc::wattroff(self.ptr, i)); }
         }
-        pub fn attron(&mut self, attrs: &[attr]) {
-            let i = encode_attrs(attrs);
+        pub fn attron<A:EncodesAttrs>(&mut self, attrs: A) {
+            let i = attrs.encode();
             unsafe { fail_if_err!(nc::wattron(self.ptr, i)); }
         }
-        pub fn attrset(&mut self, attrs: &[attr]) {
-            let i = encode_attrs(attrs);
+        pub fn attrset<A:EncodesAttrs>(&mut self, attrs: A) {
+            let i = attrs.encode();
             unsafe { fail_if_err!(nc::wattrset(self.ptr, i)); }
         }
     }
