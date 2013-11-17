@@ -21,11 +21,18 @@ pub struct Window<'a> {
     priv ctxt: &'a Context<'a>,
 }
 
-/// These are windows as large as the terminal screen (upper-left to
-/// lower-right).  `stdscr` is one such screen; it is the default for
-/// output.  There is a special screen, the "terminal screen", that
-/// corresponds to ncurses' model of what the user sees now.  (It
-/// might also correspond to `curscr`.
+// These are windows as large as the terminal screen (upper-left to
+// lower-right).  `stdscr` is one such screen; it is the default for
+// output.  There is a special screen, the "terminal screen", that
+// corresponds to ncurses' model of what the user sees now.  (It
+// might also correspond to `curscr`.
+//
+// However, the ncurses-intro's notion of "screen" is not the same as
+// the ncurses SCREEN type, and thus should be conflated with the
+// below.  So this text is no longer a doc comment; if I figure out
+// why the ncurses-intro was introducing this distinction in the first
+// place, then maybe I will find place for this to be revised as doc.
+
 pub struct Screen { priv ptr: SCREEN_p }
 
 impl Screen {
