@@ -161,9 +161,32 @@ pub mod attrs {
     }
 
     impl<'a> super::Context<'a> {
+        pub fn attroff(&mut self, attrs: &[attr]) {
+            let i = encode_attrs(attrs);
+            unsafe { fail_if_err!(nc::attroff(i)); }
+        }
+        pub fn attron(&mut self, attrs: &[attr]) {
+            let i = encode_attrs(attrs);
+            unsafe { fail_if_err!(nc::attron(i)); }
+        }
         pub fn attrset(&mut self, attrs: &[attr]) {
             let i = encode_attrs(attrs);
             unsafe { fail_if_err!(nc::attrset(i)); }
+        }
+    }
+
+    impl<'a> super::Window<'a> {
+        pub fn attroff(&mut self, attrs: &[attr]) {
+            let i = encode_attrs(attrs);
+            unsafe { fail_if_err!(nc::wattroff(self.ptr, i)); }
+        }
+        pub fn attron(&mut self, attrs: &[attr]) {
+            let i = encode_attrs(attrs);
+            unsafe { fail_if_err!(nc::wattron(self.ptr, i)); }
+        }
+        pub fn attrset(&mut self, attrs: &[attr]) {
+            let i = encode_attrs(attrs);
+            unsafe { fail_if_err!(nc::wattrset(self.ptr, i)); }
         }
     }
 }

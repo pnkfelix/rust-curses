@@ -42,9 +42,9 @@ extern {
     fn addchstr (_:*chtype) -> c_int;
     fn addnstr (_:*c_char, _:c_int) -> c_int;
     fn addstr (_:*c_char) -> c_int;
-    fn attroff (_:NCURSES_ATTR_T) -> c_int;
-    fn attron (_:NCURSES_ATTR_T) -> c_int;
-    pub fn attrset (_:NCURSES_ATTR_T) -> c_int;
+    pub fn attroff (_:attr_t) -> c_int;
+    pub fn attron (_:attr_t) -> c_int;
+    pub fn attrset (_:attr_t) -> c_int;
     fn attr_get (_:attr_t_p, _:short_p, _:void_p) -> c_int;
     fn attr_off (_:attr_t, _:void_p) -> c_int;
     fn attr_on (_:attr_t, _:void_p) -> c_int;
@@ -256,9 +256,9 @@ extern {
     fn waddchstr (_:WINDOW_p,_:chtype_p) -> c_int;
     fn waddnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
     fn waddstr (_:WINDOW_p,_:char_p) -> c_int;
-    fn wattron (_:WINDOW_p, _:c_int) -> c_int;
-    fn wattroff (_:WINDOW_p, _:c_int) -> c_int;
-    fn wattrset (_:WINDOW_p, _:c_int) -> c_int;
+    pub fn wattron (_:WINDOW_p, _:c_int) -> c_int;
+    pub fn wattroff (_:WINDOW_p, _:c_int) -> c_int;
+    pub fn wattrset (_:WINDOW_p, _:c_int) -> c_int;
     fn wattr_get (_:WINDOW_p, _:attr_t_p, _:short_p, _:void_p) -> c_int;
     fn wattr_on (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
     fn wattr_off (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
