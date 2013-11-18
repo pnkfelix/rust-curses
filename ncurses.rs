@@ -967,6 +967,8 @@ mod screens {
 }
 
 impl<'a> Context<'a> {
+    // XXX fail on err may be overkill for these routines; consider putting
+    // in similar condition handling analogous to getch_err_response above.
     pub fn beep(&mut self) { unsafe { fail_if_err!(nc::beep()); } }
     pub fn flash(&mut self) { unsafe { fail_if_err!(nc::flash()); } }
 }
