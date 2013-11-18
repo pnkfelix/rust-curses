@@ -2,6 +2,7 @@
 
 #[feature(macro_rules)];
 
+use std::libc;
 use std::ptr;
 use nc = ncurses_core;
 use ncurses_core::{WINDOW_p, SCREEN_p};
@@ -966,6 +967,29 @@ mod screens {
 }
 
 impl<'a> Context<'a> {
+    pub fn baudrate(&self) -> libc::c_int { unsafe { nc::baudrate() } }
+    pub fn erasechar(&self) -> char {
+        use std::char;
+        let mut c : libc::wchar_t = 0;
+        unsafe { fail_if_err!(nc::erasewchar(&mut c as *mut libc::wchar_t)); }
+        char::from_u32(c as u32).unwrap()
+    }
+    pub fn killchar(&self) -> char {
+        use std::char;
+        let mut c : libc::wchar_t = 0;
+        unsafe { fail_if_err!(nc::killwchar(&mut c as *mut libc::wchar_t)); }
+        char::from_u32(c as u32).unwrap()
+    }
+    pub fn has_ins_del_char(&self) -> bool { unsafe { nc::has_ic() != 0 } }
+    pub fn has_ins_del_line(&self) -> bool { unsafe { nc::has_il() != 0 } }
+    pub fn longname(&self) -> ~str {
+        use std::str;
+        unsafe {
+            let s: *libc::c_char = nc::longname();
+            str::raw::from_c_str(s)
+        }
+    }
+
     #[fixed_stack_segment]
     pub fn keypad(&mut self, s:&mut self::screens::Screen, enabled: bool) {
         unsafe {

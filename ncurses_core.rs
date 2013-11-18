@@ -1,7 +1,8 @@
 #[feature(macro_rules)];
 
 #[link(name="ncurses_core",vers="5.7")];
-use std::libc::{c_char, c_int, c_short, c_uchar, c_uint, c_void,FILE};
+use std::libc::{c_char, c_int, c_short, c_uchar, c_uint, c_void};
+use std::libc::{wchar_t, FILE};
 
 pub type chtype = c_uint;
 pub type attr_t = c_int;
@@ -48,10 +49,10 @@ extern {
     pub fn attron (_:attr_t) -> c_int;
     pub fn attrset (_:attr_t) -> c_int;
     pub fn attr_get (_:mut_attr_t_p, _:mut_short_p, _:void_p) -> c_int;
-    fn attr_off (_:attr_t, _:void_p) -> c_int;
-    fn attr_on (_:attr_t, _:void_p) -> c_int;
-    fn attr_set (_:attr_t, _:c_short, _:void_p) -> c_int;
-    fn baudrate () -> c_int;
+    // fn attr_off (_:attr_t, _:void_p) -> c_int;
+    // fn attr_on (_:attr_t, _:void_p) -> c_int;
+    // fn attr_set (_:attr_t, _:c_short, _:void_p) -> c_int;
+    pub fn baudrate () -> c_int;
     fn beep  () -> c_int;
     fn bkgd (_:chtype) -> c_int;
     fn bkgdset (_:chtype);
@@ -83,7 +84,8 @@ extern {
     pub fn echochar (_:chtype) -> c_int;
     fn erase () -> c_int;
     pub fn endwin () -> c_int;
-    fn erasechar () -> c_char;
+    // fn erasechar () -> c_char;
+    pub fn erasewchar (c:*mut wchar_t) -> c_int;
     fn filter ();
     fn flash () -> c_int;
     fn flushinp () -> c_int;
@@ -94,8 +96,8 @@ extern {
     fn getwin (_:FILE_p) -> *WINDOW;
     fn halfdelay (_:c_int) -> c_int;
     pub fn has_colors () -> bool_t;
-    fn has_ic () -> bool_t;
-    fn has_il () -> bool_t;
+    pub fn has_ic () -> bool_t;
+    pub fn has_il () -> bool_t;
     fn hline (_:chtype, _:c_int) -> c_int;
     fn idcok (_:WINDOW_p, _:bool_t);
     fn idlok (_:WINDOW_p, _:bool_t) -> c_int;
@@ -119,9 +121,10 @@ extern {
     fn is_wintouched (_:WINDOW_p) -> bool_t;
     fn keyname (_:c_int) -> *c_char;
     pub fn keypad (_:WINDOW_p, _:bool_t) -> c_int;
-    fn killchar () -> c_char;
+    // fn killchar () -> c_char;
+    pub fn killwchar (c:*mut wchar_t) -> c_int;
     fn leaveok (_:WINDOW_p,_:bool_t) -> c_int;
-    fn longname () -> *c_char;
+    pub fn longname () -> *c_char;
     fn meta (_:WINDOW_p,_:bool_t) -> c_int;
     pub fn move (_:c_int, _:c_int) -> c_int;
     pub fn mvaddch (_:c_int, _:c_int, _:chtype) -> c_int;
