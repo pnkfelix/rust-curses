@@ -54,8 +54,8 @@ extern {
     // fn attr_set (_:attr_t, _:c_short, _:void_p) -> c_int;
     pub fn baudrate () -> c_int;
     pub fn beep  () -> c_int;
-    fn bkgd (_:chtype) -> c_int;
-    fn bkgdset (_:chtype);
+    pub fn bkgd (_:chtype) -> c_int;
+    pub fn bkgdset (_:chtype);
     fn border (_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
     fn box (_:WINDOW_p, _:chtype, _:chtype) -> c_int;
     fn can_change_color () -> bool_t;
@@ -89,7 +89,7 @@ extern {
     fn filter ();
     pub fn flash () -> c_int;
     fn flushinp () -> c_int;
-    fn getbkgd (_:WINDOW_p) -> chtype;
+    pub fn getbkgd (_:WINDOW_p) -> chtype;
     pub fn getch () -> c_int;
     pub fn getnstr (_:mut_char_p, _:c_int) -> c_int;
     fn getstr (_:char_p) -> c_int;
@@ -268,8 +268,8 @@ extern {
     fn wattr_on (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
     fn wattr_off (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
     fn wattr_set (_:WINDOW_p, _:attr_t, _:c_short, _:void_p) -> c_int;
-    fn wbkgd (_:WINDOW_p, _:chtype) -> c_int;
-    fn wbkgdset (_:WINDOW_p,_:chtype);
+    pub fn wbkgd (_:WINDOW_p, _:chtype) -> c_int;
+    pub fn wbkgdset (_:WINDOW_p,_:chtype);
     fn wborder (_:WINDOW_p,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
     fn wchgat (_:WINDOW_p, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
     fn wclear (_:WINDOW_p) -> c_int;

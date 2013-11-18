@@ -111,6 +111,13 @@ pub mod attrs {
         priv state: libc::c_int
     }
 
+    impl attr_set {
+        pub fn from_chtype(bits:libc::c_int) -> attr_set {
+            if (bits & !nc::A_ATTRIBUTES) != 0 { fail!() }
+            attr_set { state: bits }
+        }
+    }
+
     fn encode_one(a: attr) -> libc::c_int {
         match a {
             display(d) => d as libc::c_int,
@@ -554,6 +561,18 @@ pub mod chars {
             ch_with_attr(rc, attrs) => encode_raw(rc) | (attrs.encode() as c_uint)
         }
     }
+    pub fn decode(c:nc::chtype) -> ch {
+        let c = c as c_int;
+        // This might fail; I do not yet know how best to extract attrs.
+        let chartext = c & nc::A_CHARTEXT;
+        let attributes = c & nc::A_ATTRIBUTES;
+        let raw = super::input::getch_result_to_ch(chartext);
+        if attributes == 0 {
+            ch(raw)
+        } else {
+            ch_with_attr(raw, attrs::attr_set::from_chtype(attributes))
+        }
+    }
 }
 
 pub mod colors {
@@ -728,6 +747,47 @@ pub mod moves {
     impl<'a> super::Window<'a> {
         fn move(&mut self, y: c_int, x: c_int) {
             unsafe { fail_if_err!(nc::wmove(self.ptr, y, x)); }
+        }
+    }
+}
+
+pub mod background {
+    use nc = ncurses_core;
+    use std::libc::c_int;
+    use super::chars;
+    use ToCh = super::chars::HasChEncoding;
+    use WIN_p = nc::WINDOW_p;
+
+    unsafe fn bkgdset (c:nc::chtype) { nc::bkgdset(c) }
+    unsafe fn wbkgdset (w:WIN_p, c:nc::chtype) { nc::wbkgdset(w, c) }
+    unsafe fn bkgd (c:nc::chtype) -> c_int { nc::bkgd(c) }
+    unsafe fn wbkgd (w:WIN_p, c:nc::chtype) -> c_int { nc::wbkgd(w, c) }
+
+    trait Background {
+        fn bkgd<E:ToCh>(&mut self, c:E);
+        fn bkgdset<E:ToCh>(&mut self, c:E);
+    }
+    impl<'a> Background for super::Context<'a> {
+        fn bkgd<E:ToCh>(&mut self, c:E) {
+            unsafe { fail_if_err!(bkgd(c.encode())); }
+        }
+
+        fn bkgdset<E:ToCh>(&mut self, c:E) {
+            unsafe { bkgdset(c.encode()) }
+        }
+    }
+    impl<'a> Background for super::Window<'a> {
+        fn bkgd<E:ToCh>(&mut self, c:E) {
+            unsafe { fail_if_err!(wbkgd(self.ptr, c.encode())); }
+        }
+        fn bkgdset<E:ToCh>(&mut self, c:E) {
+            unsafe { wbkgdset(self.ptr, c.encode()) }
+        }
+    }
+    impl<'a> super::Window<'a> {
+        fn getbkgd(&self) -> chars::ch {
+            let c = unsafe { nc::getbkgd(self.ptr) };
+            chars::decode(c)
         }
     }
 }

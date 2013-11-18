@@ -55,6 +55,7 @@ fn main() {
     use ncurses::output::AddChstr;
     use ncurses::attrs;
     use ncurses::attrs::AttrSet;
+    use ncurses::background::Background;
 
     let mut num : colors::pair_num = 0;
 
@@ -110,6 +111,8 @@ fn main() {
 
         let name = context.longname();
         context.addstr(name);
+        context.bkgd(chars::ascii_ch('_' as i8));
+        context.bkgdset(chars::ascii_ch('*' as i8));
 
         while !finished {
             // let c = context.getch();
