@@ -51,6 +51,7 @@ fn main() {
     use ncurses::colors;
     // use ncurses::chars::{getch};
     use ncurses::input;
+    use ncurses::input::GetCh;
     use ncurses::output::AddChstr;
     use ncurses::attrs;
     use ncurses::attrs::AttrSet;

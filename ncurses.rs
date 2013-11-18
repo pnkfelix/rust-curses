@@ -590,7 +590,16 @@ pub mod input {
         pub fn on_getch_err(&mut self, value: getch_err_response<'a>) {
             self.on_getch_err_do = value;
         }
-        pub fn getch(&mut self) -> raw_ch {
+    }
+
+    trait GetCh {
+        fn getch(&mut self) -> raw_ch;
+        fn getstr(&mut self, bytes: &mut [c_char]);
+        fn getnstr(&mut self, bytes: &mut [c_char], n: uint);
+    }
+
+    impl<'a> GetCh for super::Context<'a> {
+        fn getch(&mut self) -> raw_ch {
             let mut result : c_int;
             'getch: loop {
                 result = unsafe { nc::getch() };
@@ -612,7 +621,7 @@ pub mod input {
 
         // (deliberately not using unsafe nc::getstr fcn.)
 
-        pub fn getstr(&mut self, bytes: &mut [c_char]) {
+        fn getstr(&mut self, bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
                     let len = len as i32;
                     if len < 0 { fail!(); }
@@ -620,7 +629,7 @@ pub mod input {
                 });
         }
 
-        pub fn getnstr(&mut self, bytes: &mut [c_char], n: uint) {
+        fn getnstr(&mut self, bytes: &mut [c_char], n: uint) {
             bytes.as_mut_buf(|ptr, len| {
                     if n > len { fail!(); }
                     let n = n as i32;
@@ -630,8 +639,8 @@ pub mod input {
         }
     }
 
-    impl<'a> super::Window<'a> {
-        pub fn getch(&mut self) -> raw_ch {
+    impl<'a> GetCh for super::Window<'a> {
+        fn getch(&mut self) -> raw_ch {
             let mut result : c_int;
             'getch: loop {
                 result = unsafe { nc::wgetch(self.ptr) };
@@ -651,7 +660,7 @@ pub mod input {
             }
         }
 
-        pub fn getstr(&mut self, bytes: &mut [c_char]) {
+        fn getstr(&mut self, bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
                     let len = len as i32;
                     if len < 0 { fail!(); }
@@ -659,7 +668,7 @@ pub mod input {
                 });
         }
 
-        pub fn getnstr(&mut self, bytes: &mut [c_char], n: uint) {
+        fn getnstr(&mut self, bytes: &mut [c_char], n: uint) {
             bytes.as_mut_buf(|ptr, len| {
                     if n > len { fail!(); }
                     let n = n as i32;
