@@ -110,8 +110,7 @@ fn main() {
             context.getstr(b.mut_slice_from(0));
             let c = chars::ascii_ch(b[0]);
 
-            let v = [attrs::color_pair(num % 8)];
-            context.attrset(v.as_slice());
+            context.attrset(attrs::color_pair(num % 8));
             num = num + 1;
 
             // process the command keystroke
