@@ -4,15 +4,15 @@ rust-curses
 Rust interface to terminal curses library / libraries.
 
 Eventually the goal is to provide a Rust-ic API in
-[ncurses.rs](blob/master/ncurses.rs), e.g. using RAII to ensure that
+[ncurses.rs](ncurses.rs), e.g. using RAII to ensure that
 you setup and teardown an ncurses context, and that you thread access
 to the terminal (or subwindows of it) via that context.
 
 You can see a sample usage of the above in
-[ncurses-intro.rs](blob/master/ncurses-intro.rs).
+[ncurses-intro.rs](ncurses-intro.rs).
 
 For now most functionality that you cannot access via that you can
-still get at via [ncurses_core.rs](blob/master/ncurses_core.rs), which
+still get at via [ncurses_core.rs](ncurses_core.rs), which
 is the (very thin) veneer over the `ncurses.h` header that pnkfelix
 found on his Mac.  Sample uses of *that* module can be found in the
 various `hello*.rs` source files.
