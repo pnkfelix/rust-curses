@@ -107,6 +107,10 @@ fn main() {
                 _ => Fail,
             }
         }
+
+        let name = context.longname();
+        context.addstr(name);
+
         while !finished {
             // let c = context.getch();
             let mut b = [0i8, ..16];
