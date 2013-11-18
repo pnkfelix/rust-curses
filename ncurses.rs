@@ -75,6 +75,8 @@ pub mod attrs {
     use std::libc;
     use std::cast;
     use nc = ncurses_core;
+    use WIN_p = nc::WINDOW_p;
+    use std::libc::c_int;
 
     use super::colors;
 
@@ -175,9 +177,9 @@ pub mod attrs {
     unsafe fn attroff (x:nc::attr_t) -> libc::c_int { nc::attroff(x) }
     unsafe fn attron  (x:nc::attr_t) -> libc::c_int { nc::attron(x)  }
     unsafe fn attrset (x:nc::attr_t) -> libc::c_int { nc::attrset(x) }
-    unsafe fn wattroff (w:nc::WINDOW_p, x:nc::attr_t) -> libc::c_int { nc::wattroff(w, x) }
-    unsafe fn wattron  (w:nc::WINDOW_p, x:nc::attr_t) -> libc::c_int { nc::wattron(w, x)  }
-    unsafe fn wattrset (w:nc::WINDOW_p, x:nc::attr_t) -> libc::c_int { nc::wattrset(w, x) }
+    unsafe fn wattroff (w:WIN_p, x:nc::attr_t) -> c_int { nc::wattroff(w, x) }
+    unsafe fn wattron  (w:WIN_p, x:nc::attr_t) -> c_int { nc::wattron(w, x)  }
+    unsafe fn wattrset (w:WIN_p, x:nc::attr_t) -> c_int { nc::wattrset(w, x) }
 
     impl<'a> super::Context<'a> {
         pub fn attroff<A:EncodesAttrs>(&mut self, attrs: A) {
@@ -479,6 +481,20 @@ pub mod chars {
         ch_with_attr(raw_ch, attrs::attr_set)
     }
 
+    pub trait HasChEncoding { fn encode(&self) -> nc::chtype; }
+
+    impl HasChEncoding for raw_ch {
+        fn encode(&self) -> nc::chtype { encode_raw(*self) }
+    }
+
+    impl HasChEncoding for ch {
+        fn encode(&self) -> nc::chtype { encode(*self) }
+    }
+
+    impl HasChEncoding for nc::chtype {
+        fn encode(&self) -> nc::chtype { *self }
+    }
+
     fn encode_raw(c:raw_ch) -> nc::chtype {
         match c {
             ascii_ch(bk)  => bk as nc::chtype,
@@ -669,6 +685,7 @@ pub mod output {
     use nc = ncurses_core;
     use std::libc::c_int;
     use super::chars::{ch,encode};
+    use ToCh = super::chars::HasChEncoding;
 
     impl<'a> super::Context<'a> {
         pub fn addch(&mut self, c: ch) {
@@ -679,6 +696,167 @@ pub mod output {
             let c = encode(c);
             unsafe { fail_if_err!(nc::mvaddch(y, x, c)); }
         }
+    }
+    impl<'a> super::Window<'a> {
+        pub fn addch(&mut self, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::waddch(self.ptr, c)); }
+        }
+        pub fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
+            let c = encode(c);
+            unsafe { fail_if_err!(nc::mvwaddch(self.ptr, y, x, c)); }
+        }
+    }
+
+    fn addchnstr(chs:&[nc::chtype], n:uint) {
+        chs.as_imm_buf(|ptr, len| {
+                let len = len as i32;
+                let n = n as c_int;
+                if (n < 0) || (len < n) { fail!(); }
+                unsafe { fail_if_err!(nc::addchnstr(ptr, n)); }
+            });
+    }
+
+    fn mvaddchnstr(y: c_int, x: c_int, chs:&[nc::chtype], n:uint) {
+        chs.as_imm_buf(|ptr, len| {
+                let len = len as i32;
+                let n = n as c_int;
+                if (n < 0) || (len < n) { fail!(); }
+                unsafe { fail_if_err!(nc::mvaddchnstr(y, x, ptr, n)); }
+            });
+    }
+
+    fn waddchnstr(w: nc::WINDOW_p, chs:&[nc::chtype], n:uint) {
+        chs.as_imm_buf(|ptr, len| {
+                let len = len as i32;
+                let n = n as c_int;
+                if (n < 0) || (len < n) { fail!(); }
+                unsafe { fail_if_err!(nc::waddchnstr(w, ptr, n)); }
+            });
+    }
+
+    fn mvwaddchnstr(w: nc::WINDOW_p, y: c_int, x: c_int, chs:&[nc::chtype], n:uint) {
+        chs.as_imm_buf(|ptr, len| {
+                let len = len as i32;
+                let n = n as c_int;
+                if (n < 0) || (len < n) { fail!(); }
+                unsafe { fail_if_err!(nc::mvwaddchnstr(w, y, x, ptr, n)); }
+            });
+    }
+
+    trait AddChstr {
+        fn addchnstr<E:ToCh>(&mut self, chs:&[E], n:uint);
+        fn addchstr<E:ToCh>(&mut self, chs:&[E]);
+        fn mvaddchnstr<E:ToCh>(&mut self, y: c_int, x: c_int, chs:&[E], n:uint);
+        fn mvaddchstr<E:ToCh>(&mut self, y: c_int, x: c_int, chs:&[E]);
+    }
+
+    impl<'a> AddChstr for super::Context<'a> {
+        fn addchnstr<E:ToCh>(&mut self, chs:&[E], n:uint) {
+            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            addchnstr(v.as_slice(), n);
+        }
+        fn addchstr<E:ToCh>(&mut self, chs:&[E]) {
+            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            addchnstr(v.as_slice(), v.len());
+        }
+        fn mvaddchnstr<E:ToCh>(&mut self, y: c_int, x: c_int, chs:&[E], n:uint) {
+            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            mvaddchnstr(y, x, v.as_slice(), n);
+        }
+        fn mvaddchstr<E:ToCh>(&mut self, y: c_int, x: c_int, chs:&[E]) {
+            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            mvaddchnstr(y, x, v.as_slice(), v.len());
+        }
+    }
+
+    impl<'a> AddChstr for super::Window<'a> {
+        fn addchnstr<E:ToCh>(&mut self, chs:&[E], n:uint) {
+            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            waddchnstr(self.ptr, v.as_slice(), n);
+        }
+        fn addchstr<E:ToCh>(&mut self, chs:&[E]) {
+            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            waddchnstr(self.ptr, v.as_slice(), v.len());
+        }
+        fn mvaddchnstr<E:ToCh>(&mut self, y: c_int, x: c_int, chs:&[E], n:uint) {
+            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            mvwaddchnstr(self.ptr, y, x, v.as_slice(), n);
+        }
+        fn mvaddchstr<E:ToCh>(&mut self, y: c_int, x: c_int, chs:&[E]) {
+            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            mvwaddchnstr(self.ptr, y, x, v.as_slice(), v.len());
+        }
+    }
+
+    impl<'a> super::Context<'a> {
+        pub fn addnstr(&mut self, s: &str, n:uint) {
+            if n > s.len() { fail!(); }
+            let n = n as c_int;
+            if n < 0 { fail!(); }
+            s.with_c_str(|p| { unsafe { fail_if_err!(nc::addnstr(p, n)) } });
+        }
+        pub fn addstr(&mut self, s: &str) {
+            let n = s.len() as c_int;
+            if n < 0 { fail!(); }
+            s.with_c_str(|p| { unsafe { fail_if_err!(nc::addnstr(p, n)) } });
+        }
+        pub fn mvaddstr(&mut self, y: c_int, x: c_int, s: &str) {
+            let n = s.len() as c_int;
+            if n < 0 { fail!(); }
+            s.with_c_str(|p| { unsafe { fail_if_err!(nc::mvaddnstr(y, x, p, n)) } });
+        }
+        pub fn mvaddnstr(&mut self, y: c_int, x: c_int, s: &str, n:uint) {
+            if n > s.len() { fail!(); }
+            let n = s.len() as c_int;
+            if n < 0 { fail!(); }
+            s.with_c_str(|p| { unsafe { fail_if_err!(nc::mvaddnstr(y, x, p, n)) } });
+        }
+    }
+
+    impl<'a> super::Window<'a> {
+        pub fn addnstr(&mut self, s: &str, n:uint) {
+            if n > s.len() { fail!(); }
+            let n = n as c_int;
+            if n < 0 { fail!(); }
+            s.with_c_str(|p| { unsafe { fail_if_err!(nc::waddnstr(self.ptr, p, n)) } });
+        }
+        pub fn addstr(&mut self, s: &str) {
+            let n = s.len() as c_int;
+            if n < 0 { fail!(); }
+            s.with_c_str(|p| { unsafe { fail_if_err!(nc::waddnstr(self.ptr, p, n)) } });
+        }
+        pub fn mvaddstr(&mut self, y: c_int, x: c_int, s: &str) {
+            let n = s.len() as c_int;
+            if n < 0 { fail!(); }
+            s.with_c_str(|p| { unsafe { fail_if_err!(nc::mvwaddnstr(self.ptr, y, x, p, n)) } });
+        }
+        pub fn mvaddnstr(&mut self, y: c_int, x: c_int, s: &str, n:uint) {
+            if n > s.len() { fail!(); }
+            let n = s.len() as c_int;
+            if n < 0 { fail!(); }
+            s.with_c_str(|p| { unsafe { fail_if_err!(nc::mvwaddnstr(self.ptr, y, x, p, n)) } });
+        }
+    }
+
+    impl<'a> super::Window<'a> {
+        pub fn addnstr(&mut self, s: &str, n:uint) {
+            if n > s.len() { fail!(); }
+            let n = n as c_int;
+            if n < 0 { fail!(); }
+            s.with_c_str(|p| {
+                    unsafe { fail_if_err!(nc::waddnstr(self.ptr, p, n)) }
+                });
+        }
+        pub fn addstr(&mut self, s: &str) {
+            let n = s.len() as c_int;
+            if n < 0 { fail!(); }
+            s.with_c_str(|p| {
+                    unsafe { fail_if_err!(nc::waddnstr(self.ptr, p, n)) }
+                });
+        }
+    }
+    impl<'a> super::Context<'a> {
         pub fn echo(&mut self, c: ch) {
             let c = encode(c);
             unsafe { fail_if_err!(nc::echochar(c)); }
@@ -689,14 +867,6 @@ pub mod output {
     }
 
     impl<'a> super::Window<'a> {
-        pub fn addch(&mut self, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::waddch(self.ptr, c)); }
-        }
-        pub fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::mvwaddch(self.ptr, y, x, c)); }
-        }
         pub fn echo(&mut self, c: ch) {
             let c = encode(c);
             unsafe { fail_if_err!(nc::wechochar(self.ptr, c)); }

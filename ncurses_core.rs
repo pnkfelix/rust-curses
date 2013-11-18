@@ -38,10 +38,10 @@ extern {
     pub static TABSIZE : c_int;
 
     pub fn addch (_:chtype) -> c_int;
-    fn addchnstr (_:*chtype, _:c_int) -> c_int;
-    fn addchstr (_:*chtype) -> c_int;
-    fn addnstr (_:*c_char, _:c_int) -> c_int;
-    fn addstr (_:*c_char) -> c_int;
+    pub fn addchnstr (_:*chtype, _:c_int) -> c_int;
+    // fn addchstr (_:*chtype) -> c_int;
+    pub fn addnstr (_:*c_char, _:c_int) -> c_int;
+    pub fn addstr (_:*c_char) -> c_int;
     pub fn attroff (_:attr_t) -> c_int;
     pub fn attron (_:attr_t) -> c_int;
     pub fn attrset (_:attr_t) -> c_int;
@@ -123,9 +123,9 @@ extern {
     fn meta (_:WINDOW_p,_:bool_t) -> c_int;
     pub fn move (_:c_int, _:c_int) -> c_int;
     pub fn mvaddch (_:c_int, _:c_int, _:chtype) -> c_int;
-    fn mvaddchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
-    fn mvaddchstr (_:c_int, _:c_int, _:chtype_p) -> c_int;
-    fn mvaddnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+    pub fn mvaddchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
+    // fn mvaddchstr (_:c_int, _:c_int, _:chtype_p) -> c_int;
+    pub fn mvaddnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
     fn mvaddstr (_:c_int, _:c_int, _:char_p) -> c_int;
     fn mvchgat (_:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
     fn mvcur (_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
@@ -147,9 +147,9 @@ extern {
     //  fn mvscanw (_:c_int,_:c_int, _:char_p) -> c_int;
     fn mvvline (_:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
     pub fn mvwaddch (_:WINDOW_p, _:c_int, _:c_int, _:chtype) -> c_int;
-    fn mvwaddchnstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
+    pub fn mvwaddchnstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
     fn mvwaddchstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p) -> c_int;
-    fn mvwaddnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+    pub fn mvwaddnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
     fn mvwaddstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
     fn mvwchgat (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
     fn mvwdelch (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
@@ -252,10 +252,10 @@ extern {
     //  fn vwscanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
     //  fn vw_scanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
     pub fn waddch (_:WINDOW_p, _:chtype) -> c_int;
-    fn waddchnstr (_:WINDOW_p,_:chtype_p,_:c_int) -> c_int;
-    fn waddchstr (_:WINDOW_p,_:chtype_p) -> c_int;
-    fn waddnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
-    fn waddstr (_:WINDOW_p,_:char_p) -> c_int;
+    pub fn waddchnstr (_:WINDOW_p,_:chtype_p,_:c_int) -> c_int;
+    // fn waddchstr (_:WINDOW_p,_:chtype_p) -> c_int;
+    pub fn waddnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
+    // fn waddstr (_:WINDOW_p,_:char_p) -> c_int;
     pub fn wattron (_:WINDOW_p, _:c_int) -> c_int;
     pub fn wattroff (_:WINDOW_p, _:c_int) -> c_int;
     pub fn wattrset (_:WINDOW_p, _:c_int) -> c_int;

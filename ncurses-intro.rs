@@ -51,6 +51,7 @@ fn main() {
     use ncurses::colors;
     // use ncurses::chars::{getch};
     use ncurses::input;
+    use ncurses::output::AddChstr;
     use ncurses::attrs;
 
     let mut num : colors::pair_num = 0;
@@ -108,14 +109,16 @@ fn main() {
             // let c = context.getch();
             let mut b = [0i8, ..16];
             context.getstr(b.mut_slice_from(0));
-            let c = chars::ascii_ch(b[0]);
+            // let c = chars::ascii_ch(b[0]);
+            let cs : ~[chars::raw_ch] =
+                b.iter().map(|&c| chars::ascii_ch(c)).collect();
 
             context.attrset(attrs::color_pair(num % 8));
             num = num + 1;
 
             // process the command keystroke
 
-            context.addch(chars::ch(c));
+            context.addchstr(cs);
             context.refresh();
         }
 
