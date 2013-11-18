@@ -21,7 +21,7 @@ pub struct Window<'a> {
     priv ctxt: &'a Context<'a>,
 }
 
-// These are windows as large as the terminal screen (upper-left to
+// "Screens" are windows as large as the terminal screen (upper-left to
 // lower-right).  `stdscr` is one such screen; it is the default for
 // output.  There is a special screen, the "terminal screen", that
 // corresponds to ncurses' model of what the user sees now.  (It
