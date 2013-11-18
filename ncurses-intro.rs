@@ -115,9 +115,12 @@ fn main() {
         context.bkgdset(chars::ascii_ch('*' as i8));
 
         while !finished {
-            // let c = context.getch();
+            let c = context.getch();
+            println!("{:?}", c);
+
             let mut b = [0i8, ..16];
-            context.getstr(b.mut_slice_from(0));
+            context.mvgetstr(num as i32, 0, b.mut_slice_from(0));
+
             // let c = chars::ascii_ch(b[0]);
             let cs : ~[chars::raw_ch] =
                 b.iter().map(|&c| chars::ascii_ch(c)).collect();

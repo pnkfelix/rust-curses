@@ -137,8 +137,8 @@ extern {
     fn mvdelch (_:c_int, _:c_int) -> c_int;
     fn mvderwin (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
     fn mvgetch (_:c_int, _:c_int) -> c_int;
-    fn mvgetnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    fn mvgetstr (_:c_int, _:c_int, _:char_p) -> c_int;
+    pub fn mvgetnstr (_:c_int, _:c_int, _:mut_char_p, _:c_int) -> c_int;
+    // fn mvgetstr (_:c_int, _:c_int, _:char_p) -> c_int;
     fn mvhline (_:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
     fn mvinch (_:c_int, _:c_int) -> chtype;
     fn mvinchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
@@ -159,8 +159,8 @@ extern {
     fn mvwchgat (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
     fn mvwdelch (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
     fn mvwgetch (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
-    fn mvwgetnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    fn mvwgetstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
+    pub fn mvwgetnstr (_:WINDOW_p, _:c_int, _:c_int, _:mut_char_p, _:c_int) -> c_int;
+    // fn mvwgetstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
     fn mvwhline (_:WINDOW_p, _:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
     fn mvwin (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
     fn mvwinch (_:WINDOW_p, _:c_int, _:c_int) -> chtype;

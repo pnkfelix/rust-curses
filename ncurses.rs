@@ -648,6 +648,7 @@ pub mod input {
     trait GetCh {
         fn getch(&mut self) -> raw_ch;
         fn getstr(&mut self, bytes: &mut [c_char]);
+        fn mvgetstr(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]);
         fn getnstr(&mut self, bytes: &mut [c_char], n: uint);
     }
 
@@ -679,6 +680,14 @@ pub mod input {
                     let len = len as i32;
                     if len < 0 { fail!(); }
                     unsafe { fail_if_err!(nc::getnstr(ptr, len)); }
+                });
+        }
+
+        fn mvgetstr(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]) {
+            bytes.as_mut_buf(|ptr, len| {
+                    let len = len as i32;
+                    if len < 0 { fail!(); }
+                    unsafe { fail_if_err!(nc::mvgetnstr(y, x, ptr, len)); }
                 });
         }
 
@@ -718,6 +727,14 @@ pub mod input {
                     let len = len as i32;
                     if len < 0 { fail!(); }
                     unsafe { fail_if_err!(nc::wgetnstr(self.ptr, ptr, len)); }
+                });
+        }
+
+        fn mvgetstr(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]) {
+            bytes.as_mut_buf(|ptr, len| {
+                    let len = len as i32;
+                    if len < 0 { fail!(); }
+                    unsafe { fail_if_err!(nc::mvwgetnstr(self.ptr, y, x, ptr, len)); }
                 });
         }
 
