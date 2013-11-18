@@ -160,38 +160,37 @@ pub mod attrs {
         }
     }
 
+    impl<'a> EncodesAttrs for ~[attr] {
+        fn encode(&self) -> libc::c_int {
+            encode_attrs(self.as_slice())
+        }
+    }
+
     impl EncodesAttrs for attr {
         fn encode(&self) -> libc::c_int {
             encode_one(*self)
         }
     }
 
-     impl<'a> super::Context<'a> {
-        pub fn attroff(&mut self, attrs: &[attr]) {
-            let i = encode_attrs(attrs);
-            unsafe { fail_if_err!(nc::attroff(i)); }
-        }
-        pub fn attron(&mut self, attrs: &[attr]) {
-            let i = encode_attrs(attrs);
-            unsafe { fail_if_err!(nc::attron(i)); }
-        }
-        pub fn attrset(&mut self, attrs: &[attr]) {
-            let i = encode_attrs(attrs);
-            unsafe { fail_if_err!(nc::attrset(i)); }
-        }
-    }
+    unsafe fn attroff (x:nc::attr_t) -> libc::c_int { nc::attroff(x) }
+    unsafe fn attron  (x:nc::attr_t) -> libc::c_int { nc::attron(x)  }
+    unsafe fn attrset (x:nc::attr_t) -> libc::c_int { nc::attrset(x) }
+    unsafe fn wattroff (w:nc::WINDOW_p, x:nc::attr_t) -> libc::c_int { nc::wattroff(w, x) }
+    unsafe fn wattron  (w:nc::WINDOW_p, x:nc::attr_t) -> libc::c_int { nc::wattron(w, x)  }
+    unsafe fn wattrset (w:nc::WINDOW_p, x:nc::attr_t) -> libc::c_int { nc::wattrset(w, x) }
+
     impl<'a> super::Context<'a> {
-        pub fn broke_attroff<A:EncodesAttrs>(&mut self, attrs: A) {
+        pub fn attroff<A:EncodesAttrs>(&mut self, attrs: A) {
             let i = attrs.encode();
-            unsafe { fail_if_err!(nc::attroff(i)); }
+            unsafe { fail_if_err!(attroff(i)); }
         }
-        pub fn broke_attron<A:EncodesAttrs>(&mut self, attrs: A) {
+        pub fn attron<A:EncodesAttrs>(&mut self, attrs: A) {
             let i = attrs.encode();
-            unsafe { fail_if_err!(nc::attron(i)); }
+            unsafe { fail_if_err!(attron(i)); }
         }
-        pub fn broke_attrset<A:EncodesAttrs>(&mut self, attrs: A) {
+        pub fn attrset<A:EncodesAttrs>(&mut self, attrs: A) {
             let i = attrs.encode();
-            unsafe { fail_if_err!(nc::attrset(i)); }
+            unsafe { fail_if_err!(attrset(i)); }
         }
     }
 
