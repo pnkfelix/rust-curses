@@ -181,31 +181,37 @@ pub mod attrs {
     unsafe fn wattron  (w:WIN_p, x:nc::attr_t) -> c_int { nc::wattron(w, x)  }
     unsafe fn wattrset (w:WIN_p, x:nc::attr_t) -> c_int { nc::wattrset(w, x) }
 
-    impl<'a> super::Context<'a> {
-        pub fn attroff<A:EncodesAttrs>(&mut self, attrs: A) {
+    trait AttrSet {
+        fn attroff<A:EncodesAttrs>(&mut self, attrs: A);
+        fn attron<A:EncodesAttrs>(&mut self, attrs: A);
+        fn attrset<A:EncodesAttrs>(&mut self, attrs: A);
+    }
+
+    impl<'a> AttrSet for super::Context<'a> {
+        fn attroff<A:EncodesAttrs>(&mut self, attrs: A) {
             let i = attrs.encode();
             unsafe { fail_if_err!(attroff(i)); }
         }
-        pub fn attron<A:EncodesAttrs>(&mut self, attrs: A) {
+        fn attron<A:EncodesAttrs>(&mut self, attrs: A) {
             let i = attrs.encode();
             unsafe { fail_if_err!(attron(i)); }
         }
-        pub fn attrset<A:EncodesAttrs>(&mut self, attrs: A) {
+        fn attrset<A:EncodesAttrs>(&mut self, attrs: A) {
             let i = attrs.encode();
             unsafe { fail_if_err!(attrset(i)); }
         }
     }
 
-    impl<'a> super::Window<'a> {
-        pub fn attroff<A:EncodesAttrs>(&mut self, attrs: A) {
+    impl<'a> AttrSet for super::Window<'a> {
+        fn attroff<A:EncodesAttrs>(&mut self, attrs: A) {
             let i = attrs.encode();
             unsafe { fail_if_err!(nc::wattroff(self.ptr, i)); }
         }
-        pub fn attron<A:EncodesAttrs>(&mut self, attrs: A) {
+        fn attron<A:EncodesAttrs>(&mut self, attrs: A) {
             let i = attrs.encode();
             unsafe { fail_if_err!(nc::wattron(self.ptr, i)); }
         }
-        pub fn attrset<A:EncodesAttrs>(&mut self, attrs: A) {
+        fn attrset<A:EncodesAttrs>(&mut self, attrs: A) {
             let i = attrs.encode();
             unsafe { fail_if_err!(nc::wattrset(self.ptr, i)); }
         }

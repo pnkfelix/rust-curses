@@ -53,6 +53,7 @@ fn main() {
     use ncurses::input;
     use ncurses::output::AddChstr;
     use ncurses::attrs;
+    use ncurses::attrs::AttrSet;
 
     let mut num : colors::pair_num = 0;
 
