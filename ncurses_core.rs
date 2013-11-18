@@ -10,7 +10,9 @@ pub type NCURSES_BOOL = c_char;
 
 type bool_t = NCURSES_BOOL;
 type attr_t_p = *attr_t;
+type mut_attr_t_p = *mut attr_t;
 type short_p = *c_short;
+type mut_short_p = *mut c_short;
 type void_p = *c_void;
 type char_p = *c_char;
 type mut_char_p = *mut c_char;
@@ -45,7 +47,7 @@ extern {
     pub fn attroff (_:attr_t) -> c_int;
     pub fn attron (_:attr_t) -> c_int;
     pub fn attrset (_:attr_t) -> c_int;
-    fn attr_get (_:attr_t_p, _:short_p, _:void_p) -> c_int;
+    pub fn attr_get (_:mut_attr_t_p, _:mut_short_p, _:void_p) -> c_int;
     fn attr_off (_:attr_t, _:void_p) -> c_int;
     fn attr_on (_:attr_t, _:void_p) -> c_int;
     fn attr_set (_:attr_t, _:c_short, _:void_p) -> c_int;
@@ -259,7 +261,7 @@ extern {
     pub fn wattron (_:WINDOW_p, _:c_int) -> c_int;
     pub fn wattroff (_:WINDOW_p, _:c_int) -> c_int;
     pub fn wattrset (_:WINDOW_p, _:c_int) -> c_int;
-    fn wattr_get (_:WINDOW_p, _:attr_t_p, _:short_p, _:void_p) -> c_int;
+    pub fn wattr_get (_:WINDOW_p, _:mut_attr_t_p, _:mut_short_p, _:void_p) -> c_int;
     fn wattr_on (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
     fn wattr_off (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
     fn wattr_set (_:WINDOW_p, _:attr_t, _:c_short, _:void_p) -> c_int;

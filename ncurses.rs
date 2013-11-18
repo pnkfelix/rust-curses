@@ -74,6 +74,7 @@ macro_rules! wrap {
 pub mod attrs {
     use std::libc;
     use std::cast;
+    use std::ptr;
     use nc = ncurses_core;
     use WIN_p = nc::WINDOW_p;
     use std::libc::c_int;
@@ -102,7 +103,7 @@ pub mod attrs {
 
     pub enum attr {
         display(display),
-        color_pair(super::colors::pair_num),   // Color-pair number n
+        color_pair(colors::pair_num),   // Color-pair number n
     }
 
     pub struct attr_set {
@@ -216,6 +217,40 @@ pub mod attrs {
             unsafe { fail_if_err!(nc::wattrset(self.ptr, i)); }
         }
     }
+
+    trait AttrGet {
+        fn attr_get(&self) -> (attr_set, colors::pair_num);
+    }
+
+    impl<'a> AttrGet for super::Context<'a> {
+        fn attr_get(&self) -> (attr_set, colors::pair_num) {
+            let mut a = attr_set{ state: 0 };
+            let mut p : colors::pair_num = 0;
+            unsafe {
+                fail_if_err!(nc::attr_get(&mut a.state as *mut libc::c_int,
+                                          &mut p as *mut libc::c_short,
+                                          ptr::null()));
+            }
+            (a, p)
+        }
+    }
+
+    impl<'a> super::Window<'a> {
+        fn attr_get(&self) -> (attr_set, colors::pair_num) {
+            let mut a = attr_set{ state: 0 };
+            let mut p : colors::pair_num = 0;
+            unsafe {
+                fail_if_err!(nc::wattr_get(self.ptr,
+                                           &mut a.state as *mut libc::c_int,
+                                           &mut p as *mut libc::c_short,
+                                           ptr::null()));
+            }
+            (a, p)
+        }
+    }
+
+    // impl<'a> super::Context<'a> { }
+    // impl<'a> super::Window<'a> { }
 }
 
 pub mod mode {
