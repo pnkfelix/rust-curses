@@ -53,7 +53,7 @@ extern {
     // fn attr_on (_:attr_t, _:void_p) -> c_int;
     // fn attr_set (_:attr_t, _:c_short, _:void_p) -> c_int;
     pub fn baudrate () -> c_int;
-    fn beep  () -> c_int;
+    pub fn beep  () -> c_int;
     fn bkgd (_:chtype) -> c_int;
     fn bkgdset (_:chtype);
     fn border (_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
@@ -87,7 +87,7 @@ extern {
     // fn erasechar () -> c_char;
     pub fn erasewchar (c:*mut wchar_t) -> c_int;
     fn filter ();
-    fn flash () -> c_int;
+    pub fn flash () -> c_int;
     fn flushinp () -> c_int;
     fn getbkgd (_:WINDOW_p) -> chtype;
     pub fn getch () -> c_int;

@@ -119,6 +119,8 @@ fn main() {
             let cs : ~[chars::raw_ch] =
                 b.iter().map(|&c| chars::ascii_ch(c)).collect();
 
+            context.flash();
+
             context.attrset(attrs::color_pair(num % 8));
             num = num + 1;
 
@@ -128,6 +130,7 @@ fn main() {
             context.refresh();
         }
 
+        context.beep();
         os::set_exit_status(0);
     }
 }

@@ -967,6 +967,11 @@ mod screens {
 }
 
 impl<'a> Context<'a> {
+    pub fn beep(&mut self) { unsafe { fail_if_err!(nc::beep()); } }
+    pub fn flash(&mut self) { unsafe { fail_if_err!(nc::flash()); } }
+}
+
+impl<'a> Context<'a> {
     pub fn baudrate(&self) -> libc::c_int { unsafe { nc::baudrate() } }
     pub fn erasechar(&self) -> char {
         use std::char;
