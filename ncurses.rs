@@ -10,7 +10,6 @@ use ncurses_core::{WINDOW_p, SCREEN_p};
 mod ncurses_core;
 
 pub struct Context<'a> {
-    priv force_new: (),
     priv on_getch_err_do: input::getch_err_response<'a>,
 }
 
@@ -320,8 +319,7 @@ fn endwin() {
 
 impl<'a> Context<'a> {
     pub fn new() -> Context {
-        let c = Context{ force_new: (),
-                         on_getch_err_do: input::Immed(input::Fail) };
+        let c = Context{ on_getch_err_do: input::Immed(input::Fail) };
         c.initscr();
         c
     }
