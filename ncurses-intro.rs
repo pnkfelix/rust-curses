@@ -54,10 +54,13 @@ fn main() {
     // use ncurses::chars::{getch};
     use ncurses::input;
     use ncurses::input::GetCh;
-    use ncurses::input::GetStr;
+    // use ncurses::input::GetStr;
+    use ncurses::output::AddCh;
+    use ncurses::HasYX;
     use ncurses::attrs;
     use ncurses::attrs::AttrSet;
     use ncurses::background::Background;
+    use ncurses::moves::Move;
 
     let mut num : colors::pair_num = 0;
 
@@ -118,13 +121,22 @@ fn main() {
         context.bkgdset(chars::ascii_ch('*' as i8));
 
         while !finished {
+            let (y,x) = context.getyx();
             let c = context.getch();
-            println!("{:?}", c);
+            let desc = format!("{:?}", c);
+            context.mvaddstr(0, 0, desc);
+            context.move(y, x);
 
             // process the command keystroke
-
-            let s = context.mvgetstr(num as i32, 0);
-            context.addstr(s);
+            match c {
+                chars::move_ch(chars::down)  if y < ncurses::lines()-1 => context.move(y+1, x),
+                chars::move_ch(chars::up)    if y > 0                => context.move(y-1, x),
+                chars::move_ch(chars::left)  if x > 0                => context.move(y, x-1),
+                chars::move_ch(chars::right) if x < ncurses::cols()-1  => context.move(y, x+1),
+                _ => {}
+            }
+            // let s = context.mvgetstr(num as i32, 0);
+            // context.addch(c);
 
 /*
             let mut b = [0i8, ..16];
