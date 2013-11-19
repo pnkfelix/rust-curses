@@ -2,7 +2,7 @@
 
 #[link(name="ncurses_core",vers="5.7")];
 use std::libc::{c_char, c_int, c_short, c_uchar, c_uint, c_void};
-use std::libc::{wchar_t, FILE};
+use std::libc::{wchar_t, FILE, EOF};
 
 pub type chtype = c_uint;
 pub type attr_t = c_int;
@@ -695,7 +695,7 @@ pub static KEY_EVENT:c_int     = 0o633; /* We were interrupted by an event */
 pub static KEY_MAX:c_int       = 0x1ff; /* Maximum key value is 0633 */
 
 static CCHARW_MAX:c_uint = 5;
-struct cchar_t
+pub struct cchar_t
 {
     attr: attr_t,
     chars: [wchar_t, ..CCHARW_MAX],
@@ -713,10 +713,12 @@ struct cchar_t
  * "implemented" comments do not need this marker.
  */
 
-type wint_t = i32;
+// (this at least works on OS X, apparently.)
+pub type wint_t = i32;
+pub static WEOF : wint_t = EOF;
 
 extern {
-    fn add_wch(_:*cchar_t) -> c_int;
+    pub fn add_wch(_:*cchar_t) -> c_int;
     fn add_wchnstr(_:*cchar_t, _:c_int) -> c_int;
     fn add_wchstr(_:*cchar_t) -> c_int;
     fn addnwstr(_:*wchar_t, _:c_int) -> c_int;
@@ -727,7 +729,7 @@ extern {
     fn box_set(_:WINDOW_p, _:*cchar_t, _:*cchar_t) -> c_int;
     fn echo_wchar(_:*cchar_t) -> c_int;
     pub fn erasewchar(_:*mut wchar_t) -> c_int;
-    fn get_wch(_:*mut wint_t) -> c_int;
+    pub fn get_wch(_:*mut wint_t) -> c_int;
     fn get_wstr(_:*mut wint_t) -> c_int;
     fn getbkgrnd(_:*mut cchar_t) -> c_int;
     fn getcchar(_:*cchar_t, _:*mut wchar_t, _:*mut attr_t, _:*mut c_short, _:*c_void) -> c_int;
@@ -796,7 +798,7 @@ extern {
     fn wbkgrndset (_:WINDOW_p, _:*cchar_t);
     fn wborder_set (_:WINDOW_p, _:*cchar_t, _:*cchar_t, _:*cchar_t, _:*cchar_t, _:*cchar_t, _:*cchar_t, _:*cchar_t, _:*cchar_t) -> c_int;
     fn wecho_wchar (_:WINDOW_p, _:*cchar_t) -> c_int;
-    fn wget_wch (_:WINDOW_p, _:*mut wint_t) -> c_int;
+    pub fn wget_wch (_:WINDOW_p, _:*mut wint_t) -> c_int;
     fn wget_wstr (_:WINDOW_p, _:*mut wint_t) -> c_int;
     fn wgetbkgrnd (_:WINDOW_p, _:*mut cchar_t) -> c_int;
     fn wgetn_wstr (_:WINDOW_p, _:*mut wint_t, _:c_int) -> c_int;

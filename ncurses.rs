@@ -515,6 +515,7 @@ pub mod chars {
 
     pub enum raw_ch {
         ascii_ch(c_char),
+        wide_ch(char),
         move_ch(move_key),
         fcn_ch(fcn_key),
         reset_ch(reset_key),
@@ -545,6 +546,7 @@ pub mod chars {
     fn encode_raw(c:raw_ch) -> nc::chtype {
         match c {
             ascii_ch(bk)  => bk as nc::chtype,
+            wide_ch(_)    => fail!("cannot encode (wide) char as nc::chtype"),
             move_ch(mk)   => mk as nc::chtype,
             fcn_ch(fk)    => fk as nc::chtype,
             reset_ch(rk)  => rk as nc::chtype,
@@ -615,7 +617,7 @@ pub mod colors {
 pub mod input {
     use nc = ncurses_core;
     use std::libc::{c_int,c_char};
-    use super::chars::{raw_ch,ascii_ch,
+    use super::chars::{raw_ch,ascii_ch,wide_ch,
                        move_ch,fcn_ch,reset_ch,action_ch,shift_ch,event_ch,
                        move_key,fcn_key,reset_key,action_key,shifted_key,event,
                        FromCInt};
@@ -654,21 +656,27 @@ pub mod input {
 
     impl<'a> GetCh for super::Context<'a> {
         fn getch(&mut self) -> raw_ch {
-            let mut result : c_int;
+            use std::char;
+            let mut result : nc::wint_t = 0;
             'getch: loop {
-                result = unsafe { nc::getch() };
-                if result == nc::ERR {
-                    let act = match &self.on_getch_err_do {
-                        &Immed(ref act) => *act,
-                        &Delay(ref call) => (*call)(),
-                    };
-                    match act {
-                        Fail       => fail!("ncurses::getch"),
-                        Retry      => continue 'getch,
-                        Return(c)  => return c,
+                let r = unsafe { nc::get_wch(&mut result as *mut nc::wint_t) };
+                match (r, result, char::from_u32(result as u32)) {
+
+                    (nc::KEY_CODE_YES, _, _) => return getch_result_to_ch(result),
+
+                    (nc::OK, _, Some(c)) => return wide_ch(c),
+
+                    _ => {
+                        let act = match &self.on_getch_err_do {
+                            &Immed(ref act) => *act,
+                            &Delay(ref call) => (*call)(),
+                        };
+                        match act {
+                            Fail       => fail!("ncurses::get_wch"),
+                            Retry      => continue 'getch,
+                            Return(c)  => return c,
+                        }
                     }
-                } else {
-                    return getch_result_to_ch(result);
                 }
             }
         }
@@ -703,21 +711,27 @@ pub mod input {
 
     impl<'a> GetCh for super::Window<'a> {
         fn getch(&mut self) -> raw_ch {
-            let mut result : c_int;
+            use std::char;
+            let mut result : nc::wint_t = 0;
             'getch: loop {
-                result = unsafe { nc::wgetch(self.ptr) };
-                if result == nc::ERR {
-                    let act = match &self.ctxt.on_getch_err_do {
-                        &Immed(ref act) => *act,
-                        &Delay(ref call) => (*call)(),
-                    };
-                    match act {
-                        Fail       => fail!("ncurses::getch"),
-                        Retry      => continue 'getch,
-                        Return(c)  => return c,
+                let r = unsafe { nc::wget_wch(self.ptr, &mut result as *mut nc::wint_t) };
+                match (r, result, char::from_u32(result as u32)) {
+
+                    (nc::KEY_CODE_YES, _, _) => return getch_result_to_ch(result),
+
+                    (nc::OK, _, Some(c)) => return wide_ch(c),
+
+                    _ => {
+                        let act = match &self.ctxt.on_getch_err_do {
+                            &Immed(ref act) => *act,
+                            &Delay(ref call) => (*call)(),
+                        };
+                        match act {
+                            Fail       => fail!("ncurses::wget_wch"),
+                            Retry      => continue 'getch,
+                            Return(c)  => return c,
+                        }
                     }
-                } else {
-                    return getch_result_to_ch(result);
                 }
             }
         }
@@ -848,6 +862,16 @@ pub mod output {
             unsafe { fail_if_err!(nc::mvwaddch(self.ptr, y, x, c)); }
         }
     }
+
+    fn add_wch(c:&nc::cchar_t) {
+        unsafe { fail_if_err!(nc::add_wch(c as *nc::cchar_t)); }
+    }
+
+    // impl<'a> super::Context<'a> { }
+    // impl<'a> super::Window<'a> { }
+
+    // impl<'a> super::Context<'a> { }
+    // impl<'a> super::Window<'a> { }
 
     fn addchnstr(chs:&[nc::chtype], n:uint) {
         chs.as_imm_buf(|ptr, len| {
