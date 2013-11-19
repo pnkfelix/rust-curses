@@ -651,7 +651,7 @@ pub mod input {
         fn getch(&mut self) -> raw_ch;
         fn getascii(&mut self, bytes: &mut [c_char]);
         fn mvgetascii(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]);
-        fn getnstr(&mut self, bytes: &mut [c_char], n: uint);
+        fn getnascii(&mut self, bytes: &mut [c_char], n: uint);
     }
 
     impl<'a> GetCh for super::Context<'a> {
@@ -699,7 +699,7 @@ pub mod input {
                 });
         }
 
-        fn getnstr(&mut self, bytes: &mut [c_char], n: uint) {
+        fn getnascii(&mut self, bytes: &mut [c_char], n: uint) {
             bytes.as_mut_buf(|ptr, len| {
                     if n > len { fail!(); }
                     let n = n as i32;
@@ -752,7 +752,7 @@ pub mod input {
                 });
         }
 
-        fn getnstr(&mut self, bytes: &mut [c_char], n: uint) {
+        fn getnascii(&mut self, bytes: &mut [c_char], n: uint) {
             bytes.as_mut_buf(|ptr, len| {
                     if n > len { fail!(); }
                     let n = n as i32;
