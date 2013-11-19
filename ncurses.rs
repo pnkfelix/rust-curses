@@ -813,27 +813,38 @@ pub mod output {
     use super::chars::{ch,encode};
     use ToCh = super::chars::HasChEncoding;
 
+    fn addch(c: nc::chtype) {
+        unsafe { fail_if_err!(nc::addch(c)); }
+    }
+    fn mvaddch(y: c_int, x: c_int, c: nc::chtype) {
+        unsafe { fail_if_err!(nc::mvaddch(y, x, c)); }
+    }
+    fn waddch(p:nc::WINDOW_p, c: nc::chtype) {
+        unsafe { fail_if_err!(nc::waddch(p, c)); }
+    }
+    fn mvwaddch(p:nc::WINDOW_p, y: c_int, x: c_int, c: nc::chtype) {
+        unsafe { fail_if_err!(nc::mvwaddch(p, y, x, c)); }
+    }
+
     trait AddCh {
-        fn addch(&mut self, c: ch);
-        fn mvaddch(&mut self, y: c_int, x: c_int, c: ch);
+        fn addch<E:ToCh>(&mut self, c: E);
+        fn mvaddch<E:ToCh>(&mut self, y: c_int, x: c_int, c: E);
     }
     impl<'a> AddCh for super::Context<'a> {
-        fn addch(&mut self, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::addch(c)); }
+        fn addch<E:ToCh>(&mut self, c: E) {
+            let c = c.encode(); addch(c);
         }
-        fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::mvaddch(y, x, c)); }
+        fn mvaddch<E:ToCh>(&mut self, y: c_int, x: c_int, c: E) {
+            let c = c.encode(); mvaddch(y, x, c);
         }
     }
     impl<'a> AddCh for super::Window<'a> {
-        fn addch(&mut self, c: ch) {
-            let c = encode(c);
-            unsafe { fail_if_err!(nc::waddch(self.ptr, c)); }
+        fn addch<E:ToCh>(&mut self, c: E) {
+            let c = c.encode();
+            waddch(self.ptr, c);
         }
-        fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
-            let c = encode(c);
+        fn mvaddch<E:ToCh>(&mut self, y: c_int, x: c_int, c: E) {
+            let c = c.encode();
             unsafe { fail_if_err!(nc::mvwaddch(self.ptr, y, x, c)); }
         }
     }
