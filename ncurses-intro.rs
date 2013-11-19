@@ -9,6 +9,8 @@ use std::os;
 
 mod signal_h;
 
+mod locale;
+
 // Some notes at the outset:
 // (1.) In general:
 //                 move(y, x);
@@ -52,15 +54,14 @@ fn main() {
     // use ncurses::chars::{getch};
     use ncurses::input;
     use ncurses::input::GetCh;
-    use ncurses::input::GetAscii;
     use ncurses::input::GetStr;
-    use ncurses::output::AddChstr;
     use ncurses::attrs;
     use ncurses::attrs::AttrSet;
     use ncurses::background::Background;
 
     let mut num : colors::pair_num = 0;
 
+    locale::setlocale(locale::all, "en_US.utf-8");
     let mut context = ncurses::Context::new();
 
     unsafe {

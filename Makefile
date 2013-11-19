@@ -13,8 +13,8 @@ ncurses-lib-built: ncurses.rs ncurses_core.rs ncurses-lib-core-built
 hello%: hello%.rs ncurses-lib-built
 	rustc $(RUSTC_FLAGS) -L. --link-args -lncurses $<
 
-ncurses-intro: ncurses-intro.rs ncurses-lib-built
+ncurses-intro: ncurses-intro.rs ncurses-lib-built locale.rs signal_h.rs
 	rustc $(RUSTC_FLAGS) -L. $< -o $@
 
-ncurses-intro-test: ncurses-intro.rs ncurses-lib-built
+ncurses-intro-test: ncurses-intro.rs ncurses-lib-built locale.rs signal_h.rs
 	rustc $(RUSTC_FLAGS) --test -L. $< -o $@
