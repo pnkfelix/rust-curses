@@ -813,22 +813,26 @@ pub mod output {
     use super::chars::{ch,encode};
     use ToCh = super::chars::HasChEncoding;
 
-    impl<'a> super::Context<'a> {
-        pub fn addch(&mut self, c: ch) {
+    trait AddCh {
+        fn addch(&mut self, c: ch);
+        fn mvaddch(&mut self, y: c_int, x: c_int, c: ch);
+    }
+    impl<'a> AddCh for super::Context<'a> {
+        fn addch(&mut self, c: ch) {
             let c = encode(c);
             unsafe { fail_if_err!(nc::addch(c)); }
         }
-        pub fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
+        fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
             let c = encode(c);
             unsafe { fail_if_err!(nc::mvaddch(y, x, c)); }
         }
     }
-    impl<'a> super::Window<'a> {
-        pub fn addch(&mut self, c: ch) {
+    impl<'a> AddCh for super::Window<'a> {
+        fn addch(&mut self, c: ch) {
             let c = encode(c);
             unsafe { fail_if_err!(nc::waddch(self.ptr, c)); }
         }
-        pub fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
+        fn mvaddch(&mut self, y: c_int, x: c_int, c: ch) {
             let c = encode(c);
             unsafe { fail_if_err!(nc::mvwaddch(self.ptr, y, x, c)); }
         }
