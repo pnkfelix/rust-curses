@@ -649,8 +649,8 @@ pub mod input {
 
     trait GetCh {
         fn getch(&mut self) -> raw_ch;
-        fn getstr(&mut self, bytes: &mut [c_char]);
-        fn mvgetstr(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]);
+        fn getascii(&mut self, bytes: &mut [c_char]);
+        fn mvgetascii(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]);
         fn getnstr(&mut self, bytes: &mut [c_char], n: uint);
     }
 
@@ -683,7 +683,7 @@ pub mod input {
 
         // (deliberately not using unsafe nc::getstr fcn.)
 
-        fn getstr(&mut self, bytes: &mut [c_char]) {
+        fn getascii(&mut self, bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
                     let len = len as i32;
                     if len < 0 { fail!(); }
@@ -691,7 +691,7 @@ pub mod input {
                 });
         }
 
-        fn mvgetstr(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]) {
+        fn mvgetascii(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
                     let len = len as i32;
                     if len < 0 { fail!(); }
@@ -736,7 +736,7 @@ pub mod input {
             }
         }
 
-        fn getstr(&mut self, bytes: &mut [c_char]) {
+        fn getascii(&mut self, bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
                     let len = len as i32;
                     if len < 0 { fail!(); }
@@ -744,7 +744,7 @@ pub mod input {
                 });
         }
 
-        fn mvgetstr(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]) {
+        fn mvgetascii(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
                     let len = len as i32;
                     if len < 0 { fail!(); }

@@ -119,7 +119,7 @@ fn main() {
             println!("{:?}", c);
 
             let mut b = [0i8, ..16];
-            context.mvgetstr(num as i32, 0, b.mut_slice_from(0));
+            context.mvgetascii(num as i32, 0, b.mut_slice_from(0));
 
             // let c = chars::ascii_ch(b[0]);
             let cs : ~[chars::raw_ch] =
