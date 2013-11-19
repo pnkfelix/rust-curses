@@ -52,6 +52,7 @@ fn main() {
     // use ncurses::chars::{getch};
     use ncurses::input;
     use ncurses::input::GetCh;
+    use ncurses::input::GetAscii;
     use ncurses::output::AddChstr;
     use ncurses::attrs;
     use ncurses::attrs::AttrSet;

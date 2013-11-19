@@ -649,9 +649,6 @@ pub mod input {
 
     trait GetCh {
         fn getch(&mut self) -> raw_ch;
-        fn getascii(&mut self, bytes: &mut [c_char]);
-        fn mvgetascii(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]);
-        fn getnascii(&mut self, bytes: &mut [c_char], n: uint);
     }
 
     impl<'a> GetCh for super::Context<'a> {
@@ -679,33 +676,6 @@ pub mod input {
                     }
                 }
             }
-        }
-
-        // (deliberately not using unsafe nc::getstr fcn.)
-
-        fn getascii(&mut self, bytes: &mut [c_char]) {
-            bytes.as_mut_buf(|ptr, len| {
-                    let len = len as i32;
-                    if len < 0 { fail!(); }
-                    unsafe { fail_if_err!(nc::getnstr(ptr, len)); }
-                });
-        }
-
-        fn mvgetascii(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]) {
-            bytes.as_mut_buf(|ptr, len| {
-                    let len = len as i32;
-                    if len < 0 { fail!(); }
-                    unsafe { fail_if_err!(nc::mvgetnstr(y, x, ptr, len)); }
-                });
-        }
-
-        fn getnascii(&mut self, bytes: &mut [c_char], n: uint) {
-            bytes.as_mut_buf(|ptr, len| {
-                    if n > len { fail!(); }
-                    let n = n as i32;
-                    if n < 0 { fail!(); }
-                    unsafe { fail_if_err!(nc::getnstr(ptr, n)); }
-                });
         }
     }
 
@@ -735,6 +705,44 @@ pub mod input {
                 }
             }
         }
+    }
+
+    trait GetAscii {
+        fn getascii(&mut self, bytes: &mut [c_char]);
+        fn mvgetascii(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]);
+        fn getnascii(&mut self, bytes: &mut [c_char], n: uint);
+    }
+
+    impl<'a> GetAscii for super::Context<'a> {
+        // (deliberately not using unsafe nc::getstr fcn.)
+
+        fn getascii(&mut self, bytes: &mut [c_char]) {
+            bytes.as_mut_buf(|ptr, len| {
+                    let len = len as i32;
+                    if len < 0 { fail!(); }
+                    unsafe { fail_if_err!(nc::getnstr(ptr, len)); }
+                });
+        }
+
+        fn mvgetascii(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]) {
+            bytes.as_mut_buf(|ptr, len| {
+                    let len = len as i32;
+                    if len < 0 { fail!(); }
+                    unsafe { fail_if_err!(nc::mvgetnstr(y, x, ptr, len)); }
+                });
+        }
+
+        fn getnascii(&mut self, bytes: &mut [c_char], n: uint) {
+            bytes.as_mut_buf(|ptr, len| {
+                    if n > len { fail!(); }
+                    let n = n as i32;
+                    if n < 0 { fail!(); }
+                    unsafe { fail_if_err!(nc::getnstr(ptr, n)); }
+                });
+        }
+    }
+
+    impl<'a> GetAscii for super::Window<'a> {
 
         fn getascii(&mut self, bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
