@@ -10,7 +10,8 @@ use ncurses_core::{WINDOW_p, SCREEN_p};
 mod ncurses_core;
 
 pub struct Context<'a> {
-    priv on_getch_err_do: input::getch_err_response<'a>,
+    priv on_getch_err_do: input::get_err_response<'a, chars::raw_ch>,
+    priv on_getstr_err_do: input::get_err_response<'a, ~str>,
 }
 
 /// Describes a sub-rectangle of the screen (possibly in its
@@ -319,7 +320,10 @@ fn endwin() {
 
 impl<'a> Context<'a> {
     pub fn new() -> Context {
-        let c = Context{ on_getch_err_do: input::Immed(input::Fail) };
+        let c = Context {
+            on_getch_err_do: input::Immed(input::Fail),
+            on_getstr_err_do: input::Immed(input::Fail),
+        };
         c.initscr();
         c
     }
@@ -622,11 +626,12 @@ pub mod input {
                        move_key,fcn_key,reset_key,action_key,shifted_key,event,
                        FromCInt};
 
-    pub enum getch_err_act { Fail, Retry, Return(raw_ch) }
+    #[deriving(Clone)]
+    pub enum get_err_act<RET> { Fail, Retry, Return(RET) }
 
-    pub enum getch_err_response<'a> {
-        Immed(getch_err_act),
-        Delay(&'static fn:Send() -> getch_err_act),
+    pub enum get_err_response<'a, RET> {
+        Immed(get_err_act<RET>),
+        Delay(&'static fn:Send() -> get_err_act<RET>),
     }
 
     pub fn getch_result_to_ch(result: c_int) -> raw_ch {
@@ -642,8 +647,11 @@ pub mod input {
     }
 
     impl<'a> super::Context<'a> {
-        pub fn on_getch_err(&mut self, value: getch_err_response<'a>) {
+        pub fn on_getch_err(&mut self, value: get_err_response<'a, raw_ch>) {
             self.on_getch_err_do = value;
+        }
+        pub fn on_getstr_err(&mut self, value: get_err_response<'a, ~str>) {
+            self.on_getstr_err_do = value;
         }
     }
 
@@ -767,6 +775,61 @@ pub mod input {
                     if n < 0 { fail!(); }
                     unsafe { fail_if_err!(nc::wgetnstr(self.ptr, ptr, n)); }
                 });
+        }
+    }
+
+    trait GetStr {
+        fn getstr(&mut self) -> ~str;
+        fn getnstr(&mut self, n:uint) -> ~str;
+        fn mvgetstr(&mut self, y: c_int, x: c_int) -> ~str;
+        fn mvgetnstr(&mut self, y: c_int, x: c_int, n:uint) -> ~str;
+    }
+
+    impl<'a> GetStr for super::Context<'a> {
+        fn getstr(&mut self) -> ~str {
+            let (y,x) = self.getyx();
+            self.mvgetnstr(y, x, nc::COLS as uint)
+        }
+        fn getnstr(&mut self, n:uint) -> ~str {
+            let (y,x) = self.getyx();
+            self.mvgetnstr(y, x, n)
+        }
+        fn mvgetstr(&mut self, y: c_int, x: c_int) -> ~str {
+            self.mvgetnstr(y, x, nc::COLS as uint)
+        }
+        fn mvgetnstr(&mut self, y: c_int, x: c_int, n:uint) -> ~str {
+            use std::{char,str,vec};
+            let mut result : ~[nc::wint_t] = vec::from_elem(n as uint, 0i32);
+            'getstr: loop {
+                let r = unsafe {
+                    result.as_mut_buf(|p, len| {
+                            if n > len { fail!(); }
+                            let n = n as c_int;
+                            if n < 0 { fail!(); }
+                            nc::mvgetn_wstr(y, x, p, n)
+                        })};
+
+                let mut saw_nonchar = false;
+                let chars = result.map(|&i| match char::from_u32(i as u32) {
+                        None    => { saw_nonchar = true; '_' }
+                        Some(c) => c,
+                    });
+
+                match r {
+                    nc::OK if !saw_nonchar => return str::from_chars(chars),
+                    _ => {
+                        let act = match &self.on_getstr_err_do {
+                            &Immed(ref act) => act.clone(),
+                            &Delay(ref call) => (*call)(),
+                        };
+                        match act {
+                            Fail       => fail!("ncurses::wget_wch"),
+                            Retry      => continue 'getstr,
+                            Return(c)  => return c,
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -970,9 +1033,15 @@ pub mod output {
             s.with_c_str(|p| { unsafe { fail_if_err!(nc::addnstr(p, n)) } });
         }
         pub fn addstr(&mut self, s: &str) {
-            let n = s.len() as c_int;
-            if n < 0 { fail!(); }
-            s.with_c_str(|p| { unsafe { fail_if_err!(nc::addnstr(p, n)) } });
+            // let n = s.len() as c_int;
+            // if n < 0 { fail!(); }
+            // s.with_c_str(|p| { unsafe { fail_if_err!(nc::addnstr(p, n)) } });
+            let c : ~[char] = s.iter().collect();
+            c.as_imm_buf(|p, n| { unsafe {
+                        let n = n as c_int;
+                        if n < 0 { fail!(); }
+                        fail_if_err!(nc::addnwstr(p as *i32, n))
+                    } });
         }
         pub fn mvaddstr(&mut self, y: c_int, x: c_int, s: &str) {
             let n = s.len() as c_int;
@@ -1088,9 +1157,29 @@ mod screens {
 
 }
 
+trait HasYX { fn getyx(&self) -> (libc::c_int, libc::c_int); }
+
+impl<'a> HasYX for Context<'a> {
+    fn getyx(&self) -> (libc::c_int, libc::c_int) {
+        let mut y: libc::c_int = 0;
+        let mut x: libc::c_int = 0;
+        unsafe { nc::getyx(nc::stdscr, &mut y, &mut x); }
+        (y, x)
+    }
+}
+
+impl<'a> HasYX for Window<'a> {
+    fn getyx(&self) -> (libc::c_int, libc::c_int) {
+        let mut y: libc::c_int = 0;
+        let mut x: libc::c_int = 0;
+        unsafe { nc::getyx(self.ptr, &mut y, &mut x); }
+        (y, x)
+    }
+}
+
 impl<'a> Context<'a> {
     // XXX fail on err may be overkill for these routines; consider putting
-    // in similar condition handling analogous to getch_err_response above.
+    // in similar condition handling analogous to get_err_response above.
     pub fn beep(&mut self) { unsafe { fail_if_err!(nc::beep()); } }
     pub fn flash(&mut self) { unsafe { fail_if_err!(nc::flash()); } }
 }

@@ -53,6 +53,7 @@ fn main() {
     use ncurses::input;
     use ncurses::input::GetCh;
     use ncurses::input::GetAscii;
+    use ncurses::input::GetStr;
     use ncurses::output::AddChstr;
     use ncurses::attrs;
     use ncurses::attrs::AttrSet;
@@ -102,7 +103,7 @@ fn main() {
 
         // context.on_getch_err(Immed(Retry));
         context.on_getch_err(Delay(inspect_errno));
-        fn inspect_errno() -> input::getch_err_act {
+        fn inspect_errno() -> input::get_err_act<chars::raw_ch> {
             let transient = unsafe { !finished };
             match os::errno() as libc::c_int {
                 libc::EINTR if transient => Retry,
@@ -119,21 +120,24 @@ fn main() {
             let c = context.getch();
             println!("{:?}", c);
 
+            // process the command keystroke
+
+            let s = context.mvgetstr(num as i32, 0);
+            context.addstr(s);
+
+/*
             let mut b = [0i8, ..16];
             context.mvgetascii(num as i32, 0, b.mut_slice_from(0));
-
             // let c = chars::ascii_ch(b[0]);
             let cs : ~[chars::raw_ch] =
                 b.iter().map(|&c| chars::ascii_ch(c)).collect();
-
+            context.addchstr(cs);
+*/
             context.flash();
 
             context.attrset(attrs::color_pair(num % 8));
             num = num + 1;
 
-            // process the command keystroke
-
-            context.addchstr(cs);
             context.refresh();
         }
 

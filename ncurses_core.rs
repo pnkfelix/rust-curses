@@ -420,7 +420,7 @@ pub static A_VERTICAL: c_int   = ncurses_bits!(1u,22)  as c_int;
  */
 
 #[fixed_stack_segment]
-unsafe fn getyx(win:WINDOW_p,y: &mut c_int,x: &mut c_int) { *y = getcury(win); *x = getcurx(win); }
+pub unsafe fn getyx(win:WINDOW_p,y: &mut c_int,x: &mut c_int) { *y = getcury(win); *x = getcurx(win); }
 #[fixed_stack_segment]
 unsafe fn getbegyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getbegy(win); *x = getbegx(win) }
 #[fixed_stack_segment]
@@ -721,7 +721,7 @@ extern {
     pub fn add_wch(_:*cchar_t) -> c_int;
     fn add_wchnstr(_:*cchar_t, _:c_int) -> c_int;
     fn add_wchstr(_:*cchar_t) -> c_int;
-    fn addnwstr(_:*wchar_t, _:c_int) -> c_int;
+    pub fn addnwstr(_:*wchar_t, _:c_int) -> c_int;
     fn addwstr(_:*wchar_t) -> c_int;
     fn bkgrnd(_:*cchar_t) -> c_int;
     fn bkgrndset(_:*cchar_t);
@@ -730,10 +730,10 @@ extern {
     fn echo_wchar(_:*cchar_t) -> c_int;
     pub fn erasewchar(_:*mut wchar_t) -> c_int;
     pub fn get_wch(_:*mut wint_t) -> c_int;
-    fn get_wstr(_:*mut wint_t) -> c_int;
+    // fn get_wstr(_:*mut wint_t) -> c_int;
     fn getbkgrnd(_:*mut cchar_t) -> c_int;
     fn getcchar(_:*cchar_t, _:*mut wchar_t, _:*mut attr_t, _:*mut c_short, _:*c_void) -> c_int;
-    fn getn_wstr(_:*mut wint_t, _:c_int) -> c_int;
+    pub fn getn_wstr(_:*mut wint_t, _:c_int) -> c_int;
     fn hline_set(_:*cchar_t, _:c_int) -> c_int;
     fn in_wch(_:*mut cchar_t) -> c_int;
     fn in_wchnstr(_:*mut cchar_t, _:c_int) -> c_int;
@@ -752,7 +752,7 @@ extern {
     fn mvaddwstr(_:c_int, _:c_int, _:*wchar_t) -> c_int;
     fn mvget_wch(_:c_int, _:c_int, _:*mut wint_t) -> c_int;
     fn mvget_wstr(_:c_int, _:c_int, _:*mut wint_t) -> c_int;
-    fn mvgetn_wstr(_:c_int, _:c_int, _:*mut wint_t, _:c_int) -> c_int;
+    pub fn mvgetn_wstr(_:c_int, _:c_int, _:*mut wint_t, _:c_int) -> c_int;
     fn mvhline_set(_:c_int, _:c_int, _:*cchar_t, _:c_int) -> c_int;
     fn mvin_wch(_:c_int, _:c_int, _:*mut cchar_t) -> c_int;
     fn mvin_wchnstr(_:c_int, _:c_int, _:*mut cchar_t, _:c_int) -> c_int;
