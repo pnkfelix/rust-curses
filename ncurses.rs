@@ -7,6 +7,9 @@ use std::ptr;
 use nc = ncurses_core;
 use ncurses_core::{WINDOW_p, SCREEN_p};
 
+pub fn lines() -> libc::c_int { nc::LINES }
+pub fn cols() -> libc::c_int { nc::COLS }
+
 mod ncurses_core;
 
 pub struct Context<'a> {
@@ -669,7 +672,10 @@ pub mod input {
 
                     (nc::KEY_CODE_YES, _, _) => return getch_result_to_ch(result),
 
-                    (nc::OK, _, Some(c)) => return wide_ch(c),
+                    (nc::OK, _, Some(c)) => {
+                        let ret = if c.is_ascii() { ascii_ch(c as c_char) } else { wide_ch(c) };
+                        return ret;
+                    }
 
                     _ => {
                         let act = match &self.on_getch_err_do {
@@ -838,13 +844,16 @@ pub mod moves {
     use nc = ncurses_core;
     use std::libc::c_int;
 
-    impl<'a> super::Context<'a> {
+    trait Move {
+        fn move(&mut self, y: c_int, x: c_int);
+    }
+    impl<'a> Move for super::Context<'a> {
         fn move(&mut self, y: c_int, x: c_int) {
             unsafe { fail_if_err!(nc::move(y, x)); }
         }
     }
 
-    impl<'a> super::Window<'a> {
+    impl<'a> Move for super::Window<'a> {
         fn move(&mut self, y: c_int, x: c_int) {
             unsafe { fail_if_err!(nc::wmove(self.ptr, y, x)); }
         }
