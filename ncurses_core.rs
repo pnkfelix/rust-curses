@@ -85,7 +85,6 @@ extern {
     fn erase () -> c_int;
     pub fn endwin () -> c_int;
     // fn erasechar () -> c_char;
-    pub fn erasewchar (c:*mut wchar_t) -> c_int;
     fn filter ();
     pub fn flash () -> c_int;
     fn flushinp () -> c_int;
@@ -122,7 +121,6 @@ extern {
     fn keyname (_:c_int) -> *c_char;
     pub fn keypad (_:WINDOW_p, _:bool_t) -> c_int;
     // fn killchar () -> c_char;
-    pub fn killwchar (c:*mut wchar_t) -> c_int;
     fn leaveok (_:WINDOW_p,_:bool_t) -> c_int;
     pub fn longname () -> *c_char;
     fn meta (_:WINDOW_p,_:bool_t) -> c_int;
@@ -696,9 +694,123 @@ pub static KEY_EVENT:c_int     = 0o633; /* We were interrupted by an event */
 
 pub static KEY_MAX:c_int       = 0x1ff; /* Maximum key value is 0633 */
 
-// FSK skipping functions involving cchar_t which has "interesting"
-// structure and which are all guarded by #ifdef
-// _XOPEN_SOURCE_EXTENDED
+static CCHARW_MAX:c_uint = 5;
+struct cchar_t
+{
+    attr: attr_t,
+    chars: [wchar_t, ..CCHARW_MAX],
+}
 
+// FSK skipping NCURSES_WACS table lookup macros.  (It is not clear if
+// they are really of interest in a world with Unicode, we will see.)
+
+/*
+ * Function prototypes for wide-character operations.
+ *
+ * "generated" comments should include ":WIDEC" to make the corresponding
+ * functions ifdef'd in lib_gen.c
+ *
+ * "implemented" comments do not need this marker.
+ */
+
+type wint_t = i32;
+
+extern {
+    fn add_wch(_:*cchar_t) -> c_int;
+    fn add_wchnstr(_:*cchar_t, _:c_int) -> c_int;
+    fn add_wchstr(_:*cchar_t) -> c_int;
+    fn addnwstr(_:*wchar_t, _:c_int) -> c_int;
+    fn addwstr(_:*wchar_t) -> c_int;
+    fn bkgrnd(_:*cchar_t) -> c_int;
+    fn bkgrndset(_:*cchar_t);
+    fn border_set(_:*cchar_t,_:*cchar_t,_:*cchar_t,_:*cchar_t,_:*cchar_t,_:*cchar_t,_:*cchar_t,_:*cchar_t) -> c_int;
+    fn box_set(_:WINDOW_p, _:*cchar_t, _:*cchar_t) -> c_int;
+    fn echo_wchar(_:*cchar_t) -> c_int;
+    pub fn erasewchar(_:*mut wchar_t) -> c_int;
+    fn get_wch(_:*mut wint_t) -> c_int;
+    fn get_wstr(_:*mut wint_t) -> c_int;
+    fn getbkgrnd(_:*mut cchar_t) -> c_int;
+    fn getcchar(_:*cchar_t, _:*mut wchar_t, _:*mut attr_t, _:*mut c_short, _:*c_void) -> c_int;
+    fn getn_wstr(_:*mut wint_t, _:c_int) -> c_int;
+    fn hline_set(_:*cchar_t, _:c_int) -> c_int;
+    fn in_wch(_:*mut cchar_t) -> c_int;
+    fn in_wchnstr(_:*mut cchar_t, _:c_int) -> c_int;
+    fn in_wchstr(_:*mut cchar_t) -> c_int;
+    fn innwstr(_:*mut wchar_t, _:c_int) -> c_int;
+    fn ins_nwstr(_:*wchar_t, _:c_int) -> c_int;
+    fn ins_wch(_:*cchar_t) -> c_int;
+    fn ins_wstr(_:*wchar_t) -> c_int;
+    fn inwstr(_:*mut wchar_t) -> c_int;
+    fn key_name(_:wchar_t) -> *c_char;
+    pub fn killwchar(_:*mut wchar_t) -> c_int;
+    fn mvadd_wch(_:c_int, _:c_int, _:*cchar_t) -> c_int;
+    fn mvadd_wchnstr(_:c_int, _:c_int, _:*cchar_t, _:c_int) -> c_int;
+    fn mvadd_wchstr(_:c_int, _:c_int, _:*cchar_t) -> c_int;
+    fn mvaddnwstr(_:c_int, _:c_int, _:*wchar_t, _:c_int) -> c_int;
+    fn mvaddwstr(_:c_int, _:c_int, _:*wchar_t) -> c_int;
+    fn mvget_wch(_:c_int, _:c_int, _:*mut wint_t) -> c_int;
+    fn mvget_wstr(_:c_int, _:c_int, _:*mut wint_t) -> c_int;
+    fn mvgetn_wstr(_:c_int, _:c_int, _:*mut wint_t, _:c_int) -> c_int;
+    fn mvhline_set(_:c_int, _:c_int, _:*cchar_t, _:c_int) -> c_int;
+    fn mvin_wch(_:c_int, _:c_int, _:*mut cchar_t) -> c_int;
+    fn mvin_wchnstr(_:c_int, _:c_int, _:*mut cchar_t, _:c_int) -> c_int;
+    fn mvin_wchstr(_:c_int, _:c_int, _:*mut cchar_t) -> c_int;
+    fn mvinnwstr(_:c_int, _:c_int, _:*mut wchar_t, _:c_int) -> c_int;
+    fn mvins_nwstr (_:c_int, _:c_int, _:*wchar_t, _:c_int) -> c_int;
+    fn mvins_wch (_:c_int, _:c_int, _:*cchar_t) -> c_int;
+    fn mvins_wstr (_:c_int, _:c_int, _:*wchar_t) -> c_int;
+    fn mvinwstr (_:c_int, _:c_int, _:*mut wchar_t) -> c_int;
+    fn mvvline_set (_:c_int, _:c_int, _:*cchar_t, _:c_int) -> c_int;
+    fn mvwadd_wch (_:WINDOW_p, _:c_int, _:c_int, _:*cchar_t) -> c_int;
+    fn mvwadd_wchnstr (_:WINDOW_p, _:c_int, _:c_int, _:*cchar_t, _:c_int) -> c_int;
+    fn mvwadd_wchstr (_:WINDOW_p, _:c_int, _:c_int, _:*cchar_t) -> c_int;
+    fn mvwaddnwstr (_:WINDOW_p, _:c_int, _:c_int, _:*wchar_t, _:c_int) -> c_int;
+    fn mvwaddwstr (_:WINDOW_p, _:c_int, _:c_int, _:*wchar_t) -> c_int;
+    fn mvwget_wch (_:WINDOW_p, _:c_int, _:c_int, _:*mut wint_t) -> c_int;
+    fn mvwget_wstr (_:WINDOW_p, _:c_int, _:c_int, _:*mut wint_t) -> c_int;
+    fn mvwgetn_wstr (_:WINDOW_p, _:c_int, _:c_int, _:*mut wint_t, _:c_int) -> c_int;
+    fn mvwhline_set (_:WINDOW_p, _:c_int, _:c_int, _:*cchar_t, _:c_int) -> c_int;
+    fn mvwin_wch (_:WINDOW_p, _:c_int, _:c_int, _:*mut cchar_t) -> c_int;
+    fn mvwin_wchnstr (_:WINDOW_p, _:c_int, _:c_int, _:*mut cchar_t, _:c_int) -> c_int;
+    fn mvwin_wchstr (_:WINDOW_p, _:c_int, _:c_int, _:*mut cchar_t) -> c_int;
+    fn mvwinnwstr (_:WINDOW_p, _:c_int, _:c_int, _:*mut wchar_t, _:c_int) -> c_int;
+    fn mvwins_nwstr (_:WINDOW_p, _:c_int, _:c_int, _:*wchar_t, _:c_int) -> c_int;
+    fn mvwins_wch (_:WINDOW_p, _:c_int, _:c_int, _:*cchar_t) -> c_int;
+    fn mvwins_wstr (_:WINDOW_p, _:c_int, _:c_int, _:*wchar_t) -> c_int;
+    fn mvwinwstr (_:WINDOW_p, _:c_int, _:c_int, _:*mut wchar_t) -> c_int;
+    fn mvwvline_set (_:WINDOW_p, _:c_int, _:c_int, _:*cchar_t, _:c_int) -> c_int;
+    fn pecho_wchar (_:WINDOW_p, _:*cchar_t) -> c_int;
+    fn setcchar (_:*mut cchar_t, _:*wchar_t, _:attr_t, _:c_short, _:*c_void) -> c_int;
+    fn slk_wset (_:c_int, _:*wchar_t, _:c_int) -> c_int;
+    fn term_attrs () -> attr_t;
+    fn unget_wch (_:wchar_t) -> c_int;
+    fn vid_attr (_:attr_t, _:c_short, _:*c_void) -> c_int;
+    fn vid_puts (_:attr_t, _:c_short, _:*c_void, _:&fn (_:c_int) -> c_int) -> c_int;
+    fn vline_set (_:*cchar_t, _:c_int) -> c_int;
+    fn wadd_wch (_:WINDOW_p, _:*cchar_t) -> c_int;
+    fn wadd_wchnstr (_:WINDOW_p, _:*cchar_t, _:c_int) -> c_int;
+    fn wadd_wchstr (_:WINDOW_p, _:*cchar_t) -> c_int;
+    fn waddnwstr (_:WINDOW_p, _:*wchar_t, _:c_int) -> c_int;
+    fn waddwstr (_:WINDOW_p, _:*wchar_t) -> c_int;
+    fn wbkgrnd (_:WINDOW_p, _:*cchar_t) -> c_int;
+    fn wbkgrndset (_:WINDOW_p, _:*cchar_t);
+    fn wborder_set (_:WINDOW_p, _:*cchar_t, _:*cchar_t, _:*cchar_t, _:*cchar_t, _:*cchar_t, _:*cchar_t, _:*cchar_t, _:*cchar_t) -> c_int;
+    fn wecho_wchar (_:WINDOW_p, _:*cchar_t) -> c_int;
+    fn wget_wch (_:WINDOW_p, _:*mut wint_t) -> c_int;
+    fn wget_wstr (_:WINDOW_p, _:*mut wint_t) -> c_int;
+    fn wgetbkgrnd (_:WINDOW_p, _:*mut cchar_t) -> c_int;
+    fn wgetn_wstr (_:WINDOW_p, _:*mut wint_t, _:c_int) -> c_int;
+    fn whline_set (_:WINDOW_p, _:* cchar_t, _:c_int) -> c_int;
+    fn win_wch (_:WINDOW_p, _:*mut cchar_t) -> c_int;
+    fn win_wchnstr (_:WINDOW_p, _:*mut cchar_t, _:c_int) -> c_int;
+    fn win_wchstr (_:WINDOW_p, _:*mut cchar_t) -> c_int;
+    fn winnwstr (_:WINDOW_p, _:*mut wchar_t, _:c_int) -> c_int;
+    fn wins_nwstr (_:WINDOW_p, _:*wchar_t, _:c_int) -> c_int;
+    fn wins_wch (_:WINDOW_p, _:*cchar_t) -> c_int;
+    fn wins_wstr (_:WINDOW_p, _:*wchar_t) -> c_int;
+    fn winwstr (_:WINDOW_p, _:*mut wchar_t) -> c_int;
+    fn wunctrl (_:*mut cchar_t) -> *wchar_t;
+    fn wvline_set (_:WINDOW_p, _:*cchar_t, _:c_int) -> c_int;
+}
 // FSK skipping mouse support material
 /* $Id: curses.tail,v 1.16 2008/07/05 20:20:38 tom Exp $ */
