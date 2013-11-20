@@ -123,7 +123,11 @@ fn main() {
         while !finished {
             let (y,x) = context.getyx();
             let c = context.getch();
-            let desc = format!("{:?}", c);
+            let desc = match c {
+                chars::ascii_ch(cc) => format!("ascii_ch('{}')", cc as u8 as char),
+                chars::wide_ch(wc)  => format!("wide_ch('{}')", wc),
+                _                   => format!("{:?}", c),
+            };
             context.mvaddstr(0, 0, desc);
             context.move(y, x);
 
