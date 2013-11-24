@@ -1234,6 +1234,7 @@ pub mod windows {
     use super::Window;
     use nc = ncurses_core;
 
+    // Oddly `impl<'a> Window<'a>` does not work here, despite the `use` above.
     impl<'a> super::Window<'a> {
         fn parent(&self) -> Option<Window<'a>> {
             let p = unsafe { nc::wgetparent(self.ptr) };
