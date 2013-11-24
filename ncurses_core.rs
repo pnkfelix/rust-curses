@@ -40,18 +40,95 @@ extern {
     pub static LINES : c_int;
     pub static TABSIZE : c_int;
 
-    pub fn addch (_:chtype) -> c_int;
-    pub fn addchnstr (_:*chtype, _:c_int) -> c_int;
-    // fn addchstr (_:*chtype) -> c_int;
-    pub fn addnstr (_:*c_char, _:c_int) -> c_int;
+    /// Put `ch` into window at current window position, and then
+    /// advance position (with automatic wrapping at right margin to
+    /// beginning of next line.  If `scrollok` and at bottom of
+    /// scrolling region, then scrolling region is scrolled up one
+    /// line.
+    ///
+    /// Special cases: 
+    /// - backspace moves cursor one character left; no-op at left-edge of window.
+    /// - newline does `clrtoeol` and advances to left-margin in next line
+    /// - tab advances to next column (every eight characters, or as set by TABSIZE).
+    /// - control characters other than tab/newline/backspace are drawn in ^X notation.
+    ///
+    /// Video attributes can be logical-OR'ed into the `ch` argument.
+    ///
+    /// Return ERR upon failure and OK on success.
+    pub fn addch (ch:chtype) -> c_int;
+    pub fn waddch (_:WINDOW_p, _:chtype) -> c_int;
+    pub fn mvaddch (_:c_int, _:c_int, _:chtype) -> c_int;
+    pub fn mvwaddch (_:WINDOW_p, _:c_int, _:c_int, _:chtype) -> c_int;
+
+    /// Equivalent to `addch; refresh` (with potential performance gain).
+    pub fn echochar (_:chtype) -> c_int;
+    /// Equivalent to `waddch; wrefresh` (with potential performance gain).
+    pub fn wechochar (_:WINDOW_p, _:chtype) -> c_int;
+
+    /// Copy (at most `n` elements from) `chstr` into window image
+    /// structure at and after current cursor position.  Never copies
+    /// more elements than would fit on the line; thus truncates
+    /// overlong input (rather than wrapping it to next line).  Does
+    /// not advance window cursor.
+    ///
+    /// Returns ERR upon failure and OK on success.
+    fn addchstr (_:*chtype) -> c_int;
+    pub fn addchnstr (chstr:*chtype, n:c_int) -> c_int;
+    fn waddchstr (_:WINDOW_p,_:chtype_p) -> c_int;
+    pub fn waddchnstr (_:WINDOW_p,_:chtype_p,_:c_int) -> c_int;
+    fn mvaddchstr (_:c_int, _:c_int, _:chtype_p) -> c_int;
+    pub fn mvaddchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
+    fn mvwaddchstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p) -> c_int;
+    pub fn mvwaddchnstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
+
+    /// Writes (at most `n` characters of) null-terminated `str` into
+    /// window.
+    /// 
+    /// FSK: man page claims that this is similar to calling `waddch`
+    /// once for each character in the string, but it also claims that
+    /// if `n` is -1, then the entire string will be added, up to the
+    /// maximum number of characters that *will fit on the line*.
+    /// (The latter is not consistent with FSK's understanding of how
+    /// `waddch` automatically wraps at right margin to next line).
     pub fn addstr (_:*c_char) -> c_int;
+    pub fn addnstr (str:*c_char, n:c_int) -> c_int;
+    // fn waddstr (_:WINDOW_p,_:char_p) -> c_int;
+    pub fn waddnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
+    fn mvaddstr (_:c_int, _:c_int, _:char_p) -> c_int;
+    pub fn mvaddnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+    fn mvwaddstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
+    pub fn mvwaddnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
+
+    /// Manipulate attributes of named window; the current attributes
+    /// apply to all characters written with `waddch`, `waddstr`, and
+    /// `wprintw` (at which point they are a property of the output
+    /// character, and move with the character through scrolling and
+    /// insert/delete line/character operations).
     pub fn attroff (_:attr_t) -> c_int;
+    pub fn wattroff (_:WINDOW_p, _:c_int) -> c_int;
     pub fn attron (_:attr_t) -> c_int;
+    pub fn wattron (_:WINDOW_p, _:c_int) -> c_int;
     pub fn attrset (_:attr_t) -> c_int;
+    pub fn wattrset (_:WINDOW_p, _:c_int) -> c_int;
+    fn color_set (_:c_short,_:void_p) -> c_int;
+    fn wcolor_set (_:WINDOW_p,_:c_short,_:void_p) -> c_int;
+    fn standend () -> c_int;
+    fn wstandend (_:WINDOW_p) -> c_int;
+    fn standout () -> c_int;
+    fn wstandout (_:WINDOW_p) -> c_int;
     pub fn attr_get (_:mut_attr_t_p, _:mut_short_p, _:void_p) -> c_int;
+    pub fn wattr_get (_:WINDOW_p, _:mut_attr_t_p, _:mut_short_p, _:void_p) -> c_int;
     // fn attr_off (_:attr_t, _:void_p) -> c_int;
+    fn wattr_off (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
     // fn attr_on (_:attr_t, _:void_p) -> c_int;
+    fn wattr_on (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
     // fn attr_set (_:attr_t, _:c_short, _:void_p) -> c_int;
+    fn wattr_set (_:WINDOW_p, _:attr_t, _:c_short, _:void_p) -> c_int;
+    fn chgat (_:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
+    fn wchgat (_:WINDOW_p, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
+    fn mvchgat (_:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
+    fn mvwchgat (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
+
     pub fn baudrate () -> c_int;
     pub fn beep  () -> c_int;
     pub fn bkgd (_:chtype) -> c_int;
@@ -60,13 +137,27 @@ extern {
     fn box (_:WINDOW_p, _:chtype, _:chtype) -> c_int;
     fn can_change_color () -> bool_t;
     pub fn cbreak () -> c_int;
-    fn chgat (_:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
+
+    // Copies blankes to every position in the window, clearing the
+    // screen, and also calls `clearok`, so that screen is cleared and
+    // repainted from scratch on next call to `wrefresh`.
     fn clear () -> c_int;
-    fn clearok (_:WINDOW_p,_:bool_t) -> c_int;
+
+    /// If called with TRUE as argument, next call to `wrefresh` with
+    /// `_win` will clear screen completely and redraw entire screen
+    /// from scratch.  If `_win` is `curscr`, the next call to
+    /// `wrefresh` with any window causes the screen to be cleared and
+    /// repainted from scratch.
+    fn clearok (_win:WINDOW_p,_:bool_t) -> c_int;
+
+    /// Erase from the cursor to the end of the screen (i.e. all lines
+    /// below the cursor in the window, and the portion of the current
+    /// line to the right of the cursor).
     fn clrtobot () -> c_int;
+
+    /// Erase from cursor to end of the line to right of the cursor.
     fn clrtoeol () -> c_int;
     fn color_content (_:c_short,_:short_p,_:short_p,_:short_p) -> c_int;
-    fn color_set (_:c_short,_:void_p) -> c_int;
     pub fn COLOR_PAIR (_:c_int) -> c_int;
     fn copywin (_:WINDOW_p,_:WINDOW_p,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
     fn curs_set (_:c_int) -> c_int;
@@ -81,7 +172,8 @@ extern {
     fn doupdate () -> c_int;
     fn dupwin (_:WINDOW_p) -> *WINDOW;
     pub fn echo () -> c_int;
-    pub fn echochar (_:chtype) -> c_int;
+
+    // Copies blankes to every position in the window, clearing the screen.
     fn erase () -> c_int;
     pub fn endwin () -> c_int;
     // fn erasechar () -> c_char;
@@ -98,8 +190,21 @@ extern {
     pub fn has_ic () -> bool_t;
     pub fn has_il () -> bool_t;
     fn hline (_:chtype, _:c_int) -> c_int;
+
+    /// If called with FALSE, curses no longer considers using
+    /// hardware insert/delete character even if equipped.  (Enabled
+    /// by default.)
     fn idcok (_:WINDOW_p, _:bool_t);
+
+    /// If called with TRUE, curses "considers using" hardware
+    /// insert/delete line feature if so equiped.  Calling with FALSE
+    /// disables use of line insertion/deletion.  (Enable only if
+    /// application needs it, due to potential for annoyance.)
     fn idlok (_:WINDOW_p, _:bool_t) -> c_int;
+
+    /// If called with TRUE, any change to window image, such as
+    /// caused by `waddch`, `wclrtobot`, `wscrl`, etc, automatically
+    /// cause `wrefresh` call.  May degrade performance.
     fn immedok (_:WINDOW_p, _:bool_t);
     fn inch () -> chtype;
     fn inchnstr (_:chtype_p, _:c_int) -> c_int;
@@ -121,16 +226,16 @@ extern {
     fn keyname (_:c_int) -> *c_char;
     pub fn keypad (_:WINDOW_p, _:bool_t) -> c_int;
     // fn killchar () -> c_char;
+
+    /// Allows hardware cursor to be left whereever the update happens
+    /// to leave it (rather than at location of the window cursor
+    /// being refreshed, the default).  Enabling reduces need for
+    /// cursor motions.
     fn leaveok (_:WINDOW_p,_:bool_t) -> c_int;
+
     pub fn longname () -> *c_char;
     fn meta (_:WINDOW_p,_:bool_t) -> c_int;
     pub fn move (_:c_int, _:c_int) -> c_int;
-    pub fn mvaddch (_:c_int, _:c_int, _:chtype) -> c_int;
-    pub fn mvaddchnstr (_:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
-    // fn mvaddchstr (_:c_int, _:c_int, _:chtype_p) -> c_int;
-    pub fn mvaddnstr (_:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    fn mvaddstr (_:c_int, _:c_int, _:char_p) -> c_int;
-    fn mvchgat (_:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
     fn mvcur (_:c_int,_:c_int,_:c_int,_:c_int) -> c_int;
     fn mvdelch (_:c_int, _:c_int) -> c_int;
     fn mvderwin (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
@@ -149,12 +254,6 @@ extern {
     fn mvprintw (_:c_int, _:c_int, _:char_p) -> c_int;
     //  fn mvscanw (_:c_int,_:c_int, _:char_p) -> c_int;
     fn mvvline (_:c_int, _:c_int, _:chtype, _:c_int) -> c_int;
-    pub fn mvwaddch (_:WINDOW_p, _:c_int, _:c_int, _:chtype) -> c_int;
-    pub fn mvwaddchnstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p, _:c_int) -> c_int;
-    fn mvwaddchstr (_:WINDOW_p, _:c_int, _:c_int, _:chtype_p) -> c_int;
-    pub fn mvwaddnstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p, _:c_int) -> c_int;
-    fn mvwaddstr (_:WINDOW_p, _:c_int, _:c_int, _:char_p) -> c_int;
-    fn mvwchgat (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
     fn mvwdelch (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
     fn mvwgetch (_:WINDOW_p, _:c_int, _:c_int) -> c_int;
     pub fn mvwgetnstr (_:WINDOW_p, _:c_int, _:c_int, _:mut_char_p, _:c_int) -> c_int;
@@ -177,11 +276,28 @@ extern {
     fn newpad (_:c_int,_:c_int) -> *WINDOW;
     pub fn newterm (_:char_p,_:FILE_p,_:FILE_p) -> *SCREEN;
     fn newwin (_:c_int,_:c_int,_:c_int,_:c_int) -> *WINDOW;
+
+    /// Enables the newline-translation where the underlying display
+    /// device translates the return key into newline on input, and
+    /// whether it translates newline into return and line-feed on
+    /// output.  By default, these translations do occur.  If disabled
+    /// via `nonl`, curses will be able to better utilize line-feed
+    /// capability, resulting in faster cursor motion.  (Also, curses
+    /// will then be able to detect the return key.)
     pub fn nl () -> c_int;
     pub fn nocbreak () -> c_int;
     fn nodelay (_:WINDOW_p,_:bool_t) -> c_int;
     pub fn noecho () -> c_int;
+
+    /// Disables the newline-translation where the underlying display
+    /// device translates the return key into newline on input, and
+    /// whether it translates newline into return and line-feed on
+    /// output.  By default, these translations do occur.  If disabled
+    /// via `nonl`, curses will be able to better utilize line-feed
+    /// capability, resulting in faster cursor motion.  (Also, curses
+    /// will then be able to detect the return key.)
     pub fn nonl () -> c_int;
+
     fn noqiflush ();
     pub fn noraw () -> c_int;
     fn notimeout (_:WINDOW_p,_:bool_t) -> c_int;
@@ -210,10 +326,28 @@ extern {
     fn scr_init (_:char_p) -> c_int;
     fn scrl (_:c_int) -> c_int;
     fn scroll (_:WINDOW_p) -> c_int;
+
+    // Controls what happens when the cursor is moved off the edge of
+    // the window or scrolling region, either as a result of a newline
+    // action on the bottom line, or typing the last character of the
+    // last line.  If disabled, the cursor is left on the bottom line.
+    // If enabled, the window is scrolled up one line.  (Note that to
+    // get the physical scrolling effect on the terminal, it is also
+    // necessary to call idlok.
     pub fn scrollok (_:WINDOW_p,_:bool_t) -> c_int;
+
     fn scr_restore (_:char_p) -> c_int;
     fn scr_set (_:char_p) -> c_int;
-    fn setscrreg (_:c_int,_:c_int) -> c_int;
+
+    /// Sets software scrolling region.  `top` and `bot` are line
+    /// numbers of top and bottom margin of scrolling region.  (Line 0
+    /// is top line of the window.)  If this and `scrollok` are
+    /// enabled, an attempt to move off the bottom margin causes all
+    /// lines in the scrolling region to scroll one line in the
+    /// direction of the first line.  Only the text of the window is
+    /// scrolled.
+    fn setscrreg (top:c_int, bot:c_int) -> c_int;
+
     pub fn set_term (_:SCREEN_p) -> SCREEN_p;
     fn slk_attroff (_:chtype) -> c_int;
     fn slk_attr_off (_:attr_t, _:void_p) -> c_int;
@@ -231,8 +365,6 @@ extern {
     fn slk_restore () -> c_int;
     fn slk_set (_:c_int,_:char_p,_:c_int) -> c_int;
     fn slk_touch () -> c_int;
-    fn standout () -> c_int;
-    fn standend () -> c_int;
     pub fn start_color () -> c_int;
     fn subpad (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:c_int) -> WINDOW_p;
     fn subwin (_:WINDOW_p, _:c_int, _:c_int, _:c_int, _:c_int) -> WINDOW_p;
@@ -254,30 +386,28 @@ extern {
     fn vw_printw (_:WINDOW_p, _:char_p,_:va_list) -> c_int;
     //  fn vwscanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
     //  fn vw_scanw (_:WINDOW_p, _:char_p, _:va_list) -> c_int;
-    pub fn waddch (_:WINDOW_p, _:chtype) -> c_int;
-    pub fn waddchnstr (_:WINDOW_p,_:chtype_p,_:c_int) -> c_int;
-    // fn waddchstr (_:WINDOW_p,_:chtype_p) -> c_int;
-    pub fn waddnstr (_:WINDOW_p,_:char_p,_:c_int) -> c_int;
-    // fn waddstr (_:WINDOW_p,_:char_p) -> c_int;
-    pub fn wattron (_:WINDOW_p, _:c_int) -> c_int;
-    pub fn wattroff (_:WINDOW_p, _:c_int) -> c_int;
-    pub fn wattrset (_:WINDOW_p, _:c_int) -> c_int;
-    pub fn wattr_get (_:WINDOW_p, _:mut_attr_t_p, _:mut_short_p, _:void_p) -> c_int;
-    fn wattr_on (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
-    fn wattr_off (_:WINDOW_p, _:attr_t, _:void_p) -> c_int;
-    fn wattr_set (_:WINDOW_p, _:attr_t, _:c_short, _:void_p) -> c_int;
     pub fn wbkgd (_:WINDOW_p, _:chtype) -> c_int;
     pub fn wbkgdset (_:WINDOW_p,_:chtype);
     fn wborder (_:WINDOW_p,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
-    fn wchgat (_:WINDOW_p, _:c_int, _:attr_t, _:c_short, _:void_p) -> c_int;
+
+    /// Copies blankes to every position in the window, clearing the
+    /// screen, and also calls `clearok`, so that screen is cleared and
+    /// repainted from scratch on next call to `wrefresh`.
     fn wclear (_:WINDOW_p) -> c_int;
+
+    /// Erase from the cursor to the end of the screen (i.e. all lines
+    /// below the cursor in the window, and the portion of the current
+    /// line to the right of the cursor).
     fn wclrtobot (_:WINDOW_p) -> c_int;
+
+    /// Erase from cursor to end of the line to right of the cursor.
     fn wclrtoeol (_:WINDOW_p) -> c_int;
-    fn wcolor_set (_:WINDOW_p,_:c_short,_:void_p) -> c_int;
+
     fn wcursyncup (_:WINDOW_p);
     fn wdelch (_:WINDOW_p) -> c_int;
     fn wdeleteln (_:WINDOW_p) -> c_int;
-    pub fn wechochar (_:WINDOW_p, _:chtype) -> c_int;
+
+    /// Copies blankes to every position in the window, clearing the screen.
     fn werase (_:WINDOW_p) -> c_int;
     pub fn wgetch (_:WINDOW_p) -> c_int;
     pub fn wgetnstr (_:WINDOW_p,_:mut_char_p,_:c_int) -> c_int;
@@ -300,9 +430,16 @@ extern {
     pub fn wrefresh (_:WINDOW_p) -> c_int;
     //  fn wscanw (_:WINDOW_p, _:NCURSES_CONST char_p) -> c_int;
     fn wscrl (_:WINDOW_p,_:c_int) -> c_int;
-    fn wsetscrreg (_:WINDOW_p,_:c_int,_:c_int) -> c_int;
-    fn wstandout (_:WINDOW_p) -> c_int;
-    fn wstandend (_:WINDOW_p) -> c_int;
+
+    /// Sets software scrolling region.  `top` and `bot` are line
+    /// numbers of top and bottom margin of scrolling region.  (Line 0
+    /// is top line of the window.)  If this and `scrollok` are
+    /// enabled, an attempt to move off the bottom margin causes all
+    /// lines in the scrolling region to scroll one line in the
+    /// direction of the first line.  Only the text of the window is
+    /// scrolled.
+    fn wsetscrreg (_:WINDOW_p,top:c_int,bot:c_int) -> c_int;
+
     fn wsyncdown (_:WINDOW_p);
     fn wsyncup (_:WINDOW_p);
     fn wtimeout (_:WINDOW_p,_:c_int);
