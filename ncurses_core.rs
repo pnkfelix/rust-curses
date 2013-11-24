@@ -366,7 +366,7 @@ extern NCURSES_EXPORT(void) nofilter(void);
  * when NCURSES_OPAQUE is set:
  */
 extern {
-    fn wgetparent (_:WINDOW_p) -> WINDOW_p;
+    pub fn wgetparent (_:WINDOW_p) -> WINDOW_p;
     fn is_cleared (_:WINDOW_p) -> bool_t;
     fn is_idcok (_:WINDOW_p) -> bool_t;
     fn is_idlok (_:WINDOW_p) -> bool_t;

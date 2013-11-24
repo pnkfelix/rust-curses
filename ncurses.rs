@@ -1228,3 +1228,20 @@ impl<'a> Context<'a> {
         self::screens::Screen { ptr: nc::stdscr as SCREEN_p}
     }
 }
+
+pub mod windows {
+    use std::ptr;
+    use super::Window;
+    use nc = ncurses_core;
+
+    impl<'a> super::Window<'a> {
+        fn parent(&self) -> Option<Window<'a>> {
+            let p = unsafe { nc::wgetparent(self.ptr) };
+            if p == ptr::null() {
+                None
+            } else {
+                Some(Window { ptr: p, ctxt: self.ctxt })
+            }
+        }
+    }
+}
