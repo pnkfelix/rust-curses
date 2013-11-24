@@ -1255,5 +1255,9 @@ pub mod windows {
         fn is_notimeout(&self) -> bool { unsafe { nc::is_notimeout(self.ptr) != 0 } }
         fn is_scrollok(&self)  -> bool { unsafe { nc::is_scrollok(self.ptr)  != 0 } }
         fn is_syncok(&self)    -> bool { unsafe { nc::is_syncok(self.ptr)    != 0 } }
+
+        fn scrollok(&mut self, val:bool) {
+            unsafe { fail_if_err!(nc::scrollok(self.ptr, val as nc::bool_t)); }
+        }
     }
 }

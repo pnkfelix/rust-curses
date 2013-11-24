@@ -9,7 +9,7 @@ pub type attr_t = c_int;
 pub type NCURSES_ATTR_T = attr_t;
 pub type NCURSES_BOOL = c_char;
 
-type bool_t = NCURSES_BOOL;
+pub type bool_t = NCURSES_BOOL;
 type attr_t_p = *attr_t;
 type mut_attr_t_p = *mut attr_t;
 type short_p = *c_short;
@@ -210,7 +210,7 @@ extern {
     fn scr_init (_:char_p) -> c_int;
     fn scrl (_:c_int) -> c_int;
     fn scroll (_:WINDOW_p) -> c_int;
-    fn scrollok (_:WINDOW_p,_:bool_t) -> c_int;
+    pub fn scrollok (_:WINDOW_p,_:bool_t) -> c_int;
     fn scr_restore (_:char_p) -> c_int;
     fn scr_set (_:char_p) -> c_int;
     fn setscrreg (_:c_int,_:c_int) -> c_int;
