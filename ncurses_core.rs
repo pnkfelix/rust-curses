@@ -367,16 +367,16 @@ extern NCURSES_EXPORT(void) nofilter(void);
  */
 extern {
     pub fn wgetparent (_:WINDOW_p) -> WINDOW_p;
-    fn is_cleared (_:WINDOW_p) -> bool_t;
-    fn is_idcok (_:WINDOW_p) -> bool_t;
-    fn is_idlok (_:WINDOW_p) -> bool_t;
-    fn is_immedok (_:WINDOW_p) -> bool_t;
-    fn is_keypad (_:WINDOW_p) -> bool_t;
-    fn is_leaveok (_:WINDOW_p) -> bool_t;
-    fn is_nodelay (_:WINDOW_p) -> bool_t;
-    fn is_notimeout (_:WINDOW_p) -> bool_t;
-    fn is_scrollok (_:WINDOW_p) -> bool_t;
-    fn is_syncok (_:WINDOW_p) -> bool_t;
+    pub fn is_cleared (_:WINDOW_p) -> bool_t;
+    pub fn is_idcok (_:WINDOW_p) -> bool_t;
+    pub fn is_idlok (_:WINDOW_p) -> bool_t;
+    pub fn is_immedok (_:WINDOW_p) -> bool_t;
+    pub fn is_keypad (_:WINDOW_p) -> bool_t;
+    pub fn is_leaveok (_:WINDOW_p) -> bool_t;
+    pub fn is_nodelay (_:WINDOW_p) -> bool_t;
+    pub fn is_notimeout (_:WINDOW_p) -> bool_t;
+    pub fn is_scrollok (_:WINDOW_p) -> bool_t;
+    pub fn is_syncok (_:WINDOW_p) -> bool_t;
     fn wgetscrreg (_:WINDOW_p, _:*c_int, _:*c_int) -> c_int;
 }
 

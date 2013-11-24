@@ -1244,5 +1244,16 @@ pub mod windows {
                 Some(Window { ptr: p, ctxt: self.ctxt })
             }
         }
+
+        fn is_cleared(&self)   -> bool { unsafe { nc::is_cleared(self.ptr)   != 0 } }
+        fn is_idcok(&self)     -> bool { unsafe { nc::is_idcok(self.ptr)     != 0 } }
+        fn is_idlok(&self)     -> bool { unsafe { nc::is_idlok(self.ptr)     != 0 } }
+        fn is_immedok(&self)   -> bool { unsafe { nc::is_immedok(self.ptr)   != 0 } }
+        fn is_keypad(&self)    -> bool { unsafe { nc::is_keypad(self.ptr)    != 0 } }
+        fn is_leaveok(&self)   -> bool { unsafe { nc::is_leaveok(self.ptr)   != 0 } }
+        fn is_nodelay(&self)   -> bool { unsafe { nc::is_nodelay(self.ptr)   != 0 } }
+        fn is_notimeout(&self) -> bool { unsafe { nc::is_notimeout(self.ptr) != 0 } }
+        fn is_scrollok(&self)  -> bool { unsafe { nc::is_scrollok(self.ptr)  != 0 } }
+        fn is_syncok(&self)    -> bool { unsafe { nc::is_syncok(self.ptr)    != 0 } }
     }
 }
