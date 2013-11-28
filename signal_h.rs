@@ -91,7 +91,6 @@ mod ffi {
     }
 }
 
-#[fixed_stack_segment]
 unsafe fn wrap_signal(sig: name_t, func: handler_t) -> handler_t {
     ffi::signal(sig as libc::c_int, func)
 }

@@ -18,16 +18,16 @@ fn main() {
         keypad(stdscr, true as ncurses_core::NCURSES_BOOL);
         noecho();
 
-        do "Type any character to see it in bold\n".to_c_str().with_ref |m| {
+        "Type any character to see it in bold\n".to_c_str().with_ref(|m| {
             printw(m);
-        }
+        });
 
         let ch = getch(); // Without raw the input would be buffered to line break
 
         if ch == KEY_F1 { // Without keypad we'd miss F1
-            do "F1 Key pressed".to_c_str().with_ref |m| { printw(m); }
+            "F1 Key pressed".to_c_str().with_ref(|m| { printw(m); })
         } else {
-            do "The pressed key is ".to_c_str().with_ref |m| { printw(m); }
+            "The pressed key is ".to_c_str().with_ref(|m| { printw(m); });
             attron(A_BOLD);
             // FSK: actual invocation was printw("%c", ch);
             // FSK: I am now curious as to whether curses needs to
@@ -35,7 +35,7 @@ fn main() {
             // FSK: and thus my simplification of passing one (fmt!'ed) string
             // FSK: will be broken.
             let mychar = std::char::from_u32(ch as u32).unwrap().to_str().to_c_str();
-            do mychar.with_ref |m| { printw(m); }
+            mychar.with_ref(|m| { printw(m); });
             attroff(A_BOLD);
         }
         refresh();                    // 

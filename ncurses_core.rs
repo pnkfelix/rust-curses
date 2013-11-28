@@ -1,6 +1,3 @@
-#[feature(macro_rules)];
-
-#[link(name="ncurses_core",vers="5.7")];
 use std::libc::{c_char, c_int, c_short, c_uchar, c_uint, c_void};
 use std::libc::{wchar_t, FILE, EOF};
 
@@ -556,16 +553,11 @@ pub static A_VERTICAL: c_int   = ncurses_bits!(1u,22)  as c_int;
  * These pseudo functions are always implemented as macros:
  */
 
-#[fixed_stack_segment]
 pub unsafe fn getyx(win:WINDOW_p,y: &mut c_int,x: &mut c_int) { *y = getcury(win); *x = getcurx(win); }
-#[fixed_stack_segment]
 unsafe fn getbegyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getbegy(win); *x = getbegx(win) }
-#[fixed_stack_segment]
 pub unsafe fn getmaxyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getmaxy(win); *x = getmaxx(win) }
-#[fixed_stack_segment]
 unsafe fn getparyx(win:WINDOW_p,y: &mut c_int, x: &mut c_int) { *y = getpary(win); *x = getparx(win) }
 
-#[fixed_stack_segment]
 unsafe fn getsyx(y:&mut c_int, x:&mut c_int) {
     if newscr != (0 as WINDOW_p) {
         if is_leaveok(newscr) != 0 {
@@ -577,7 +569,6 @@ unsafe fn getsyx(y:&mut c_int, x:&mut c_int) {
     }
 }
 
-#[fixed_stack_segment]
 unsafe fn setsyx(y:&mut c_int,x:&mut c_int) {
     if newscr != (0 as WINDOW_p) {
         if *y == -1 && *x == -1 {
@@ -924,7 +915,7 @@ extern {
     fn term_attrs () -> attr_t;
     fn unget_wch (_:wchar_t) -> c_int;
     fn vid_attr (_:attr_t, _:c_short, _:*c_void) -> c_int;
-    fn vid_puts (_:attr_t, _:c_short, _:*c_void, _:&fn (_:c_int) -> c_int) -> c_int;
+    fn vid_puts (_:attr_t, _:c_short, _:*c_void, _:|c_int| -> c_int) -> c_int;
     fn vline_set (_:*cchar_t, _:c_int) -> c_int;
     fn wadd_wch (_:WINDOW_p, _:*cchar_t) -> c_int;
     fn wadd_wchnstr (_:WINDOW_p, _:*cchar_t, _:c_int) -> c_int;

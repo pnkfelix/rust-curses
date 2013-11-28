@@ -1,6 +1,6 @@
-#[link(name="ncurses",vers="5.7")];
-
 #[feature(macro_rules)];
+
+#[link(name="ncurses",vers="5.7")];
 
 use std::libc;
 use std::ptr;
@@ -67,7 +67,6 @@ macro_rules! fail_if_err {
 macro_rules! wrap {
     ($i:ident) => {
         impl<'a> super::Context<'a> {
-            #[fixed_stack_segment]
             pub fn $i(&mut self) {
                 unsafe { fail_if_err!(nc::$i()); }
             }
@@ -270,7 +269,6 @@ pub mod mode {
 
     // wrap!(cbreak)
     impl<'a> super::Context<'a> {
-        #[fixed_stack_segment]
         pub fn set_cbreak(&mut self, val:bool) {
             if val {
                 unsafe { fail_if_err!(nc::cbreak()); }
@@ -282,7 +280,6 @@ pub mod mode {
 
     // wrap!(nonl)
     impl<'a> super::Context<'a> {
-        #[fixed_stack_segment]
         pub fn set_nl(&mut self, val:bool) {
             if val {
                 unsafe { fail_if_err!(nc::nl()); }
@@ -293,7 +290,6 @@ pub mod mode {
     }
 
     impl<'a> super::Context<'a> {
-        #[fixed_stack_segment]
         pub fn set_echo(&mut self, val:bool) {
             if val {
                 unsafe { fail_if_err!(nc::echo()); }
@@ -304,7 +300,6 @@ pub mod mode {
     }
 
     impl<'a> super::Context<'a> {
-        #[fixed_stack_segment]
         pub fn set_raw(&mut self, val:bool) {
             if val {
                 unsafe { fail_if_err!(nc::raw()); }
@@ -316,7 +311,6 @@ pub mod mode {
 
 }
 
-#[fixed_stack_segment]
 fn endwin() {
     unsafe { fail_if_err!(nc::endwin()); }
 }
@@ -600,18 +594,15 @@ pub mod colors {
     }
 
     impl<'a> super::Context<'a> {
-        #[fixed_stack_segment]
         pub fn has_colors(&self) -> bool {
             unsafe { nc::has_colors() != 0 }
         }
 
-        #[fixed_stack_segment]
         pub fn init_pair(&mut self, pair: pair_num, fg: color, bg: color) {
             assert!((pair as i32) < color_pair_count());
             unsafe { fail_if_err!(nc::init_pair(pair, fg as i16, bg as i16)); }
         }
 
-        #[fixed_stack_segment]
         pub fn start(&mut self) { self.start_color(); }
     }
     wrap!(start_color)
@@ -634,7 +625,7 @@ pub mod input {
 
     pub enum get_err_response<'a, RET> {
         Immed(get_err_act<RET>),
-        Delay(&'static fn:Send() -> get_err_act<RET>),
+        Delay('static ||:Send -> get_err_act<RET>),
     }
 
     pub fn getch_result_to_ch(result: c_int) -> raw_ch {
@@ -1045,7 +1036,7 @@ pub mod output {
             // let n = s.len() as c_int;
             // if n < 0 { fail!(); }
             // s.with_c_str(|p| { unsafe { fail_if_err!(nc::addnstr(p, n)) } });
-            let c : ~[char] = s.iter().collect();
+            let c : ~[char] = s.chars().collect();
             c.as_imm_buf(|p, n| { unsafe {
                         let n = n as c_int;
                         if n < 0 { fail!(); }
@@ -1217,7 +1208,6 @@ impl<'a> Context<'a> {
         }
     }
 
-    #[fixed_stack_segment]
     pub fn keypad(&mut self, s:&mut self::screens::Screen, enabled: bool) {
         unsafe {
             fail_if_err!(nc::keypad(s.wnd_ptr(), enabled as nc::NCURSES_BOOL));
