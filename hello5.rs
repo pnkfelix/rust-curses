@@ -1,6 +1,6 @@
 #[feature(globs)];
 
-extern mod ncurses_core;
+extern mod ncurses_core (vers = "5.7");
 
 #[fixed_stack_segment]
 fn body() {
