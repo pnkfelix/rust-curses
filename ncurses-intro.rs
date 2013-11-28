@@ -1,7 +1,9 @@
 // Adapted from a read-through of:
 //   http://invisible-island.net/ncurses/ncurses-intro.html
 
-extern mod ncurses;
+#[allow(unused_imports)];
+
+extern mod ncurses (vers = "5.7");
 
 use sig = signal_h;
 use std::libc;

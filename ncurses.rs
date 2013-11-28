@@ -193,7 +193,7 @@ pub mod attrs {
     unsafe fn wattron  (w:WIN_p, x:nc::attr_t) -> c_int { nc::wattron(w, x)  }
     unsafe fn wattrset (w:WIN_p, x:nc::attr_t) -> c_int { nc::wattrset(w, x) }
 
-    trait AttrSet {
+    pub trait AttrSet {
         fn attroff<A:EncodesAttrs>(&mut self, attrs: A);
         fn attron<A:EncodesAttrs>(&mut self, attrs: A);
         fn attrset<A:EncodesAttrs>(&mut self, attrs: A);
@@ -658,7 +658,7 @@ pub mod input {
         }
     }
 
-    trait GetCh {
+    pub trait GetCh {
         fn getch(&mut self) -> raw_ch;
     }
 
@@ -844,7 +844,7 @@ pub mod moves {
     use nc = ncurses_core;
     use std::libc::c_int;
 
-    trait Move {
+    pub trait Move {
         fn move(&mut self, y: c_int, x: c_int);
     }
     impl<'a> Move for super::Context<'a> {
@@ -872,7 +872,7 @@ pub mod background {
     unsafe fn bkgd (c:nc::chtype) -> c_int { nc::bkgd(c) }
     unsafe fn wbkgd (w:WIN_p, c:nc::chtype) -> c_int { nc::wbkgd(w, c) }
 
-    trait Background {
+    pub trait Background {
         fn bkgd<E:ToCh>(&mut self, c:E);
         fn bkgdset<E:ToCh>(&mut self, c:E);
     }
@@ -1166,7 +1166,7 @@ mod screens {
 
 }
 
-trait HasYX { fn getyx(&self) -> (libc::c_int, libc::c_int); }
+pub trait HasYX { fn getyx(&self) -> (libc::c_int, libc::c_int); }
 
 impl<'a> HasYX for Context<'a> {
     fn getyx(&self) -> (libc::c_int, libc::c_int) {
