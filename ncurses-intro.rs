@@ -47,7 +47,7 @@ mod locale;
 // global lock or just outright failing if it is initialized more than
 // once in a process.
 
-fn main() {
+pub fn main() {
     use ncurses::chars;
     #[allow(unused_imports)] // Issue #10534
     // use ncurses::chars::{Immed, Return}

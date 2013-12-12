@@ -1,4 +1,5 @@
 #[feature(macro_rules)];
+#[feature(link_args)];
 
 #[link(name="ncurses",vers="5.7")];
 

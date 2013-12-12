@@ -517,7 +517,6 @@ extern {
 /* attributes */
 
 pub static NCURSES_ATTR_SHIFT  : uint =       8;
-fn NCURSES_BITS(mask:uint,shift:uint) -> uint { ((mask) << ((shift) + NCURSES_ATTR_SHIFT) as i32) }
 macro_rules! ncurses_bits {
     ($mask:expr, $shift:expr)
         =>

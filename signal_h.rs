@@ -1,3 +1,6 @@
+// warning about unused static definitions seems over-zealous to me.
+#[allow(dead_code)];
+
 use std::libc;
 pub use signal = self::wrap_signal;
 
