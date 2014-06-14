@@ -1,5 +1,7 @@
-use std::libc::{c_char, c_int, c_short, c_uchar, c_uint, c_void};
-use std::libc::{wchar_t, FILE, EOF};
+#![allow(non_camel_case_types)]
+
+use libc::{c_char, c_int, c_short, c_uchar, c_uint, c_void};
+use libc::{wchar_t, FILE, EOF};
 
 pub type chtype = c_uint;
 pub type attr_t = c_int;
@@ -131,7 +133,8 @@ extern {
     pub fn bkgd (_:chtype) -> c_int;
     pub fn bkgdset (_:chtype);
     fn border (_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype,_:chtype) -> c_int;
-    fn box (_:WINDOW_p, _:chtype, _:chtype) -> c_int;
+    #[name="box"]
+    fn box_ (_:WINDOW_p, _:chtype, _:chtype) -> c_int;
     fn can_change_color () -> bool_t;
     pub fn cbreak () -> c_int;
 

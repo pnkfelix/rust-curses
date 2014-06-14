@@ -1,4 +1,4 @@
-RUSTC_FLAGS=-Z debug-info
+RUSTC_FLAGS=-g
 
 target: ncurses-intro-test ncurses-intro
 #target: ncurses-intro-test ncurses-intro hello3 hello4 hello5
@@ -12,11 +12,11 @@ clean:
 	rm libncurses-*.dylib
 
 ncurses-lib-core-built: ncurses_core_lib.rs
-	rustc $(RUSTC_FLAGS) --lib $<
+	rustc $(RUSTC_FLAGS) --crate-type lib $<
 	touch $@
 
 ncurses-lib-built: ncurses.rs ncurses_core.rs ncurses-lib-core-built
-	rustc --lib $<
+	rustc --crate-type lib $<
 	touch $@
 
 hello%: hello%.rs ncurses-lib-built

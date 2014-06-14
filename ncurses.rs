@@ -1,10 +1,13 @@
-#[feature(macro_rules)];
-#[feature(link_args)];
+#![feature(macro_rules)]
+#![feature(link_args)]
 
-#[link(name="ncurses",vers="5.7")];
+#![crate_id="ncurses#5.7"]
 
-use std::libc;
+extern crate libc;
+
+use std::mem;
 use std::ptr;
+use std::vec;
 use nc = ncurses_core;
 use ncurses_core::{WINDOW_p, SCREEN_p};
 
@@ -14,16 +17,16 @@ pub fn cols() -> libc::c_int { nc::COLS }
 mod ncurses_core;
 
 pub struct Context<'a> {
-    priv on_getch_err_do: input::get_err_response<'a, chars::raw_ch>,
-    priv on_getstr_err_do: input::get_err_response<'a, ~str>,
+    on_getch_err_do: input::get_err_response<'a, chars::raw_ch>,
+    on_getstr_err_do: input::get_err_response<'a, String>,
 }
 
 /// Describes a sub-rectangle of the screen (possibly in its
 /// entirety), that you can write to and scroll independently of other
 /// windows on the screen.
 pub struct Window<'a> {
-    priv ptr: WINDOW_p,
-    priv ctxt: &'a Context<'a>,
+    ptr: WINDOW_p,
+    ctxt: &'a Context<'a>,
 }
 
 // "Screens" are windows as large as the terminal screen (upper-left to
@@ -43,7 +46,7 @@ macro_rules! fail_if_null {
     ($e:expr) => {
         {
             let result = $e;
-            if ptr::is_null(result) {
+            if result.is_null() {
                 fail!();
             } else {
                 result
@@ -76,12 +79,12 @@ macro_rules! wrap {
 }
 
 pub mod attrs {
-    use std::libc;
-    use std::cast;
+    use libc;
+    use std::mem;
     use std::ptr;
     use nc = ncurses_core;
-    use WIN_p = nc::WINDOW_p;
-    use std::libc::c_int;
+    use WIN_p = ncurses_core::WINDOW_p;
+    use libc::c_int;
 
     use super::colors;
 
@@ -111,19 +114,19 @@ pub mod attrs {
     }
 
     pub struct attr_set {
-        priv state: libc::c_int
+        state: ::libc::c_int
     }
 
     impl attr_set {
-        pub fn from_chtype(bits:libc::c_int) -> attr_set {
+        pub fn from_chtype(bits: ::libc::c_int) -> attr_set {
             if (bits & !nc::A_ATTRIBUTES) != 0 { fail!() }
             attr_set { state: bits }
         }
     }
 
-    fn encode_one(a: attr) -> libc::c_int {
+    fn encode_one(a: attr) -> ::libc::c_int {
         match a {
-            display(d) => d as libc::c_int,
+            display(d) => d as ::libc::c_int,
             color_pair(pair_num) => unsafe {
                 nc::COLOR_PAIR(pair_num as libc::c_int)
             },
@@ -147,10 +150,10 @@ pub mod attrs {
         fn new(attrs: &[attr]) -> attr_set {
             attr_set { state: encode_attrs(attrs) }
         }
-        fn contents(&self) -> ~[attr] {
-            let mut accum = ~[];
+        fn contents(&self) -> Vec<attr> {
+            let mut accum = Vec::new();
             for &a in all_display_attrs.iter() {
-                let i: i32 = unsafe { cast::transmute(a) };
+                let i: i32 = unsafe { mem::transmute(a) };
                 if 0 != (i as libc::c_int & self.state) {
                     accum.push(display(a));
                 }
@@ -174,7 +177,7 @@ pub mod attrs {
         }
     }
 
-    impl<'a> EncodesAttrs for ~[attr] {
+    impl<'a> EncodesAttrs for Vec<attr> {
         fn encode(&self) -> libc::c_int {
             encode_attrs(self.as_slice())
         }
@@ -341,8 +344,8 @@ impl<'a> Context<'a> {
 
 pub mod chars {
     use nc = ncurses_core;
-    use std::libc::{c_int, c_uint, c_char};
-    use x = std::cast::transmute;
+    use libc::{c_int, c_uint, c_char};
+    use x = std::mem::transmute;
     use super::attrs;
 
     pub trait FromCInt { fn from_c_int(i:c_int) -> Self; }
@@ -579,9 +582,8 @@ pub mod chars {
 
 pub mod colors {
     use nc = ncurses_core;
-    use std::libc;
 
-    pub type pair_num = libc::c_short;
+    pub type pair_num = ::libc::c_short;
 
     pub enum color {
         Black = nc::COLOR_BLACK,
@@ -608,25 +610,70 @@ pub mod colors {
     }
     wrap!(start_color)
 
-    pub fn color_pair_count() -> libc::c_int {
+    pub fn color_pair_count() -> ::libc::c_int {
         nc::COLOR_PAIRS
+    }
+}
+
+trait VecAsBuf<T> {
+    fn as_imm_buf<A>(&self, k:|ptr: *T, len: uint| -> A) -> A;
+}
+
+trait VecAsMutBuf<T> : VecAsBuf<T> {
+    fn as_mut_buf<A>(&mut self, K:|ptr: *mut T, len: uint| -> A) -> A;
+}
+
+impl<'a,T> VecAsBuf<T> for &'a [T] {
+    fn as_imm_buf<A>(&self, k:|ptr: *T, len: uint| -> A) -> A {
+        let len = self.len();
+        let ptr = self.as_ptr();
+        k(ptr, len)
+    }
+}
+
+impl<'a,T> VecAsBuf<T> for &'a mut [T] {
+    fn as_imm_buf<A>(&self, k:|ptr: *T, len: uint| -> A) -> A {
+        let len = self.len();
+        let ptr = self.as_ptr() as *T;
+        k(ptr, len)
+    }
+}
+
+impl<'a,T> VecAsMutBuf<T> for &'a mut [T] {
+    fn as_mut_buf<A>(&mut self, k:|ptr: *mut T, len: uint| -> A) -> A {
+        let len = self.len();
+        let ptr = self.as_mut_ptr() as *mut T;
+        k(ptr, len)
+    }
+}
+
+impl<T> VecAsBuf<T> for Vec<T> {
+    fn as_imm_buf<A>(&self, k:|ptr: *T, len: uint| -> A) -> A {
+        self.as_slice().as_imm_buf(k)
+    }
+}
+
+impl<T> VecAsMutBuf<T> for Vec<T> {
+    fn as_mut_buf<A>(&mut self, k:|ptr: *mut T, len: uint| -> A) -> A {
+        self.as_mut_slice().as_mut_buf(k)
     }
 }
 
 pub mod input {
     use nc = ncurses_core;
-    use std::libc::{c_int,c_char};
+    use libc::{c_int,c_char};
     use super::chars::{raw_ch,ascii_ch,wide_ch,
                        move_ch,fcn_ch,reset_ch,action_ch,shift_ch,event_ch,
                        move_key,fcn_key,reset_key,action_key,shifted_key,event,
                        FromCInt};
+    use super::VecAsMutBuf;
 
     #[deriving(Clone)]
     pub enum get_err_act<RET> { Fail, Retry, Return(RET) }
 
     pub enum get_err_response<'a, RET> {
         Immed(get_err_act<RET>),
-        Delay('static ||:Send -> get_err_act<RET>),
+        Delay(fn() -> get_err_act<RET>),
     }
 
     pub fn getch_result_to_ch(result: c_int) -> raw_ch {
@@ -645,7 +692,7 @@ pub mod input {
         pub fn on_getch_err(&mut self, value: get_err_response<'a, raw_ch>) {
             self.on_getch_err_do = value;
         }
-        pub fn on_getstr_err(&mut self, value: get_err_response<'a, ~str>) {
+        pub fn on_getstr_err(&mut self, value: get_err_response<'a, String>) {
             self.on_getstr_err_do = value;
         }
     }
@@ -722,7 +769,7 @@ pub mod input {
     impl<'a> GetAscii for super::Context<'a> {
         // (deliberately not using unsafe nc::getstr fcn.)
 
-        fn getascii(&mut self, bytes: &mut [c_char]) {
+        fn getascii(&mut self, mut bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
                     let len = len as i32;
                     if len < 0 { fail!(); }
@@ -730,7 +777,7 @@ pub mod input {
                 });
         }
 
-        fn mvgetascii(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]) {
+        fn mvgetascii(&mut self, y: c_int, x: c_int, mut bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
                     let len = len as i32;
                     if len < 0 { fail!(); }
@@ -738,7 +785,7 @@ pub mod input {
                 });
         }
 
-        fn getnascii(&mut self, bytes: &mut [c_char], n: uint) {
+        fn getnascii(&mut self, mut bytes: &mut [c_char], n: uint) {
             bytes.as_mut_buf(|ptr, len| {
                     if n > len { fail!(); }
                     let n = n as i32;
@@ -750,7 +797,7 @@ pub mod input {
 
     impl<'a> GetAscii for super::Window<'a> {
 
-        fn getascii(&mut self, bytes: &mut [c_char]) {
+        fn getascii(&mut self, mut bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
                     let len = len as i32;
                     if len < 0 { fail!(); }
@@ -758,7 +805,7 @@ pub mod input {
                 });
         }
 
-        fn mvgetascii(&mut self, y: c_int, x: c_int, bytes: &mut [c_char]) {
+        fn mvgetascii(&mut self, y: c_int, x: c_int, mut bytes: &mut [c_char]) {
             bytes.as_mut_buf(|ptr, len| {
                     let len = len as i32;
                     if len < 0 { fail!(); }
@@ -766,7 +813,7 @@ pub mod input {
                 });
         }
 
-        fn getnascii(&mut self, bytes: &mut [c_char], n: uint) {
+        fn getnascii(&mut self, mut bytes: &mut [c_char], n: uint) {
             bytes.as_mut_buf(|ptr, len| {
                     if n > len { fail!(); }
                     let n = n as i32;
@@ -777,27 +824,29 @@ pub mod input {
     }
 
     trait GetStr {
-        fn getstr(&mut self) -> ~str;
-        fn getnstr(&mut self, n:uint) -> ~str;
-        fn mvgetstr(&mut self, y: c_int, x: c_int) -> ~str;
-        fn mvgetnstr(&mut self, y: c_int, x: c_int, n:uint) -> ~str;
+        fn getstr(&mut self) -> String;
+        fn getnstr(&mut self, n:uint) -> String;
+        fn mvgetstr(&mut self, y: c_int, x: c_int) -> String;
+        fn mvgetnstr(&mut self, y: c_int, x: c_int, n:uint) -> String;
     }
 
     impl<'a> GetStr for super::Context<'a> {
-        fn getstr(&mut self) -> ~str {
+        fn getstr(&mut self) -> String {
+            use super::HasYX;
             let (y,x) = self.getyx();
             self.mvgetnstr(y, x, nc::COLS as uint)
         }
-        fn getnstr(&mut self, n:uint) -> ~str {
+        fn getnstr(&mut self, n:uint) -> String {
+            use super::HasYX;
             let (y,x) = self.getyx();
             self.mvgetnstr(y, x, n)
         }
-        fn mvgetstr(&mut self, y: c_int, x: c_int) -> ~str {
+        fn mvgetstr(&mut self, y: c_int, x: c_int) -> String {
             self.mvgetnstr(y, x, nc::COLS as uint)
         }
-        fn mvgetnstr(&mut self, y: c_int, x: c_int, n:uint) -> ~str {
+        fn mvgetnstr(&mut self, y: c_int, x: c_int, n:uint) -> String {
             use std::{char,str,vec};
-            let mut result : ~[nc::wint_t] = vec::from_elem(n as uint, 0i32);
+            let mut result : Vec<nc::wint_t> = Vec::from_elem(n as uint, 0i32);
             'getstr: loop {
                 let r = unsafe {
                     result.as_mut_buf(|p, len| {
@@ -808,13 +857,13 @@ pub mod input {
                         })};
 
                 let mut saw_nonchar = false;
-                let chars = result.map(|&i| match char::from_u32(i as u32) {
-                        None    => { saw_nonchar = true; '_' }
-                        Some(c) => c,
-                    });
+                let chars : Vec<u8> = result.iter().map(|&i| match char::from_u32(i as u32) {
+                        None    => { saw_nonchar = true; '_' as u8 }
+                        Some(c) => c as u8,
+                    }).collect();
 
                 match r {
-                    nc::OK if !saw_nonchar => return str::from_chars(chars),
+                    nc::OK if !saw_nonchar => return String::from_utf8(chars).unwrap(),
                     _ => {
                         let act = match &self.on_getstr_err_do {
                             &Immed(ref act) => act.clone(),
@@ -834,7 +883,7 @@ pub mod input {
 
 pub mod moves {
     use nc = ncurses_core;
-    use std::libc::c_int;
+    use libc::c_int;
 
     pub trait Move {
         fn move(&mut self, y: c_int, x: c_int);
@@ -854,10 +903,10 @@ pub mod moves {
 
 pub mod background {
     use nc = ncurses_core;
-    use std::libc::c_int;
+    use libc::c_int;
     use super::chars;
     use ToCh = super::chars::HasChEncoding;
-    use WIN_p = nc::WINDOW_p;
+    use WIN_p = ncurses_core::WINDOW_p;
 
     unsafe fn bkgdset (c:nc::chtype) { nc::bkgdset(c) }
     unsafe fn wbkgdset (w:WIN_p, c:nc::chtype) { nc::wbkgdset(w, c) }
@@ -895,8 +944,9 @@ pub mod background {
 
 pub mod output {
     use nc = ncurses_core;
-    use std::libc::c_int;
+    use libc::c_int;
     use super::chars::{ch,encode};
+    use super::VecAsBuf;
     use ToCh = super::chars::HasChEncoding;
 
     fn addch(c: nc::chtype) {
@@ -990,38 +1040,38 @@ pub mod output {
 
     impl<'a> AddChstr for super::Context<'a> {
         fn addchnstr<E:ToCh>(&mut self, chs:&[E], n:uint) {
-            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            let v: Vec<nc::chtype> = chs.iter().map(|x| x.encode()).collect();
             addchnstr(v.as_slice(), n);
         }
         fn addchstr<E:ToCh>(&mut self, chs:&[E]) {
-            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            let v: Vec<nc::chtype> = chs.iter().map(|x| x.encode()).collect();
             addchnstr(v.as_slice(), v.len());
         }
         fn mvaddchnstr<E:ToCh>(&mut self, y: c_int, x: c_int, chs:&[E], n:uint) {
-            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            let v: Vec<nc::chtype> = chs.iter().map(|x| x.encode()).collect();
             mvaddchnstr(y, x, v.as_slice(), n);
         }
         fn mvaddchstr<E:ToCh>(&mut self, y: c_int, x: c_int, chs:&[E]) {
-            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            let v: Vec<nc::chtype> = chs.iter().map(|x| x.encode()).collect();
             mvaddchnstr(y, x, v.as_slice(), v.len());
         }
     }
 
     impl<'a> AddChstr for super::Window<'a> {
         fn addchnstr<E:ToCh>(&mut self, chs:&[E], n:uint) {
-            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            let v: Vec<nc::chtype> = chs.iter().map(|x| x.encode()).collect();
             waddchnstr(self.ptr, v.as_slice(), n);
         }
         fn addchstr<E:ToCh>(&mut self, chs:&[E]) {
-            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            let v: Vec<nc::chtype> = chs.iter().map(|x| x.encode()).collect();
             waddchnstr(self.ptr, v.as_slice(), v.len());
         }
         fn mvaddchnstr<E:ToCh>(&mut self, y: c_int, x: c_int, chs:&[E], n:uint) {
-            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            let v: Vec<nc::chtype> = chs.iter().map(|x| x.encode()).collect();
             mvwaddchnstr(self.ptr, y, x, v.as_slice(), n);
         }
         fn mvaddchstr<E:ToCh>(&mut self, y: c_int, x: c_int, chs:&[E]) {
-            let v: ~[nc::chtype] = chs.iter().map(|x| x.encode()).collect();
+            let v: Vec<nc::chtype> = chs.iter().map(|x| x.encode()).collect();
             mvwaddchnstr(self.ptr, y, x, v.as_slice(), v.len());
         }
     }
@@ -1037,7 +1087,7 @@ pub mod output {
             // let n = s.len() as c_int;
             // if n < 0 { fail!(); }
             // s.with_c_str(|p| { unsafe { fail_if_err!(nc::addnstr(p, n)) } });
-            let c : ~[char] = s.chars().collect();
+            let c : Vec<char> = s.chars().collect();
             c.as_imm_buf(|p, n| { unsafe {
                         let n = n as c_int;
                         if n < 0 { fail!(); }
@@ -1130,13 +1180,12 @@ pub mod output {
 
 mod screens {
     // use std::io::native::file::CFile;
-    use std::libc::types::common::c95::FILE;
-    use std::libc;
+    use libc::types::common::c95::FILE;
     use nc = ncurses_core;
     use ncurses_core::{WINDOW_p, SCREEN_p};
     type FilePtr = *FILE;
 
-    struct Screen { ptr: SCREEN_p }
+    pub struct Screen { pub ptr: SCREEN_p }
 
     impl Screen {
         pub unsafe fn wnd_ptr(&self) -> WINDOW_p {
@@ -1144,7 +1193,7 @@ mod screens {
         }
     }
 
-    fn newterm(type_: *libc::c_char, out_: FilePtr, in_: FilePtr) -> Screen {
+    fn newterm(type_: *::libc::c_char, out_: FilePtr, in_: FilePtr) -> Screen {
         let p = unsafe { nc::newterm(type_, out_, in_) };
         Screen { ptr: p }
     }
@@ -1201,7 +1250,7 @@ impl<'a> Context<'a> {
     }
     pub fn has_ins_del_char(&self) -> bool { unsafe { nc::has_ic() != 0 } }
     pub fn has_ins_del_line(&self) -> bool { unsafe { nc::has_il() != 0 } }
-    pub fn longname(&self) -> ~str {
+    pub fn longname(&self) -> String {
         use std::str;
         unsafe {
             let s: *libc::c_char = nc::longname();
