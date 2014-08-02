@@ -1,7 +1,9 @@
 // warning about unused static definitions seems over-zealous to me.
-#[allow(dead_code)];
+#![allow(dead_code)]
+#![allow(non_camel_case_types)]
 
-use std::libc;
+use libc;
+
 pub use signal = self::wrap_signal;
 
 pub static SIGHUP    : libc::c_int = 1; /* hangup */
@@ -33,6 +35,7 @@ pub static SIGUSR1   : libc::c_int = 30; /* user defined signal 1 */
 pub static SIGUSR2   : libc::c_int = 31; /* user defined signal 2 */
 
 #[deriving(Clone)]
+#[repr(i32)]
 pub enum name_t {
     HUP  = SIGHUP,  INT  = SIGINT,  QUIT = SIGQUIT,
     ILL  = SIGILL,  TRAP = SIGTRAP, ABRT = SIGABRT,
@@ -86,8 +89,8 @@ impl name_t {
 pub type handler_t = extern "C" fn(libc::c_int);
 
 mod ffi {
-    use std::libc;
     use super::handler_t;
+    use libc;
 
     extern "C" {
         pub fn signal(sig: libc::c_int, func: handler_t) -> handler_t;

@@ -1,7 +1,7 @@
 #![feature(macro_rules)]
 #![feature(globs)]
 #![feature(link_args)]
-#![crate_id="ncurses_core#5.7"]
+#![crate_name="ncurses_core"]
 
 extern crate libc;
 

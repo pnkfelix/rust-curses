@@ -1,20 +1,22 @@
 #![feature(macro_rules)]
 #![feature(link_args)]
+#![feature(unsafe_destructor)]
 
-#![crate_id="ncurses#5.7"]
+#![allow(non_camel_case_types)]
+#![allow(dead_code)]
+
+#![crate_name="ncurses"]
+#![crate_type="lib"]
 
 extern crate libc;
 
-use std::mem;
-use std::ptr;
-use std::vec;
 use nc = ncurses_core;
 use ncurses_core::{WINDOW_p, SCREEN_p};
 
 pub fn lines() -> libc::c_int { nc::LINES }
 pub fn cols() -> libc::c_int { nc::COLS }
 
-mod ncurses_core;
+pub mod ncurses_core;
 
 pub struct Context<'a> {
     on_getch_err_do: input::get_err_response<'a, chars::raw_ch>,
@@ -88,6 +90,7 @@ pub mod attrs {
 
     use super::colors;
 
+    #[repr(i32)]
     pub enum display {
         normal = nc::A_NORMAL, //        Normal display (no highlight)
         standout = nc::A_STANDOUT, //      Best highlighting mode of the terminal.
@@ -320,7 +323,7 @@ fn endwin() {
 }
 
 impl<'a> Context<'a> {
-    pub fn new() -> Context {
+    pub fn new() -> Context<'a> {
         let c = Context {
             on_getch_err_do: input::Immed(input::Fail),
             on_getstr_err_do: input::Immed(input::Fail),
@@ -330,6 +333,7 @@ impl<'a> Context<'a> {
     }
 }
 
+#[unsafe_destructor]
 impl<'a> Drop for Context<'a> {
     fn drop(&mut self) { endwin(); }
 }
@@ -350,6 +354,7 @@ pub mod chars {
 
     pub trait FromCInt { fn from_c_int(i:c_int) -> Self; }
 
+    #[repr(i32)]
     pub enum move_key {
         down = nc::KEY_DOWN , up = nc::KEY_UP, left = nc::KEY_LEFT, right = nc::KEY_RIGHT,
         home = nc::KEY_HOME, backspace = nc::KEY_BACKSPACE
@@ -360,10 +365,11 @@ pub mod chars {
     }
     impl FromCInt for move_key {
         fn from_c_int(i:c_int) -> move_key {
-            let i = i as i16; assert!(move_key::covers(i as i32)); unsafe { x(i) }
+            let i = i as i32; assert!(move_key::covers(i as i32)); unsafe { x(i) }
         }
     }
 
+    #[repr(i32)]
     pub enum fcn_key {
         f0  = nc::KEY_F0,  f1  = nc::KEY_F1,  f2  = nc::KEY_F2,  f3  = nc::KEY_F3,
         f4  = nc::KEY_F4,  f5  = nc::KEY_F5,  f6  = nc::KEY_F6,  f7  = nc::KEY_F7,
@@ -376,10 +382,11 @@ pub mod chars {
     }
     impl FromCInt for fcn_key {
         fn from_c_int(i:c_int) -> fcn_key {
-            let i = i as i16; assert!(fcn_key::covers(i as i32)); unsafe { x(i) }
+            let i = i as i32; assert!(fcn_key::covers(i as i32)); unsafe { x(i) }
         }
     }
 
+    #[repr(i32)]
     pub enum reset_key {
         // all of these are listed as "unreliable" in the header
         break_ = nc::KEY_BREAK, sreset = nc::KEY_SRESET, reset = nc::KEY_RESET
@@ -392,10 +399,11 @@ pub mod chars {
     }
     impl FromCInt for reset_key {
         fn from_c_int(i:c_int) -> reset_key { 
-            let i = i as i16; assert!(reset_key::covers(i as i32)); unsafe { x(i) }
+            let i = i as i32; assert!(reset_key::covers(i as i32)); unsafe { x(i) }
         }
     }
 
+    #[repr(i32)]
     pub enum action_key {
         delete_line = nc::KEY_DL,
         insert_line = nc::KEY_IL,
@@ -459,10 +467,11 @@ pub mod chars {
     }
     impl FromCInt for action_key {
         fn from_c_int(i:c_int) -> action_key {
-            let i = i as i16; assert!(action_key::covers(i as i32)); unsafe { x(i) }
+            let i = i as i32; assert!(action_key::covers(i as i32)); unsafe { x(i) }
         }
     }
 
+    #[repr(i32)]
     pub enum shifted_key {
         shifted_begin = nc::KEY_SBEG,
         shifted_cancel = nc::KEY_SCANCEL,
@@ -499,9 +508,10 @@ pub mod chars {
         pub fn covers(i:c_int) -> bool { nc::KEY_SBEG <= i && i <= nc::KEY_SUNDO }
     }
     impl FromCInt for shifted_key {
-        fn from_c_int(i:c_int) -> shifted_key { let i = i as i16; assert!(shifted_key::covers(i as i32)); unsafe { x(i) } }
+        fn from_c_int(i:c_int) -> shifted_key { let i = i as i32; assert!(shifted_key::covers(i as i32)); unsafe { x(i) } }
     }
 
+    #[repr(i32)]
     pub enum event {
         mouse = nc::KEY_MOUSE, // /* Mouse event has occurred */
         resize = nc::KEY_RESIZE, // /* Terminal resize event */
@@ -515,7 +525,7 @@ pub mod chars {
     }
 
     impl FromCInt for event {
-        fn from_c_int(i:c_int) -> event { let i = i as i16; assert!(event::covers(i as i32)); unsafe { x(i) } }
+        fn from_c_int(i:c_int) -> event { let i = i as i32; assert!(event::covers(i as i32)); unsafe { x(i) } }
     }
 
     pub enum raw_ch {
@@ -585,6 +595,7 @@ pub mod colors {
 
     pub type pair_num = ::libc::c_short;
 
+    #[repr(i32)]
     pub enum color {
         Black = nc::COLOR_BLACK,
         Red = nc::COLOR_RED,
@@ -616,7 +627,7 @@ pub mod colors {
 }
 
 trait VecAsBuf<T> {
-    fn as_imm_buf<A>(&self, k:|ptr: *T, len: uint| -> A) -> A;
+    fn as_imm_buf<A>(&self, k:|ptr: *const T, len: uint| -> A) -> A;
 }
 
 trait VecAsMutBuf<T> : VecAsBuf<T> {
@@ -624,7 +635,7 @@ trait VecAsMutBuf<T> : VecAsBuf<T> {
 }
 
 impl<'a,T> VecAsBuf<T> for &'a [T] {
-    fn as_imm_buf<A>(&self, k:|ptr: *T, len: uint| -> A) -> A {
+    fn as_imm_buf<A>(&self, k:|ptr: *const T, len: uint| -> A) -> A {
         let len = self.len();
         let ptr = self.as_ptr();
         k(ptr, len)
@@ -632,9 +643,9 @@ impl<'a,T> VecAsBuf<T> for &'a [T] {
 }
 
 impl<'a,T> VecAsBuf<T> for &'a mut [T] {
-    fn as_imm_buf<A>(&self, k:|ptr: *T, len: uint| -> A) -> A {
+    fn as_imm_buf<A>(&self, k:|ptr: *const T, len: uint| -> A) -> A {
         let len = self.len();
-        let ptr = self.as_ptr() as *T;
+        let ptr = self.as_ptr() as *const T;
         k(ptr, len)
     }
 }
@@ -648,7 +659,7 @@ impl<'a,T> VecAsMutBuf<T> for &'a mut [T] {
 }
 
 impl<T> VecAsBuf<T> for Vec<T> {
-    fn as_imm_buf<A>(&self, k:|ptr: *T, len: uint| -> A) -> A {
+    fn as_imm_buf<A>(&self, k:|ptr: *const T, len: uint| -> A) -> A {
         self.as_slice().as_imm_buf(k)
     }
 }
@@ -845,7 +856,7 @@ pub mod input {
             self.mvgetnstr(y, x, nc::COLS as uint)
         }
         fn mvgetnstr(&mut self, y: c_int, x: c_int, n:uint) -> String {
-            use std::{char,str,vec};
+            use std::{char};
             let mut result : Vec<nc::wint_t> = Vec::from_elem(n as uint, 0i32);
             'getstr: loop {
                 let r = unsafe {
@@ -962,7 +973,7 @@ pub mod output {
         unsafe { fail_if_err!(nc::mvwaddch(p, y, x, c)); }
     }
 
-    trait AddCh {
+    pub trait AddCh {
         fn addch<E:ToCh>(&mut self, c: E);
         fn mvaddch<E:ToCh>(&mut self, y: c_int, x: c_int, c: E);
     }
@@ -986,7 +997,7 @@ pub mod output {
     }
 
     fn add_wch(c:&nc::cchar_t) {
-        unsafe { fail_if_err!(nc::add_wch(c as *nc::cchar_t)); }
+        unsafe { fail_if_err!(nc::add_wch(c as *const nc::cchar_t)); }
     }
 
     // impl<'a> super::Context<'a> { }
@@ -1091,7 +1102,7 @@ pub mod output {
             c.as_imm_buf(|p, n| { unsafe {
                         let n = n as c_int;
                         if n < 0 { fail!(); }
-                        fail_if_err!(nc::addnwstr(p as *i32, n))
+                        fail_if_err!(nc::addnwstr(p as *const i32, n))
                     } });
         }
         pub fn mvaddstr(&mut self, y: c_int, x: c_int, s: &str) {
@@ -1178,12 +1189,12 @@ pub mod output {
     }
 }
 
-mod screens {
+pub mod screens {
     // use std::io::native::file::CFile;
     use libc::types::common::c95::FILE;
     use nc = ncurses_core;
     use ncurses_core::{WINDOW_p, SCREEN_p};
-    type FilePtr = *FILE;
+    type FilePtr = *const FILE;
 
     pub struct Screen { pub ptr: SCREEN_p }
 
@@ -1193,7 +1204,7 @@ mod screens {
         }
     }
 
-    fn newterm(type_: *::libc::c_char, out_: FilePtr, in_: FilePtr) -> Screen {
+    fn newterm(type_: *const ::libc::c_char, out_: FilePtr, in_: FilePtr) -> Screen {
         let p = unsafe { nc::newterm(type_, out_, in_) };
         Screen { ptr: p }
     }
@@ -1251,10 +1262,10 @@ impl<'a> Context<'a> {
     pub fn has_ins_del_char(&self) -> bool { unsafe { nc::has_ic() != 0 } }
     pub fn has_ins_del_line(&self) -> bool { unsafe { nc::has_il() != 0 } }
     pub fn longname(&self) -> String {
-        use std::str;
+        use std::string::raw;
         unsafe {
-            let s: *libc::c_char = nc::longname();
-            str::raw::from_c_str(s)
+            let s: *const libc::c_char = nc::longname();
+            raw::from_buf(s as *const u8)
         }
     }
 

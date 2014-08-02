@@ -1,12 +1,13 @@
 // Adapted from a read-through of:
 //   http://invisible-island.net/ncurses/ncurses-intro.html
 
-#[allow(unused_imports)];
+#![allow(unused_imports)]
 
-extern mod ncurses (vers = "5.7");
+extern crate ncurses; // = "ncurses_core#5.7";
+extern crate libc;
+extern crate debug;
 
 use sig = signal_h;
-use std::libc;
 use std::os;
 
 mod signal_h;
@@ -118,7 +119,7 @@ pub fn main() {
         }
 
         let name = context.longname();
-        context.addstr(name);
+        context.addstr(name.as_slice());
         context.bkgd(chars::ascii_ch('_' as i8));
         context.bkgdset(chars::ascii_ch('*' as i8));
 
@@ -130,7 +131,7 @@ pub fn main() {
                 chars::wide_ch(wc)  => format!("wide_ch('{}')", wc),
                 _                   => format!("{:?}", c),
             };
-            context.mvaddstr(0, 0, desc);
+            context.mvaddstr(0, 0, desc.as_slice());
             context.move(y, x);
 
             // process the command keystroke
